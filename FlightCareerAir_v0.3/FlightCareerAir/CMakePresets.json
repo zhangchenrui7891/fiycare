@@ -1,0 +1,10 @@
+{
+ "version":3,
+ "cmakeMinimumRequired":{"major":3,"minor":21,"patch":0},
+ "configurePresets":[
+  {"name":"windows-release","displayName":"Windows x64 Release","generator":"Ninja","binaryDir":"${sourceDir}/out/build/release","cacheVariables":{"CMAKE_BUILD_TYPE":"Release"},"architecture":{"value":"x64","strategy":"external"},"condition":{"type":"equals","lhs":"${hostSystemName}","rhs":"Windows"}},
+  {"name":"portable-tests","displayName":"Portable physics tests","generator":"Unix Makefiles","binaryDir":"${sourceDir}/out/build/tests","cacheVariables":{"CMAKE_BUILD_TYPE":"Release"},"condition":{"type":"notEquals","lhs":"${hostSystemName}","rhs":"Windows"}}
+ ],
+ "buildPresets":[{"name":"windows-release","configurePreset":"windows-release"},{"name":"portable-tests","configurePreset":"portable-tests"}],
+ "testPresets":[{"name":"windows-release","configurePreset":"windows-release","output":{"outputOnFailure":true}},{"name":"portable-tests","configurePreset":"portable-tests","output":{"outputOnFailure":true}}]
+}

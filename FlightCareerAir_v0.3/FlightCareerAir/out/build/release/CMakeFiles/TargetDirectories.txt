@@ -1,0 +1,5 @@
+C:/Users/Lenovo/Downloads/FlightCareerAir_v0.3/FlightCareerAir/out/build/release/CMakeFiles/physics_check.dir
+C:/Users/Lenovo/Downloads/FlightCareerAir_v0.3/FlightCareerAir/out/build/release/CMakeFiles/FlightCareerAir.dir
+C:/Users/Lenovo/Downloads/FlightCareerAir_v0.3/FlightCareerAir/out/build/release/CMakeFiles/test.dir
+C:/Users/Lenovo/Downloads/FlightCareerAir_v0.3/FlightCareerAir/out/build/release/CMakeFiles/edit_cache.dir
+C:/Users/Lenovo/Downloads/FlightCareerAir_v0.3/FlightCareerAir/out/build/release/CMakeFiles/rebuild_cache.dir
