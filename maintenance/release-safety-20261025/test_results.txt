@@ -1,0 +1,1 @@
+PASS: 10 scenarios: stale temporary exclusion, failed first write, valid ZIP/hash manifest, deterministic rerun, failed overwrite, CRC rejection, hash rejection, replace denial, interruption, successful replacement
