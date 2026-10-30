@@ -1,0 +1,16 @@
+{
+ "date": "2026-10-31",
+ "version": "0.44",
+ "baseline": "v0.43 file version24; 1940 manifest hashes verified",
+ "linux_release_assimp": "PASS 254 build steps",
+ "linux_ctest": "26/26 PASS",
+ "strict_cpp17": "PASS original suite and new launch tests; renderer integration separately PASS",
+ "new_asan_ubsan": "launch options and actual renderer selection with CPU substitutes PASS, detect_leaks=0",
+ "windows_module": "MSVC19.44 /W4 /WX /utf-8 /EHsc; 2/2 real Windows tests PASS",
+ "windows_module_commit": "d2bf7a1f09656d17a94cb938168e4bd6659fd07b",
+ "windows_module_run": "https://github.com/zhangchenrui7891/fiycare/actions/runs/41135044245",
+ "full_windows_application": "NOT BUILT or RUN",
+ "target_HD6000_graphics_performance": "NOT MEASURED",
+ "exe_in_source_package": false,
+ "github_full_mirror": "NOT uploaded; change set and standalone module test only"
+}

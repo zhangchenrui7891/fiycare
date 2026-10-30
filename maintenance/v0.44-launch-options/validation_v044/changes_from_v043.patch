@@ -1,0 +1,196 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,7 +1,7 @@
+ cmake_minimum_required(VERSION 3.22)
+ include("${CMAKE_CURRENT_LIST_DIR}/tools/repair_build_timestamps.cmake")
+ fcair_check_build_timestamps("${CMAKE_CURRENT_LIST_DIR}" FALSE)
+-project(FlightCareerAir VERSION 0.43.0 LANGUAGES C CXX)
++project(FlightCareerAir VERSION 0.44.0 LANGUAGES C CXX)
+ set(CMAKE_CXX_STANDARD 17)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+ set(CMAKE_CXX_EXTENSIONS OFF)
+@@ -50,10 +50,12 @@
+ add_executable(navigation_track_check navigation_track_tests.cpp)
+ add_executable(benchmark_check benchmark_tests.cpp)
+ add_executable(performance_window_check performance_window_tests.cpp)
++add_executable(launch_options_check launch_options_tests.cpp)
+ find_package(Threads REQUIRED)
+ add_executable(terrain_stream_check terrain_stream_tests.cpp)
+ target_link_libraries(terrain_stream_check PRIVATE Threads::Threads)
+ enable_testing()
++add_test(NAME exact_launch_options COMMAND launch_options_check)
+ find_package(Python3 QUIET COMPONENTS Interpreter)
+ if(Python3_Interpreter_FOUND AND CMAKE_GENERATOR MATCHES "^Ninja")
+  add_test(NAME build_timestamp_recovery COMMAND "${Python3_EXECUTABLE}"
+@@ -61,6 +63,8 @@
+    --cmake "${CMAKE_COMMAND}" --ninja "${CMAKE_MAKE_PROGRAM}")
+ endif()
+ if(Python3_Interpreter_FOUND AND NOT WIN32)
++ add_test(NAME launch_renderer_integration COMMAND "${Python3_EXECUTABLE}"
++   "${CMAKE_CURRENT_SOURCE_DIR}/tools/check_launch_integration.py")
+  add_test(NAME rebuilt_diagnostic_storage COMMAND "${Python3_EXECUTABLE}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/tools/check_rebuilt_storage.py")
+  add_test(NAME rebuilt_cockpit_text COMMAND "${Python3_EXECUTABLE}"
+@@ -94,6 +98,13 @@
+ add_test(NAME laboratory_surface_sweep COMMAND flight_lab sweep "${CMAKE_CURRENT_BINARY_DIR}/lab_check/sweep")
+ add_test(NAME laboratory_engine_out COMMAND flight_lab scenario --surface --aircraft 3 --seconds 90 --fail-left 15 --output "${CMAKE_CURRENT_BINARY_DIR}/lab_check/engine_out")
+ if(WIN32)
++ add_executable(windows_launch_check windows_launch_tests.cpp)
++ target_link_libraries(windows_launch_check PRIVATE shell32)
++ add_test(NAME windows_command_line_parsing COMMAND windows_launch_check)
++ if(MSVC)
++  target_compile_options(windows_launch_check PRIVATE /W4 /utf-8 /EHsc)
++  target_compile_options(launch_options_check PRIVATE /W4 /utf-8 /EHsc)
++ endif()
+  add_executable(shader_check shader_tests.cpp)
+  target_compile_definitions(shader_check PRIVATE UNICODE _UNICODE NOMINMAX)
+  target_link_libraries(shader_check PRIVATE d3dcompiler)
+@@ -108,7 +119,7 @@
+  endif()
+  add_custom_command(TARGET FlightCareerAir POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/assets" "$<TARGET_FILE_DIR:FlightCareerAir>/assets")
+  target_compile_definitions(FlightCareerAir PRIVATE UNICODE _UNICODE NOMINMAX)
+- target_link_libraries(FlightCareerAir PRIVATE d3d12 d3d11 dxgi d3dcompiler user32 gdi32 comdlg32)
++ target_link_libraries(FlightCareerAir PRIVATE d3d12 d3d11 dxgi d3dcompiler user32 gdi32 comdlg32 shell32)
+  if(MSVC)
+   target_compile_options(FlightCareerAir PRIVATE /W4 /utf-8 /EHsc)
+   target_compile_options(physics_check PRIVATE /W4 /utf-8)
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -1,4 +1,5 @@
+ #include "graphics.h"
++#include "windows_launch.h"
+ #include "scene.h"
+ #include "storage.h"
+ #include "tutorial.h"
+@@ -110,30 +111,30 @@
+   L"存档/照片/日志：%LOCALAPPDATA%\\FlightCareerAir\n"
+   L"诊断输出另存：diagnostics\\benchmark 或 diagnostics\\smoke；不保存游戏生涯。\n"
+   L"DX12初始化失败会自动尝试DX11；可用--dx11强制兼容模式。",
+-  L"飞行生涯 v0.43 · 中文操作说明",MB_OK);
++  L"飞行生涯 v0.44 · 中文操作说明",MB_OK);
+ }
+-int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR command,int){
++int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
+  std::filesystem::path folder;
+  try{
+-  const std::wstring args(command);const bool benchmark=args.find(L"--benchmark")!=std::wstring::npos;const bool low=args.find(L"--low")!=std::wstring::npos||benchmark;const bool smoke=args.find(L"--smoke-test")!=std::wstring::npos;int smokeFrames=0;
++  const auto args=launch::currentOptions();const bool benchmark=args.has(L"--benchmark");const bool low=args.has(L"--low")||benchmark;const bool smoke=args.has(L"--smoke-test");int smokeFrames=0;
+   const runfiles::RunFiles runFiles(dataFolder(),benchmark,smoke);
+   folder=runFiles.folder();std::filesystem::create_directories(folder);
+-  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.43 startup");
++  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.44 startup");
+   if(!runFiles.gameSavesEnabled())logLine("Diagnostic output isolated; live game saves disabled");
+   sim::Snapshot state;bool loaded=false,primaryValid=false;
+   {std::ifstream saved(folder/L"state.txt");if(saved){if(!state.read(saved))logLine("Invalid state.txt ignored; attempting legacy career");else {loaded=primaryValid=true;logLine("Loaded compatible full flight state");}}}
+   if(!loaded){std::ifstream backup(folder/L"state.bak");if(backup&&state.read(backup)){loaded=true;logLine("Recovered state.bak");}}
+   if(!loaded){std::ifstream legacy(folder/L"career.txt");state.career.load(legacy);logLine("Legacy v2 career migration attempted");}
+-  if(smoke&&(args.find(L"--airliner")!=std::wstring::npos||args.find(L"--a330")!=std::wstring::npos||args.find(L"--a350")!=std::wstring::npos)){state.flight=sim::Flight{};state.flight.configure(args.find(L"--a350")!=std::wstring::npos?3:args.find(L"--a330")!=std::wstring::npos?2:1);state.career.stage=state.career.gate=0;}
+-  if(smoke){state.clock=args.find(L"--sunset")!=std::wstring::npos?17.4:12;state.exposureEV=0;state.terrainMode=1;state.haze=.00016;state.shadows=true;}
+-  if(benchmark){state=sim::Snapshot{};state.flight.configure(3);state.clock=12;state.exposureEV=0;state.terrainMode=1;state.haze=.00016;state.shadows=true;state.antiAlias=args.find(L"--no-aa")==std::wstring::npos;}
++  if(smoke&&(args.has(L"--airliner")||args.has(L"--a330")||args.has(L"--a350"))){state.flight=sim::Flight{};state.flight.configure(args.has(L"--a350")?3:args.has(L"--a330")?2:1);state.career.stage=state.career.gate=0;}
++  if(smoke){state.clock=args.has(L"--sunset")?17.4:12;state.exposureEV=0;state.terrainMode=1;state.haze=.00016;state.shadows=true;}
++  if(benchmark){state=sim::Snapshot{};state.flight.configure(3);state.clock=12;state.exposureEV=0;state.terrainMode=1;state.haze=.00016;state.shadows=true;state.antiAlias=!args.has(L"--no-aa");}
+   if(smoke){
+-   if(args.find(L"--night")!=std::wstring::npos)state.clock=0;
+-   if(args.find(L"--flood-off")!=std::wstring::npos)state.cockpitFlood=false;
++   if(args.has(L"--night"))state.clock=0;
++   if(args.has(L"--flood-off"))state.cockpitFlood=false;
+    else state.cockpitFlood=true;
+-   state.panelBrightness=args.find(L"--panel-dim")!=std::wstring::npos?.25:.75;
++   state.panelBrightness=args.has(L"--panel-dim")?.25:.75;
+   }
+-  if(args.find(L"--surface-flight")!=std::wstring::npos){state.flight.setSurfaceModel(true);state.debugPanel=true;state.showForces=true;}
++  if(args.has(L"--surface-flight")){state.flight.setSurfaceModel(true);state.debugPanel=true;state.showForces=true;}
+   sim::worldMode.store(state.terrainMode);
+   auto& flight=state.flight;auto& career=state.career;bool backupEligible=primaryValid;
+   auto save=[&](){
+@@ -148,11 +149,11 @@
+   const DWORD style=WS_OVERLAPPEDWINDOW;
+   WNDCLASSW wc{};wc.lpfnWndProc=windowProc;wc.hInstance=instance;wc.lpszClassName=L"FlightCareerAir";wc.hCursor=LoadCursor(nullptr,IDC_ARROW);if(!RegisterClassW(&wc))throw std::runtime_error("Window registration failed");
+   RECT bounds{0,0,low?640:1600,low?360:900};HMENU nativeMenu=createChineseMenu();AdjustWindowRect(&bounds,style,TRUE);
+-  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.43 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
++  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.44 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
+   if(!window)throw std::runtime_error("Window creation failed");ShowWindow(window,SW_SHOW);
+-  if(args.find(L"--fullscreen")!=std::wstring::npos)toggleFullscreen(window);
+-  if(args.find(L"--native")!=std::wstring::npos)renderScale=1;
+-  const std::wstring renderArgs=benchmark?args+L" --low":args;
++  if(args.has(L"--fullscreen"))toggleFullscreen(window);
++  if(args.has(L"--native"))renderScale=1;
++  const auto renderArgs=benchmark?args.with(L"--low"):args;
+   auto renderer=createRenderer(window,renderArgs);
+   RECT renderClient{};GetClientRect(window,&renderClient);
+   LONG clientWidth=renderClient.right,clientHeight=renderClient.bottom;UINT appliedScale=renderScale;
+@@ -168,8 +169,8 @@
+   {std::ifstream in(folder/L"tracks.txt");float x,z;while(marks.size()<400&&in>>x>>z)if(std::isfinite(x)&&std::isfinite(z))marks.push_back({x,z});}
+   auto saveTracks=[&](){if(!runFiles.gameSavesEnabled())return;std::ofstream out(folder/L"tracks.txt");for(auto m:marks)out<<m.x<<' '<<m.z<<'\n';};
+   int camera=0;
+-  if((smoke&&args.find(L"--cockpit")!=std::wstring::npos)||benchmark)camera=1;
+-  if(args.find(L"--no-aa")!=std::wstring::npos)state.antiAlias=false;else if(smoke)state.antiAlias=true;
++  if((smoke&&args.has(L"--cockpit"))||benchmark)camera=1;
++  if(args.has(L"--no-aa"))state.antiAlias=false;else if(smoke)state.antiAlias=true;
+   bool paused=smoke,walking=false,powerSaver=low&&!benchmark;ui::Page menuPage=(smoke||benchmark)?ui::Page::None:ui::Page::Home;XMFLOAT3 walker{};float walkYaw=0;
+   presentation::TerrainStream<std::vector<Vertex>> terrainStream;
+   presentation::FrameGeometry<Vertex> frameGeometry;frameGeometry.scene.reserve(140000);
+@@ -445,7 +446,7 @@
+     perf.flush();reportTime=0;
+    }
+    std::wostringstream display;display<<std::fixed<<std::setprecision(0);
+-   display<<L"飞行生涯 v0.43  |  "<<wideUtf8(renderer->name())<<L"  |  "<<frameStats.fps<<L" 帧/秒  |  "<<(walking?L"步行":L"飞行")<<((paused||menuPage!=ui::Page::None)?L" · 已暂停":L"")<<L"\n";
++   display<<L"飞行生涯 v0.44  |  "<<wideUtf8(renderer->name())<<L"  |  "<<frameStats.fps<<L" 帧/秒  |  "<<(walking?L"步行":L"飞行")<<((paused||menuPage!=ui::Page::None)?L" · 已暂停":L"")<<L"\n";
+    const auto air=sim::airData(flight,state.avionics.qnh);
+    display<<L"航电 "<<(state.avionics.powered(flight)?L"在线":L"断电")<<L" · IAS "<<air.ias*3.6<<L" · TAS "<<air.tas*3.6<<L" · GS "<<air.groundSpeed*3.6<<L" km/h · QNH "<<state.avionics.qnh<<L"\n";
+    display<<flight.spec().name<<L"  空速 "<<flight.airspeed()*3.6<<L" 公里/时  高度 "<<flight.y<<L" 米  升降 "<<flight.vy<<L" 米/秒\n";
+@@ -483,7 +484,7 @@
+    if(smoke&&++smokeFrames>=3){logLine("Smoke test: three rendered frames and BMP capture succeeded");DestroyWindow(window);}
+    if(benchmark&&timing::benchmarkFinished(benchmarkStarted,benchmarkSamples)){
+     std::ofstream summary(folder/L"performance_summary.txt",std::ios::trunc);
+-    const auto result=timing::writeBenchmarkSummary(summary,"v0.43",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples);
++    const auto result=timing::writeBenchmarkSummary(summary,"v0.44",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples);
+     summary.flush();if(!summary)logLine("Benchmark summary write failed; no report file success claimed");
+     pendingPhoto=folder/L"benchmark_final.bmp";renderer->draw(mesh,hud,XMMatrixLookToLH(XMVectorZero(),viewDirection,up)*reversedPerspective(activeFov,cockpit::viewportAspect,presentation::worldNear,presentation::worldFar),daylight,pendingPhoto,cabin,cabinView);pendingPhoto.clear();
+     logLine(result.complete?"Benchmark completed with valid full-run statistics":"Benchmark ended without a valid performance verdict; inspect summary status/counts");DestroyWindow(window);
+--- a/src/graphics.h
++++ b/src/graphics.h
+@@ -1,16 +1,17 @@
+ #pragma once
+ #include "renderer12.h"
+ #include "renderer11.h"
++#include "launch_options.h"
+ inline UINT renderScale=2;
+-inline std::unique_ptr<IRenderer> createRenderer(HWND window,const std::wstring& args){
++inline std::unique_ptr<IRenderer> createRenderer(HWND window,const launch::Options& args){
+  RECT client{};GetClientRect(window,&client);
+  const UINT renderWidth=UINT(std::max(1L,client.right)),renderHeight=UINT(std::max(1L,client.bottom));
+- bool force11=args.find(L"--dx11")!=std::wstring::npos;
+- bool force12=args.find(L"--dx12")!=std::wstring::npos;
+- bool software=args.find(L"--warp")!=std::wstring::npos;
++ bool force11=args.has(L"--dx11");
++ bool force12=args.has(L"--dx12");
++ bool software=args.has(L"--warp");
+  if(!force11){
+-  try{auto r=std::make_unique<Renderer12>();if(args.find(L"--low")!=std::wstring::npos){r->width=640;r->height=360;}else{r->width=renderWidth*renderScale;r->height=renderHeight*renderScale;}r->init(window,software);logLine("Selected DX12");logShaderBytecodeCache();return r;}
++  try{auto r=std::make_unique<Renderer12>();if(args.has(L"--low")){r->width=640;r->height=360;}else{r->width=renderWidth*renderScale;r->height=renderHeight*renderScale;}r->init(window,software);logLine("Selected DX12");logShaderBytecodeCache();return r;}
+   catch(const std::exception& e){logLine(std::string("DX12 initialization: ")+e.what());if(force12)throw;}
+  }
+- auto r=std::make_unique<Renderer11>();if(args.find(L"--low")!=std::wstring::npos){r->width=640;r->height=360;}else{r->width=renderWidth*renderScale;r->height=renderHeight*renderScale;}r->init(window,software);logLine(software?"Selected DX11 software (diagnostic only)":"Selected DX11 hardware compatibility mode");logShaderBytecodeCache();return r;
++ auto r=std::make_unique<Renderer11>();if(args.has(L"--low")){r->width=640;r->height=360;}else{r->width=renderWidth*renderScale;r->height=renderHeight*renderScale;}r->init(window,software);logLine(software?"Selected DX11 software (diagnostic only)":"Selected DX11 hardware compatibility mode");logShaderBytecodeCache();return r;
+ }
+--- a/tools/check_portable.sh
++++ b/tools/check_portable.sh
+@@ -4,7 +4,7 @@
+ task_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+ task_build="${1:-$task_root/out/portable}"
+ mkdir -p -- "$task_build"
+-for task_test in tests aero_avionics_tests engineering_tests stability_tests terrain_stream_tests frame_geometry_tests shader_cache_tests keyboard_state_tests keyboard_event_tests cockpit_input_tests cockpit_solids_tests approach_tests navigation_tests navigation_track_tests benchmark_tests performance_window_tests; do
++for task_test in tests aero_avionics_tests engineering_tests stability_tests terrain_stream_tests frame_geometry_tests shader_cache_tests keyboard_state_tests keyboard_event_tests cockpit_input_tests cockpit_solids_tests approach_tests navigation_tests navigation_track_tests benchmark_tests performance_window_tests launch_options_tests; do
+     g++ -std=c++17 -O2 -pthread -Wall -Wextra -Werror -pedantic \
+         "$task_root/$task_test.cpp" -o "$task_build/$task_test"
+     case "$task_test" in
+@@ -17,6 +17,6 @@
+ "$task_build/flight_lab" sweep "$task_build/lab/sweep"
+ "$task_build/flight_lab" scenario --surface --aircraft 3 --seconds 90 \
+     --fail-left 15 --output "$task_build/lab/engine_out"
+-for task_script in check_rebuilt_text check_rebuilt_storage check_frame_upload check_shader_cache_integration check_keyboard_integration check_approach_integration check_menus; do
++for task_script in check_launch_integration check_rebuilt_text check_rebuilt_storage check_frame_upload check_shader_cache_integration check_keyboard_integration check_approach_integration check_menus; do
+     python3 "$task_root/tools/$task_script.py"
+ done

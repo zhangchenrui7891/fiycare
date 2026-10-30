@@ -1,0 +1,34 @@
+Source: https://github.com/zhangchenrui7891/fiycare/actions/runs/41135044245
+Commit: d2bf7a1f09656d17a94cb938168e4bd6659fd07b
+Scope: only launch module and two standalone regression executables; not full app or GPU.
+2026-10-30T22:00:02.4154622Z -- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.20348.
+2026-10-30T22:00:19.1133909Z -- The CXX compiler identification is MSVC 19.44.35229.0
+2026-10-30T22:00:19.3556635Z -- Detecting CXX compiler ABI info
+2026-10-30T22:00:20.4523823Z -- Detecting CXX compiler ABI info - done
+2026-10-30T22:00:20.4652739Z -- Check for working CXX compiler: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+2026-10-30T22:00:20.4664448Z -- Detecting CXX compile features
+2026-10-30T22:00:20.4674951Z -- Detecting CXX compile features - done
+2026-10-30T22:00:20.4762623Z -- Configuring done (18.7s)
+2026-10-30T22:00:20.4931368Z -- Generating done (0.0s)
+2026-10-30T22:00:20.4937103Z -- Build files have been written to: D:/a/fiycare/fiycare/out/launch-check
+2026-10-30T22:00:20.6842808Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-10-30T22:00:20.7089987Z 
+2026-10-30T22:00:21.2284054Z   1>Checking Build System
+2026-10-30T22:00:21.4318448Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.44-launch-options/CMakeLists.txt
+2026-10-30T22:00:21.5356926Z   launch_options_tests.cpp
+2026-10-30T22:00:21.6486579Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.44-launch-options/CMakeLists.txt
+2026-10-30T22:00:21.7660752Z   windows_launch_tests.cpp
+2026-10-30T22:00:25.6008548Z   launch_options_check.vcxproj -> D:\a\fiycare\fiycare\out\launch-check\Release\launch_options_check.exe
+2026-10-30T22:00:26.7679274Z   windows_launch_check.vcxproj -> D:\a\fiycare\fiycare\out\launch-check\Release\windows_launch_check.exe
+2026-10-30T22:00:26.8235931Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.44-launch-options/CMakeLists.txt
+2026-10-30T22:00:27.3509581Z Internal ctest changing into directory: D:/a/fiycare/fiycare/out/launch-check
+2026-10-30T22:00:27.4648904Z Test project D:/a/fiycare/fiycare/out/launch-check
+2026-10-30T22:00:27.5168588Z     Start 1: exact_launch_options
+2026-10-30T22:00:27.5271675Z 1/2 Test #1: exact_launch_options .............   Passed    0.01 sec
+2026-10-30T22:00:27.5353649Z     Start 2: actual_windows_command_line
+2026-10-30T22:00:27.5434670Z 2/2 Test #2: actual_windows_command_line ......   Passed    0.01 sec
+2026-10-30T22:00:27.5439382Z 
+2026-10-30T22:00:27.5439559Z 100% tests passed, 0 tests failed out of 2
+2026-10-30T22:00:27.5439792Z 
+2026-10-30T22:00:27.5439908Z Total Test time (real) =   0.08 sec
+

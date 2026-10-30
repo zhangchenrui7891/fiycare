@@ -1,0 +1,11 @@
+{
+  "baseline_version": "v0.43 file version24",
+  "baseline_manifest_hashes_verified": 1940,
+  "changed_existing_files_at_review": [
+    "CMakeLists.txt",
+    "src/graphics.h",
+    "src/main.cpp",
+    "tools/check_portable.sh"
+  ],
+  "asset_and_dependency_files": "byte-identical"
+}
