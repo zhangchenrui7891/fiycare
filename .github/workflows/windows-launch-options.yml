@@ -1,0 +1,29 @@
+name: Windows launch options regression
+on:
+  push:
+    branches: ['codex/v0.44-launch-options']
+    paths: ['maintenance/v0.44-launch-options/**', '.github/workflows/windows-launch-options.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  launch-options:
+    runs-on: windows-2022
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - name: Build and test actual Windows parser wrapper
+        shell: pwsh
+        run: |
+          cmake -S maintenance/v0.44-launch-options -B out/launch-check -G 'Visual Studio 17 2022' -A x64
+          if ($LASTEXITCODE -ne 0) { throw 'Configure failed' }
+          cmake --build out/launch-check --config Release --parallel 2
+          if ($LASTEXITCODE -ne 0) { throw 'Build failed' }
+          ctest --test-dir out/launch-check -C Release --output-on-failure
+          if ($LASTEXITCODE -ne 0) { throw 'Tests failed' }
+      - name: Preserve parser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-launch-options-evidence
+          path: out/launch-check/Testing/Temporary/LastTest.log
