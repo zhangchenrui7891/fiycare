@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-31",
+  "version": "0.43",
+  "baseline": "0.42 rebuilt / file version23",
+  "linux_release_assimp": "PASS 252 steps",
+  "ctest": "24/24 PASS after correcting local executable permission",
+  "initial_ctest": "23 passed, 1 BAD_COMMAND permission denied; initial log retained",
+  "strict_cpp17": "PASS",
+  "performance_oracle_comparisons": 85002,
+  "new_asan_ubsan": "PASS detect_leaks=0",
+  "incremental": "ninja no work",
+  "windows_msvc": "NOT RUN",
+  "target_hd6000_graphics_performance": "NOT RUN",
+  "github_full_mirror": "NOT uploaded: CLI HTTPS credentials unavailable",
+  "github_scope": "iteration change set through connector on separate branch"
+}

@@ -1,0 +1,6 @@
+200000 add+summary CPU synthetic random intervals: old_ms=1460.67 new_ms=292.72
+200000 add+summary CPU synthetic random intervals: old_ms=1466.11 new_ms=283.791
+200000 add+summary CPU synthetic random intervals: old_ms=1491.75 new_ms=294.683
+200000 add+summary CPU synthetic random intervals: old_ms=1485.66 new_ms=310.818
+200000 add+summary CPU synthetic random intervals: old_ms=1470 new_ms=281.73
+Not Windows, HD6000, GPU, total-frame, or hardware FPS evidence.

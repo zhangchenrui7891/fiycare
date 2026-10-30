@@ -1,0 +1,1 @@
+PASS 85002 exact oracle comparisons: all partial window sizes, repeated queries, ring wraps, resets, duplicates, long frames, rejected samples. CPU only.

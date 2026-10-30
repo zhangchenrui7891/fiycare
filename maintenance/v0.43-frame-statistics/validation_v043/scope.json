@@ -1,0 +1,8 @@
+{
+  "baseline": "v0.42 rebuilt version23",
+  "changed_product_resource_dependency_files": [
+    "src/main.cpp",
+    "src/performance.h"
+  ],
+  "all_other_baseline_src_assets_third_party_files": "byte-identical"
+}
