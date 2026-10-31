@@ -1,0 +1,65 @@
+Test project /workspace/scratch/f28b7c9ab582/work_v048/out/build/linux
+      Start  1: autopilot_disconnect_feedback
+ 1/30 Test  #1: autopilot_disconnect_feedback .......   Passed    0.00 sec
+      Start  2: primary_instrument_text
+ 2/30 Test  #2: primary_instrument_text .............   Passed    0.00 sec
+      Start  3: exact_launch_options
+ 3/30 Test  #3: exact_launch_options ................   Passed    0.00 sec
+      Start  4: build_timestamp_recovery
+ 4/30 Test  #4: build_timestamp_recovery ............   Passed    1.75 sec
+      Start  5: launch_renderer_integration
+ 5/30 Test  #5: launch_renderer_integration .........   Passed    0.96 sec
+      Start  6: rebuilt_diagnostic_storage
+ 6/30 Test  #6: rebuilt_diagnostic_storage ..........   Passed    1.76 sec
+      Start  7: rebuilt_cockpit_text
+ 7/30 Test  #7: rebuilt_cockpit_text ................   Passed    1.46 sec
+      Start  8: pinned_assimp_source_restore
+ 8/30 Test  #8: pinned_assimp_source_restore ........   Passed    0.09 sec
+      Start  9: release_package_safety
+ 9/30 Test  #9: release_package_safety ..............   Passed    0.10 sec
+      Start 10: release_manifest_verifier
+10/30 Test #10: release_manifest_verifier ...........   Passed    0.10 sec
+      Start 11: self_contained_asset_import
+11/30 Test #11: self_contained_asset_import .........   Passed    0.03 sec
+      Start 12: asset_import_and_new_fleet
+12/30 Test #12: asset_import_and_new_fleet ..........   Passed    0.10 sec
+      Start 13: physics_and_career
+13/30 Test #13: physics_and_career ..................   Passed    0.19 sec
+      Start 14: aero_and_avionics
+14/30 Test #14: aero_and_avionics ...................   Passed    0.07 sec
+      Start 15: engineering_systems
+15/30 Test #15: engineering_systems .................   Passed    0.12 sec
+      Start 16: render_and_surface_stability
+16/30 Test #16: render_and_surface_stability ........   Passed    2.26 sec
+      Start 17: reusable_frame_geometry
+17/30 Test #17: reusable_frame_geometry .............   Passed    0.66 sec
+      Start 18: shader_bytecode_cache
+18/30 Test #18: shader_bytecode_cache ...............   Passed    0.01 sec
+      Start 19: keyboard_focus_recovery
+19/30 Test #19: keyboard_focus_recovery .............   Passed    0.03 sec
+      Start 20: keyboard_short_taps
+20/30 Test #20: keyboard_short_taps .................   Passed    0.01 sec
+      Start 21: cockpit_throttle_event_coalescing
+21/30 Test #21: cockpit_throttle_event_coalescing ...   Passed    0.12 sec
+      Start 22: cockpit_fixed_control_geometry
+22/30 Test #22: cockpit_fixed_control_geometry ......   Passed    0.07 sec
+      Start 23: training_approach_guidance
+23/30 Test #23: training_approach_guidance ..........   Passed    0.00 sec
+      Start 24: navigation_leg_capture
+24/30 Test #24: navigation_leg_capture ..............   Passed    0.03 sec
+      Start 25: navigation_leg_tracking
+25/30 Test #25: navigation_leg_tracking .............   Passed    0.18 sec
+      Start 26: benchmark_evidence_integrity
+26/30 Test #26: benchmark_evidence_integrity ........   Passed    0.01 sec
+      Start 27: rolling_frame_statistics
+27/30 Test #27: rolling_frame_statistics ............   Passed    0.65 sec
+      Start 28: asynchronous_terrain_stream
+28/30 Test #28: asynchronous_terrain_stream .........   Passed    0.00 sec
+      Start 29: laboratory_surface_sweep
+29/30 Test #29: laboratory_surface_sweep ............   Passed    0.02 sec
+      Start 30: laboratory_engine_out
+30/30 Test #30: laboratory_engine_out ...............   Passed    0.17 sec
+
+100% tests passed out of 30
+
+Total Test time (real) =  10.95 sec

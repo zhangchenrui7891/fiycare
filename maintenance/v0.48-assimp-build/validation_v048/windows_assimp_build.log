@@ -1,0 +1,39 @@
+Source: https://github.com/zhangchenrui7891/fiycare/actions/runs/41228015869
+Commit: 23641d298f230b860e2fbf6573dd539dc9b19683
+Scope: Assimp ON, resource copy OFF. CPU fixture/HLSL/GDI checks; no application/GPU/HD6000 runtime.
+Selected raw build/test lines (complete upstream compile log remains at the run URL):
+2026-10-31T18:09:52.2292788Z Verified exact bundled Assimp subset: 1630 file hashes; no dependency upgrade.
+2026-10-31T18:10:01.0497776Z -- The C compiler identification is MSVC 19.44.35229.0
+2026-10-31T18:10:02.2402682Z -- The CXX compiler identification is MSVC 19.44.35229.0
+2026-10-31T18:10:07.7011426Z -- Enabled importer formats: AMF 3DS AC ASE ASSBIN B3D BVH COLLADA DXF CSM HMP IRRMESH IQM IRR LWO LWS M3D MD2 MD3 MD5 MDC MDL NFF NDO OFF OBJ OGRE OPENGEX PLY MS3D COB BLEND XGL FBX Q3D Q3BSP RAW SIB SMD STL TERRAGEN 3D X X3D GLTF 3MF MMD
+2026-10-31T18:10:11.7062733Z   zlibstatic.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\out\build\windows-importer-check\third_party\assimp\contrib\zlib\Release\zlibstatic.lib
+2026-10-31T18:11:59.8786120Z   assimp.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\out\build\windows-importer-check\third_party\assimp\lib\Release\assimp-vc143-mt.lib
+2026-10-31T18:12:02.1514615Z   aircraft_asset_pipeline.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\out\build\windows-importer-check\Release\aircraft_asset_pipeline.lib
+2026-10-31T18:12:08.9206572Z D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\src\renderer12.h(64,95): warning C4458: declaration of 'footprint' hides class member [D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\out\build\windows-importer-check\FlightCareerAir.vcxproj]
+2026-10-31T18:12:09.1665055Z D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\src\menus.h(54,140): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\out\build\windows-importer-check\FlightCareerAir.vcxproj]
+2026-10-31T18:12:09.4596701Z D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\src\main.cpp(451,76): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\out\build\windows-importer-check\FlightCareerAir.vcxproj]
+2026-10-31T18:12:09.4599098Z D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\src\main.cpp(452,57): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\out\build\windows-importer-check\FlightCareerAir.vcxproj]
+2026-10-31T18:12:09.4601377Z D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\src\main.cpp(452,136): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\out\build\windows-importer-check\FlightCareerAir.vcxproj]
+2026-10-31T18:12:09.4603629Z D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\src\main.cpp(452,265): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\out\build\windows-importer-check\FlightCareerAir.vcxproj]
+2026-10-31T18:12:09.4605872Z D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\src\main.cpp(452,310): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\out\build\windows-importer-check\FlightCareerAir.vcxproj]
+2026-10-31T18:12:15.2392836Z   FlightCareerAir.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\out\build\windows-importer-check\Release\FlightCareerAir.exe
+2026-10-31T18:12:15.6883282Z   zlibstatic.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\out\build\windows-importer-check\third_party\assimp\contrib\zlib\Release\zlibstatic.lib
+2026-10-31T18:12:15.8949914Z   assimp.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\out\build\windows-importer-check\third_party\assimp\lib\Release\assimp-vc143-mt.lib
+2026-10-31T18:12:15.9337092Z   aircraft_asset_pipeline.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\out\build\windows-importer-check\Release\aircraft_asset_pipeline.lib
+2026-10-31T18:12:17.1172079Z   asset_import.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\out\build\windows-importer-check\Release\asset_import.exe
+2026-10-31T18:12:17.5582381Z   zlibstatic.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\out\build\windows-importer-check\third_party\assimp\contrib\zlib\Release\zlibstatic.lib
+2026-10-31T18:12:17.7095672Z   assimp.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\out\build\windows-importer-check\third_party\assimp\lib\Release\assimp-vc143-mt.lib
+2026-10-31T18:12:17.7457625Z   aircraft_asset_pipeline.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\out\build\windows-importer-check\Release\aircraft_asset_pipeline.lib
+2026-10-31T18:12:19.1423858Z   asset_fixture_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.48-assimp-build\out\build\windows-importer-check\Release\asset_fixture_check.exe
+2026-10-31T18:12:32.1302125Z  1/10 Test  #1: autopilot_disconnect_feedback ...........   Passed    0.01 sec
+2026-10-31T18:12:32.1507541Z  2/10 Test  #2: primary_instrument_text .................   Passed    0.02 sec
+2026-10-31T18:12:32.1565070Z  3/10 Test  #3: exact_launch_options ....................   Passed    0.01 sec
+2026-10-31T18:12:32.9492270Z  4/10 Test  #4: pinned_assimp_source_restore ............   Passed    0.79 sec
+2026-10-31T18:12:32.9754761Z  5/10 Test  #7: self_contained_asset_import .............   Passed    0.03 sec
+2026-10-31T18:12:33.1465328Z  6/10 Test #27: windows_autopilot_notice_glyph_bounds ...   Passed    0.17 sec
+2026-10-31T18:12:33.1677985Z  7/10 Test #28: windows_instrument_glyph_bounds .........   Passed    0.02 sec
+2026-10-31T18:12:33.1737907Z  8/10 Test #29: windows_utf8_device_log .................   Passed    0.01 sec
+2026-10-31T18:12:33.1817688Z  9/10 Test #30: windows_command_line_parsing ............   Passed    0.01 sec
+2026-10-31T18:12:33.4341049Z 10/10 Test #31: hlsl_shader_compilation .................   Passed    0.25 sec
+2026-10-31T18:12:33.4347331Z 100% tests passed, 0 tests failed out of 10
+2026-10-31T18:12:33.4730532Z Application compiled with Assimp ON and exact pinned bundled sources. CPU import fixtures and checks passed. Runtime assets NOT copied; application/GPU/HD6000 NOT run.

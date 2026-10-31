@@ -1,0 +1,17 @@
+test_archive_hash_failure_leaves_no_destination (__main__.RestoreChecks.test_archive_hash_failure_leaves_no_destination) ... ok
+test_archive_symlink_refused (__main__.RestoreChecks.test_archive_symlink_refused) ... ok
+test_complete_needs_no_archive (__main__.RestoreChecks.test_complete_needs_no_archive) ... ok
+test_failed_stage_preserves_partial_tree (__main__.RestoreChecks.test_failed_stage_preserves_partial_tree) ... ok
+test_file_hash_failure (__main__.RestoreChecks.test_file_hash_failure) ... ok
+test_local_modification_preserved (__main__.RestoreChecks.test_local_modification_preserved) ... ok
+test_missing_member (__main__.RestoreChecks.test_missing_member) ... ok
+test_overlay_hash_failure (__main__.RestoreChecks.test_overlay_hash_failure) ... ok
+test_partial_valid_tree_restored (__main__.RestoreChecks.test_partial_valid_tree_restored) ... ok
+test_roundtrip (__main__.RestoreChecks.test_roundtrip) ... ok
+test_unlisted_file_preserved (__main__.RestoreChecks.test_unlisted_file_preserved) ... ok
+test_unsafe_names (__main__.RestoreChecks.test_unsafe_names) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.016s
+
+OK

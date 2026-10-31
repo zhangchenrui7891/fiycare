@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-01",
+  "version": "0.48",
+  "baseline": "v0.47 file version28; 2023 hashes verified",
+  "linux_build": "PASS Assimp ON, full and regenerated checks",
+  "linux_ctest": "30/30 PASS final JUnit 0 failures 0 skipped",
+  "strict_cpp17": "PASS",
+  "new_asan_ubsan": "NOT RUN this iteration",
+  "assimp_verified_files": 1630,
+  "assimp_upstream_identical_files": 1628,
+  "assimp_preserved_overlays": [
+    "CMakeLists.txt",
+    "PROVENANCE.json"
+  ],
+  "restore_failure_checks": "12 PASS Linux and Windows",
+  "real_archive_restore": "PASS fresh directory 1630 hashes",
+  "windows": "MSVC19.44 x64 Release, Assimp ON, resource copy OFF; full main and importer linked",
+  "windows_ctest": "10/10 PASS",
+  "native_import_fixture": "ASCII and Unicode OBJ/MTL/external PPM; RGB bake and fcmesh roundtrip PASS Linux and Windows",
+  "existing_importer_implementation": "byte-identical to v0.47; u8path already existed",
+  "windows_tested_commit": "23641d298f230b860e2fbf6573dd539dc9b19683",
+  "windows_run": "https://github.com/zhangchenrui7891/fiycare/actions/runs/41228015869",
+  "windows_warnings": 7,
+  "application_runtime": "NOT RUN",
+  "resource_copy": "NOT TESTED on Windows",
+  "target_HD6000_performance": "NOT MEASURED",
+  "source_zip_includes_exe": false
+}

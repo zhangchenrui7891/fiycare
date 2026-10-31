@@ -1,0 +1,16 @@
+{
+  "baseline": "v0.47 file version28",
+  "baseline_manifest_files_verified": 2023,
+  "existing_importer_implementation": "byte-identical; UTF-8 path handling already existed",
+  "original_assets_and_third_party": "byte-identical",
+  "assimp_upstream_identical_files": 1628,
+  "assimp_existing_overlays": [
+    "CMakeLists.txt",
+    "PROVENANCE.json"
+  ],
+  "assimp_total_verified_files": 1630,
+  "existing_product_build_changes": [
+    "CMakeLists.txt",
+    "src/main.cpp"
+  ]
+}

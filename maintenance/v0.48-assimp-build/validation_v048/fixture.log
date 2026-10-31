@@ -1,0 +1,1 @@
+PASS actual Assimp import: ASCII/Unicode model, MTL and external texture; baked RGB, native roundtrip, bake-disable and invalid scale. Synthetic fixtures, no GPU or flight test.

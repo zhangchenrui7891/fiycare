@@ -1,0 +1,89 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,7 +1,7 @@
+ cmake_minimum_required(VERSION 3.22)
+ include("${CMAKE_CURRENT_LIST_DIR}/tools/repair_build_timestamps.cmake")
+ fcair_check_build_timestamps("${CMAKE_CURRENT_LIST_DIR}" FALSE)
+-project(FlightCareerAir VERSION 0.47.0 LANGUAGES C CXX)
++project(FlightCareerAir VERSION 0.48.0 LANGUAGES C CXX)
+ set(CMAKE_CXX_STANDARD 17)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+ set(CMAKE_CXX_EXTENSIONS OFF)
+@@ -27,12 +27,15 @@
+  target_include_directories(aircraft_asset_pipeline PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+  add_executable(asset_import asset_import_main.cpp)
+  add_executable(asset_pipeline_check asset_pipeline_tests.cpp)
++ add_executable(asset_fixture_check asset_fixture_tests.cpp)
++ target_link_libraries(asset_fixture_check PRIVATE aircraft_asset_pipeline)
+  target_link_libraries(asset_pipeline_check PRIVATE aircraft_asset_pipeline)
+  target_link_libraries(asset_import PRIVATE aircraft_asset_pipeline)
+  if(MSVC)
+   target_compile_options(aircraft_asset_pipeline PRIVATE /utf-8 /EHsc)
+   target_compile_options(asset_import PRIVATE /W4 /utf-8 /EHsc)
+   target_compile_options(asset_pipeline_check PRIVATE /W4 /utf-8 /EHsc)
++  target_compile_options(asset_fixture_check PRIVATE /W4 /utf-8 /EHsc)
+  endif()
+ endif()
+ add_executable(physics_check tests.cpp)
+@@ -76,12 +79,14 @@
+    "${CMAKE_CURRENT_SOURCE_DIR}/tools/check_rebuilt_text.py")
+ endif()
+ if(Python3_Interpreter_FOUND)
++ add_test(NAME pinned_assimp_source_restore COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tools/test_restore_assimp.py")
+  add_test(NAME release_package_safety COMMAND "${Python3_EXECUTABLE}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/tools/test_package_release.py")
+  add_test(NAME release_manifest_verifier COMMAND "${Python3_EXECUTABLE}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/tools/test_verify_release.py" --cmake "${CMAKE_COMMAND}")
+ endif()
+ if(FCAIR_WITH_ASSIMP)
++ add_test(NAME self_contained_asset_import COMMAND asset_fixture_check)
+  add_test(NAME asset_import_and_new_fleet COMMAND asset_pipeline_check "${CMAKE_CURRENT_SOURCE_DIR}/assets")
+ endif()
+ add_test(NAME physics_and_career COMMAND physics_check "${CMAKE_CURRENT_SOURCE_DIR}/assets")
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -112,7 +112,7 @@
+   L"存档/照片/日志：%LOCALAPPDATA%\\FlightCareerAir\n"
+   L"诊断输出另存：diagnostics\\benchmark 或 diagnostics\\smoke；不保存游戏生涯。\n"
+   L"DX12初始化失败会自动尝试DX11；可用--dx11强制兼容模式。",
+-  L"飞行生涯 v0.47 · 中文操作说明",MB_OK);
++  L"飞行生涯 v0.48 · 中文操作说明",MB_OK);
+ }
+ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
+  std::filesystem::path folder;
+@@ -120,7 +120,7 @@
+   const auto args=launch::currentOptions();const bool benchmark=args.has(L"--benchmark");const bool low=args.has(L"--low")||benchmark;const bool smoke=args.has(L"--smoke-test");int smokeFrames=0;
+   const runfiles::RunFiles runFiles(dataFolder(),benchmark,smoke);
+   folder=runFiles.folder();std::filesystem::create_directories(folder);
+-  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.47 startup");
++  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.48 startup");
+   if(!runFiles.gameSavesEnabled())logLine("Diagnostic output isolated; live game saves disabled");
+   sim::Snapshot state;bool loaded=false,primaryValid=false;
+   {std::ifstream saved(folder/L"state.txt");if(saved){if(!state.read(saved))logLine("Invalid state.txt ignored; attempting legacy career");else {loaded=primaryValid=true;logLine("Loaded compatible full flight state");}}}
+@@ -150,7 +150,7 @@
+   const DWORD style=WS_OVERLAPPEDWINDOW;
+   WNDCLASSW wc{};wc.lpfnWndProc=windowProc;wc.hInstance=instance;wc.lpszClassName=L"FlightCareerAir";wc.hCursor=LoadCursor(nullptr,IDC_ARROW);if(!RegisterClassW(&wc))throw std::runtime_error("Window registration failed");
+   RECT bounds{0,0,low?640:1600,low?360:900};HMENU nativeMenu=createChineseMenu();AdjustWindowRect(&bounds,style,TRUE);
+-  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.47 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
++  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.48 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
+   if(!window)throw std::runtime_error("Window creation failed");ShowWindow(window,SW_SHOW);
+   if(args.has(L"--fullscreen"))toggleFullscreen(window);
+   if(args.has(L"--native"))renderScale=1;
+@@ -456,7 +456,7 @@
+     perf.flush();reportTime=0;
+    }
+    std::wostringstream display;display<<std::fixed<<std::setprecision(0);
+-   display<<L"飞行生涯 v0.47  |  "<<wideUtf8(renderer->name())<<L"  |  "<<frameStats.fps<<L" 帧/秒  |  "<<(walking?L"步行":L"飞行")<<((paused||menuPage!=ui::Page::None)?L" · 已暂停":L"")<<L"\n";
++   display<<L"飞行生涯 v0.48  |  "<<wideUtf8(renderer->name())<<L"  |  "<<frameStats.fps<<L" 帧/秒  |  "<<(walking?L"步行":L"飞行")<<((paused||menuPage!=ui::Page::None)?L" · 已暂停":L"")<<L"\n";
+    const auto air=sim::airData(flight,state.avionics.qnh);
+    display<<L"航电 "<<(state.avionics.powered(flight)?L"在线":L"断电")<<L" · IAS "<<air.ias*3.6<<L" · TAS "<<air.tas*3.6<<L" · GS "<<air.groundSpeed*3.6<<L" km/h · QNH "<<state.avionics.qnh<<L"\n";
+    display<<flight.spec().name<<L"  空速 "<<flight.airspeed()*3.6<<L" 公里/时  高度 "<<flight.y<<L" 米  升降 "<<flight.vy<<L" 米/秒\n";
+@@ -494,7 +494,7 @@
+    if(smoke&&++smokeFrames>=3){logLine("Smoke test: three rendered frames and BMP capture succeeded");DestroyWindow(window);}
+    if(benchmark&&timing::benchmarkFinished(benchmarkStarted,benchmarkSamples)){
+     std::ofstream summary(folder/L"performance_summary.txt",std::ios::trunc);
+-    const auto result=timing::writeBenchmarkSummary(summary,"v0.47",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples);
++    const auto result=timing::writeBenchmarkSummary(summary,"v0.48",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples);
+     summary.flush();if(!summary)logLine("Benchmark summary write failed; no report file success claimed");
+     pendingPhoto=folder/L"benchmark_final.bmp";renderer->draw(mesh,hud,XMMatrixLookToLH(XMVectorZero(),viewDirection,up)*reversedPerspective(activeFov,cockpit::viewportAspect,presentation::worldNear,presentation::worldFar),daylight,pendingPhoto,cabin,cabinView);pendingPhoto.clear();
+     logLine(result.complete?"Benchmark completed with valid full-run statistics":"Benchmark ended without a valid performance verdict; inspect summary status/counts");DestroyWindow(window);
