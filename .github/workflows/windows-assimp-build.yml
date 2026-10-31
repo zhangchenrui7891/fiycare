@@ -1,0 +1,27 @@
+name: Windows Assimp-enabled source build
+on:
+  push:
+    branches: ['codex/v0.48-assimp-build']
+    paths: ['maintenance/v0.48-assimp-build/**', '.github/workflows/windows-assimp-build.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  importer-build:
+    runs-on: windows-2022
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - name: Restore exact dependency, compile with Assimp and run import fixtures
+        shell: pwsh
+        run: |
+          & ./maintenance/v0.48-assimp-build/tools/check_windows_importer.ps1
+      - name: Preserve evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-assimp-build-evidence
+          path: |
+            maintenance/v0.48-assimp-build/out/build/windows-importer-check/windows-importer-check.log
+            maintenance/v0.48-assimp-build/out/build/windows-importer-check/Testing/Temporary/LastTest.log
+          if-no-files-found: warn
