@@ -1,0 +1,1 @@
+PASS 368 truncated/trailing payload cases; valid atlas/FCMESH06/07 bytes preserved. Old header-only atlas/mesh request at least 67108864/144000000 bytes (allocator padding allowed), intercepted before allocation. New readers reject with zero requests above 1MiB. Not process RAM, Windows startup, GPU or FPS measurement.
