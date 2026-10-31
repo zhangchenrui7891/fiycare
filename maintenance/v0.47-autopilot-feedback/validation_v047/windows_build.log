@@ -1,0 +1,108 @@
+Source: https://github.com/zhangchenrui7891/fiycare/actions/runs/41204391637
+Commit: 1f5459f05283428a864fe1203ea6910d0aeb2615
+Scope: Full main compiled with Assimp/resource copy OFF; CPU/HLSL/GDI checks only. No application/GPU/HD6000 runtime.
+2026-10-31T13:11:14.4335942Z -- The C compiler identification is MSVC 19.44.35229.0
+2026-10-31T13:11:15.7282214Z -- The CXX compiler identification is MSVC 19.44.35229.0
+2026-10-31T13:11:15.8370109Z -- Detecting C compiler ABI info
+2026-10-31T13:11:16.8984172Z -- Detecting C compiler ABI info - done
+2026-10-31T13:11:16.9123132Z -- Check for working C compiler: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+2026-10-31T13:11:16.9137149Z -- Detecting C compile features
+2026-10-31T13:11:16.9181504Z -- Detecting C compile features - done
+2026-10-31T13:11:16.9366001Z -- Detecting CXX compiler ABI info
+2026-10-31T13:11:17.6277821Z -- Detecting CXX compiler ABI info - done
+2026-10-31T13:11:17.6421417Z -- Check for working CXX compiler: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+2026-10-31T13:11:17.6425553Z -- Detecting CXX compile features
+2026-10-31T13:11:17.6434056Z -- Detecting CXX compile features - done
+2026-10-31T13:11:17.6724801Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+2026-10-31T13:11:19.2285438Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+2026-10-31T13:11:19.2286063Z -- Looking for pthread_create in pthreads
+2026-10-31T13:11:19.8211802Z -- Looking for pthread_create in pthreads - not found
+2026-10-31T13:11:19.8212566Z -- Looking for pthread_create in pthread
+2026-10-31T13:11:20.3802052Z -- Looking for pthread_create in pthread - not found
+2026-10-31T13:11:20.3896429Z -- Found Threads: TRUE
+2026-10-31T13:11:21.6281004Z -- Runtime asset copy disabled: executable requires separately supplied assets before launch
+2026-10-31T13:11:21.6282779Z -- Configuring done (17.1s)
+2026-10-31T13:11:21.7826293Z -- Generating done (0.2s)
+2026-10-31T13:11:21.7834383Z -- Build files have been written to: D:/a/fiycare/fiycare/maintenance/v0.47-autopilot-feedback/out/build/windows-source-check
+2026-10-31T13:11:21.9012691Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-10-31T13:11:21.9302852Z 
+2026-10-31T13:11:22.2711229Z   1>Checking Build System
+2026-10-31T13:11:22.3777444Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.47-autopilot-feedback/CMakeLists.txt
+2026-10-31T13:11:22.5274266Z   main.cpp
+2026-10-31T13:11:26.3182952Z D:\a\fiycare\fiycare\maintenance\v0.47-autopilot-feedback\src\renderer12.h(64,95): warning C4458: declaration of 'footprint' hides class member [D:\a\fiycare\fiycare\maintenance\v0.47-autopilot-feedback\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-10-31T13:11:26.3210958Z   (compiling source file '../../../src/main.cpp')
+2026-10-31T13:11:26.3211715Z       D:\a\fiycare\fiycare\maintenance\v0.47-autopilot-feedback\src\renderer12.h(10,37):
+2026-10-31T13:11:26.3216386Z       see declaration of 'Renderer12::footprint'
+2026-10-31T13:11:26.3216686Z   
+2026-10-31T13:11:26.6558971Z D:\a\fiycare\fiycare\maintenance\v0.47-autopilot-feedback\src\menus.h(54,140): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.47-autopilot-feedback\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-10-31T13:11:26.6560135Z   (compiling source file '../../../src/main.cpp')
+2026-10-31T13:11:26.6560402Z   
+2026-10-31T13:11:27.0677311Z D:\a\fiycare\fiycare\maintenance\v0.47-autopilot-feedback\src\main.cpp(451,76): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.47-autopilot-feedback\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-10-31T13:11:27.0680247Z D:\a\fiycare\fiycare\maintenance\v0.47-autopilot-feedback\src\main.cpp(452,57): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.47-autopilot-feedback\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-10-31T13:11:27.0683046Z D:\a\fiycare\fiycare\maintenance\v0.47-autopilot-feedback\src\main.cpp(452,136): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.47-autopilot-feedback\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-10-31T13:11:27.0685584Z D:\a\fiycare\fiycare\maintenance\v0.47-autopilot-feedback\src\main.cpp(452,265): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.47-autopilot-feedback\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-10-31T13:11:27.0687683Z D:\a\fiycare\fiycare\maintenance\v0.47-autopilot-feedback\src\main.cpp(452,310): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.47-autopilot-feedback\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-10-31T13:11:34.8500497Z   FlightCareerAir.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.47-autopilot-feedback\out\build\windows-source-check\Release\FlightCareerAir.exe
+2026-10-31T13:11:34.9539634Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-10-31T13:11:34.9842627Z 
+2026-10-31T13:11:35.3187599Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.47-autopilot-feedback/CMakeLists.txt
+2026-10-31T13:11:35.4470168Z   shader_tests.cpp
+2026-10-31T13:11:37.4560591Z   shader_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.47-autopilot-feedback\out\build\windows-source-check\Release\shader_check.exe
+2026-10-31T13:11:37.5480721Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-10-31T13:11:37.5775743Z 
+2026-10-31T13:11:37.9261783Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.47-autopilot-feedback/CMakeLists.txt
+2026-10-31T13:11:38.0523306Z   windows_launch_tests.cpp
+2026-10-31T13:11:39.3167995Z   windows_launch_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.47-autopilot-feedback\out\build\windows-source-check\Release\windows_launch_check.exe
+2026-10-31T13:11:39.4090112Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-10-31T13:11:39.4390517Z 
+2026-10-31T13:11:39.7757965Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.47-autopilot-feedback/CMakeLists.txt
+2026-10-31T13:11:39.9012892Z   launch_options_tests.cpp
+2026-10-31T13:11:41.0532015Z   launch_options_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.47-autopilot-feedback\out\build\windows-source-check\Release\launch_options_check.exe
+2026-10-31T13:11:41.1510718Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-10-31T13:11:41.1804336Z 
+2026-10-31T13:11:41.5119413Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.47-autopilot-feedback/CMakeLists.txt
+2026-10-31T13:11:41.6400484Z   windows_text_tests.cpp
+2026-10-31T13:11:42.7699818Z   windows_text_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.47-autopilot-feedback\out\build\windows-source-check\Release\windows_text_check.exe
+2026-10-31T13:11:42.8614825Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-10-31T13:11:42.8916704Z 
+2026-10-31T13:11:43.2225161Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.47-autopilot-feedback/CMakeLists.txt
+2026-10-31T13:11:43.3478698Z   flight_instrument_tests.cpp
+2026-10-31T13:11:44.4364502Z   flight_instrument_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.47-autopilot-feedback\out\build\windows-source-check\Release\flight_instrument_check.exe
+2026-10-31T13:11:44.5298164Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-10-31T13:11:44.5592264Z 
+2026-10-31T13:11:44.8909373Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.47-autopilot-feedback/CMakeLists.txt
+2026-10-31T13:11:45.0194635Z   flight_instrument_layout_tests.cpp
+2026-10-31T13:11:47.1852651Z   flight_instrument_layout_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.47-autopilot-feedback\out\build\windows-source-check\Release\flight_instrument_layout_check.exe
+2026-10-31T13:11:47.2763847Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-10-31T13:11:47.3056280Z 
+2026-10-31T13:11:47.6378150Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.47-autopilot-feedback/CMakeLists.txt
+2026-10-31T13:11:47.7673244Z   autopilot_feedback_tests.cpp
+2026-10-31T13:11:49.0031629Z   autopilot_feedback_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.47-autopilot-feedback\out\build\windows-source-check\Release\autopilot_feedback_check.exe
+2026-10-31T13:11:49.0947597Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-10-31T13:11:49.1240854Z 
+2026-10-31T13:11:49.4567396Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.47-autopilot-feedback/CMakeLists.txt
+2026-10-31T13:11:49.5852294Z   autopilot_feedback_layout_tests.cpp
+2026-10-31T13:11:51.6639066Z   autopilot_feedback_layout_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.47-autopilot-feedback\out\build\windows-source-check\Release\autopilot_feedback_layout_check.exe
+2026-10-31T13:11:52.1123198Z Internal ctest changing into directory: D:/a/fiycare/fiycare/maintenance/v0.47-autopilot-feedback/out/build/windows-source-check
+2026-10-31T13:11:52.2093737Z Test project D:/a/fiycare/fiycare/maintenance/v0.47-autopilot-feedback/out/build/windows-source-check
+2026-10-31T13:11:52.2560762Z     Start  1: autopilot_disconnect_feedback
+2026-10-31T13:11:52.2722344Z 1/8 Test  #1: autopilot_disconnect_feedback ...........   Passed    0.02 sec
+2026-10-31T13:11:52.2770365Z     Start  2: primary_instrument_text
+2026-10-31T13:11:52.2972787Z 2/8 Test  #2: primary_instrument_text .................   Passed    0.02 sec
+2026-10-31T13:11:52.2975461Z     Start  3: exact_launch_options
+2026-10-31T13:11:52.3045530Z 3/8 Test  #3: exact_launch_options ....................   Passed    0.01 sec
+2026-10-31T13:11:52.3048237Z     Start 24: windows_autopilot_notice_glyph_bounds
+2026-10-31T13:11:52.5398348Z 4/8 Test #24: windows_autopilot_notice_glyph_bounds ...   Passed    0.23 sec
+2026-10-31T13:11:52.5401445Z     Start 25: windows_instrument_glyph_bounds
+2026-10-31T13:11:52.5660287Z 5/8 Test #25: windows_instrument_glyph_bounds .........   Passed    0.03 sec
+2026-10-31T13:11:52.5663300Z     Start 26: windows_utf8_device_log
+2026-10-31T13:11:52.5743509Z 6/8 Test #26: windows_utf8_device_log .................   Passed    0.01 sec
+2026-10-31T13:11:52.5746265Z     Start 27: windows_command_line_parsing
+2026-10-31T13:11:52.5846936Z 7/8 Test #27: windows_command_line_parsing ............   Passed    0.01 sec
+2026-10-31T13:11:52.5849726Z     Start 28: hlsl_shader_compilation
+2026-10-31T13:11:52.7431045Z 8/8 Test #28: hlsl_shader_compilation .................   Passed    0.16 sec
+2026-10-31T13:11:52.7437712Z 
+2026-10-31T13:11:52.7438043Z 100% tests passed, 0 tests failed out of 8
+2026-10-31T13:11:52.7438371Z 
+2026-10-31T13:11:52.7438521Z Total Test time (real) =   0.53 sec
+2026-10-31T13:11:52.7882787Z Application compiled with Assimp OFF. Native fcmesh loading remains compiled. Runtime assets are NOT copied. No application/GPU/HD6000 execution was performed.

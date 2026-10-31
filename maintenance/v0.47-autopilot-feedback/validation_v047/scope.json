@@ -1,0 +1,14 @@
+{
+  "baseline": "v0.46 file version27",
+  "baseline_manifest_files_verified": 2001,
+  "existing_file_changes": [
+    "CMakeLists.txt",
+    "src/main.cpp",
+    "tools/check_portable.sh",
+    "tools/check_windows_source.ps1"
+  ],
+  "autopilot_control_law": "src/autopilot.h byte-identical",
+  "save_format": "src/storage.h byte-identical",
+  "assets_and_third_party": "byte-identical",
+  "new_product_header": "src/autopilot_feedback.h"
+}

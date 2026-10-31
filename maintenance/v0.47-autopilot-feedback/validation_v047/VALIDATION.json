@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-31",
+  "version": "0.47",
+  "baseline": "v0.46 file version27; 2001 hashes verified",
+  "linux_release": "PASS 258 steps, Assimp ON",
+  "linux_ctest": "28/28 PASS final JUnit 0 failures 0 skipped",
+  "strict_cpp17": "PASS full suite plus final 1646-case check",
+  "new_sanitizer": "autopilot feedback ASan/UBSan PASS detect_leaks=0",
+  "new_transition_cases": 1646,
+  "windows": "MSVC19.44 x64 Release full main compiled, Assimp OFF/resource copy OFF",
+  "windows_ctest": "8/8 PASS",
+  "windows_gdi": "7 AP message combinations fit existing single notice row and stay left of performance overlay; not actual screen validation",
+  "windows_tested_commit": "1f5459f05283428a864fe1203ea6910d0aeb2615",
+  "windows_run": "https://github.com/zhangchenrui7891/fiycare/actions/runs/41204391637",
+  "control_law_and_save_format": "byte-identical to v0.46",
+  "application_runtime": "NOT RUN",
+  "windows_default_assimp_build": "NOT TESTED",
+  "target_HD6000_performance": "NOT MEASURED",
+  "source_zip_includes_exe": false
+}
