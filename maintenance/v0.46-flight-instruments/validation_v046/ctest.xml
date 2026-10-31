@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="(empty)"
+	tests="27"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname=""
+	time="6"
+	timestamp="2026-10-31T15:10:31"
+	>
+	<testcase name="primary_instrument_text" classname="primary_instrument_text" time="0.00364917" status="run">
+		<properties/>
+		<system-out>PASS 40001 heading-range cases plus cardinal/north-boundary, unit conversion, fractional VS, invalid and signed-zero cases. Text/CPU only.
+</system-out>
+	</testcase>
+	<testcase name="exact_launch_options" classname="exact_launch_options" time="0.00130296" status="run">
+		<properties/>
+		<system-out>PASS launch options: 18 flags, 126 misleading tokens, forcing/copy and backend checks. Tokenized CPU inputs only.
+</system-out>
+	</testcase>
+	<testcase name="build_timestamp_recovery" classname="build_timestamp_recovery" time="1.06924" status="run">
+		<properties/>
+		<system-out>PASS: future CMake input reproduces Ninja 100-try failure
+PASS: configuration stops early with actionable diagnosis
+PASS: only future source/input mtimes change; contents and outputs preserved; repeat is idempotent
+PASS: two clean incremental Ninja builds after repair
+PASS: real CMake edits still regenerate normally
+PASS: 17 actual Assimp command lines pass strict CMP0175 grammar (old forms rejected)
+</system-out>
+	</testcase>
+	<testcase name="launch_renderer_integration" classname="launch_renderer_integration" time="0.555544" status="run">
+		<properties/>
+		<system-out>PASS actual renderer selection: misleading/exact flags, DX11 precedence, fallback/forced failure, benchmark copy and recreation. CPU renderer/API substitutes only.
+</system-out>
+	</testcase>
+	<testcase name="rebuilt_diagnostic_storage" classname="rebuilt_diagnostic_storage" time="1.28253" status="run">
+		<properties/>
+		<system-out>PASS rebuilt storage: four modes, actual save/track lambdas, repeated commits, state readback. CPU API substitutes only.
+</system-out>
+	</testcase>
+	<testcase name="rebuilt_cockpit_text" classname="rebuilt_cockpit_text" time="0.987701" status="run">
+		<properties/>
+		<system-out>PASS rebuilt text: 192 cases, 76896 generated vertices, layout, prefix, rollback/retry. CPU glyph/matrix substitutes only.
+</system-out>
+	</testcase>
+	<testcase name="release_package_safety" classname="release_package_safety" time="0.0870154" status="run">
+		<properties/>
+		<system-out>PASS: 10 scenarios: stale temporary exclusion, failed first write, valid ZIP/hash manifest, deterministic rerun, failed overwrite, CRC rejection, hash rejection, replace denial, interruption, successful replacement
+</system-out>
+	</testcase>
+	<testcase name="release_manifest_verifier" classname="release_manifest_verifier" time="0.077555" status="run">
+		<properties/>
+		<system-out>PASS: 12 release verifier scenarios; read-only check, valid/changed/missing/invalid manifest files.
+</system-out>
+	</testcase>
+	<testcase name="asset_import_and_new_fleet" classname="asset_import_and_new_fleet" time="0.0980425" status="run">
+		<properties/>
+		<system-out>aircraft=4 surface=0 full_load_max_altitude=1257.93
+aircraft=4 surface=1 full_load_max_altitude=1361.18
+aircraft=5 surface=0 full_load_max_altitude=1344.81
+aircraft=5 surface=1 full_load_max_altitude=1444.02
+aircraft=6 surface=0 full_load_max_altitude=1476.74
+aircraft=6 surface=1 full_load_max_altitude=1620.21
+PASS: compiled multi-format importer, three downloaded aircraft, texture baking, native assets, seven-profile saves and full-load flights
+</system-out>
+	</testcase>
+	<testcase name="physics_and_career" classname="physics_and_career" time="0.121081" status="run">
+		<properties/>
+		<system-out>PASS: ground, engine/fuel, impacts, assisted controls, flex, takeoff, landing, missions, saves, fleet, assets, lighting, cockpit, FXAA persistence, fixed timing, performance benchmark, heading, altitude, waypoint navigation, cross-track, dual runway, ILS-style guidance, landing review, isolated material mipmaps and gamma-aware filtering
+</system-out>
+	</testcase>
+	<testcase name="aero_and_avionics" classname="aero_and_avionics" time="0.0574256" status="run">
+		<properties/>
+		<system-out>aircraft=0 duration_s=300 late_max_altitude_error_m=0.434079 final_tas_mps=86.3376
+aircraft=1 duration_s=300 late_max_altitude_error_m=0.216572 final_tas_mps=165.35
+aircraft=2 duration_s=300 late_max_altitude_error_m=0.224419 final_tas_mps=188.56
+aircraft=3 duration_s=300 late_max_altitude_error_m=0.259354 final_tas_mps=192.429
+PASS: aero/avionics regression and five-minute scenarios
+</system-out>
+	</testcase>
+	<testcase name="engineering_systems" classname="engineering_systems" time="0.127758" status="run">
+		<properties/>
+		<system-out>surface_takeoff aircraft=0 max_altitude_m=342.941
+surface_takeoff aircraft=1 max_altitude_m=1201.8
+surface_takeoff aircraft=2 max_altitude_m=1714.51
+surface_takeoff aircraft=3 max_altitude_m=1821.84
+PASS: rigid-body, panel aerodynamics, independent engines, faults, alerts, v15, CSV, four takeoffs, engine-out
+</system-out>
+	</testcase>
+	<testcase name="render_and_surface_stability" classname="render_and_surface_stability" time="1.15644" status="run">
+		<properties/>
+		<system-out>PASS: smooth 30-1000 FPS presentation, irregular frames, reset/wrap, reverse depth, local cabin; 35 seven-aircraft 120-second surface-flight runs agree across render cadences
+</system-out>
+	</testcase>
+	<testcase name="reusable_frame_geometry" classname="reusable_frame_geometry" time="0.196965" status="run">
+		<properties/>
+		<system-out>a330.fcmesh: 31500 model vertices; 120 warm frames, 0 geometry-buffer reallocations; 4296288 DX12 intermediate bytes removed per frame
+a350.fcmesh: 61641 model vertices; 120 warm frames, 0 geometry-buffer reallocations; 5743056 DX12 intermediate bytes removed per frame
+a320.fcmesh: 15687 model vertices; 120 warm frames, 0 geometry-buffer reallocations; 3537264 DX12 intermediate bytes removed per frame
+b737.fcmesh: 8010 model vertices; 120 warm frames, 0 geometry-buffer reallocations; 3168768 DX12 intermediate bytes removed per frame
+b787.fcmesh: 10134 model vertices; 120 warm frames, 0 geometry-buffer reallocations; 3270720 DX12 intermediate bytes removed per frame
+Frame geometry checks passed. CPU staging evidence only; no GPU/FPS claim.
+</system-out>
+	</testcase>
+	<testcase name="shader_bytecode_cache" classname="shader_bytecode_cache" time="0.00201925" status="run">
+		<properties/>
+		<system-out>100 simulated four-stage renderer requests: 4 compiler calls / 396 cache hits
+Shader cache key, failure/retry, LRU capacity and ownership checks passed. No HLSL/GPU executed.
+</system-out>
+	</testcase>
+	<testcase name="keyboard_focus_recovery" classname="keyboard_focus_recovery" time="0.0217773" status="run">
+		<properties/>
+		<system-out>Legacy defect reproduced: held G becomes a new edge on foreground return and retracts gear.
+All 256 key slots: focus recovery, hold, release/repress and independent-key gating passed.
+11 actual cockpit bindings x120 held frames: no false state change; fresh presses still act once.
+10,000 deterministic mixed availability/key sequences preserve input invariants.
+Keyboard recovery checks passed. CPU state checks only; no Windows messages executed.
+</system-out>
+	</testcase>
+	<testcase name="keyboard_short_taps" classname="keyboard_short_taps" time="0.00230498" status="run">
+		<properties/>
+		<system-out>256 slots: completed taps retained, 1000 same-frame taps coalesced, repeat filtered, no continuous latch.
+Recovery barriers, between-frame rearming, press-time modifier gating and bounds passed.
+Async physical state ahead of message: no duplicate discrete action.
+Actual gear action: 5 deterministic sample intervals x120 completed taps; all 600 delivered once.
+Keyboard event checks passed; CPU schedules only, not Windows input delivery or performance.
+</system-out>
+	</testcase>
+	<testcase name="cockpit_throttle_event_coalescing" classname="cockpit_throttle_event_coalescing" time="0.0523747" status="run">
+		<properties/>
+		<system-out>CPU burst: 100001 legacy pending events -&gt; 1; absolute position and final Snapshot identical. Not Windows/RAM/FPS measurement.
+84000 deterministic mixed events in 2296 batches: 7 profiles x2 models x2 power states, final Snapshot equivalence passed.
+Cockpit input coalescing CPU checks passed; no real Windows mouse/capture/rendering verification.
+</system-out>
+	</testcase>
+	<testcase name="cockpit_fixed_control_geometry" classname="cockpit_fixed_control_geometry" time="0.0597258" status="run">
+		<properties/>
+		<system-out>PASS: 27027 exact ordered solids, 89964 equivalent hit rays; fixed array type. Not GPU/Windows/FPS evidence.
+</system-out>
+	</testcase>
+	<testcase name="training_approach_guidance" classname="training_approach_guidance" time="0.00334172" status="run">
+		<properties/>
+		<system-out>Legacy PVG threshold: centre-distance=1800m, path delta=74.9014m relative to chosen training clearance.
+7 aircraft x2 airports x2 directions x6 distances: 168 threshold, slope and signed-deviation samples passed.
+12,001 one-metre path samples: continuous slope; selection/power/save and invalid envelopes passed.
+Training approach CPU geometry passed; not Windows, radio ILS, certified procedure or autoland validation.
+</system-out>
+	</testcase>
+	<testcase name="navigation_leg_capture" classname="navigation_leg_capture" time="0.0148078" status="run">
+		<properties/>
+		<system-out>Legacy reproduced at X=600 Z=2700: distance=632.456m, old point=1 behind; new point=2.
+7 profiles x2 models x4 courses x2 sides x3 overshoots: 336 AP capture cases passed.
+CPU flight aircraft=0 surface=0 wind=-8 seconds=10 first_point=2 final_point=2 max_roll_deg=24.0237
+CPU flight aircraft=0 surface=0 wind=8 seconds=10 first_point=2 final_point=2 max_roll_deg=24.0237
+CPU flight aircraft=0 surface=1 wind=-8 seconds=10 first_point=2 final_point=2 max_roll_deg=23.9818
+CPU flight aircraft=0 surface=1 wind=8 seconds=10 first_point=2 final_point=2 max_roll_deg=23.9898
+CPU flight aircraft=3 surface=0 wind=-8 seconds=10 first_point=2 final_point=2 max_roll_deg=24.0382
+CPU flight aircraft=3 surface=0 wind=8 seconds=10 first_point=2 final_point=2 max_roll_deg=24.0382
+CPU flight aircraft=3 surface=1 wind=-8 seconds=10 first_point=2 final_point=2 max_roll_deg=23.7612
+CPU flight aircraft=3 surface=1 wind=8 seconds=10 first_point=2 final_point=2 max_roll_deg=25.8078
+8 short actual Flight.step scenarios passed; not complet...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="navigation_leg_tracking" classname="navigation_leg_tracking" time="0.12356" status="run">
+		<properties/>
+		<system-out>4704 profile/model/course/offset/speed guidance/AP cases passed.
+X=600 Z=-1500 speed=90: legacy bearing=-8.53077 deg; new=-29.0546 deg; lookahead=1080m (CPU geometry only).
+IDEAL_ONLY course=0 side=-600 speed=48 20s old_XTK=457.593 new_XTK=149.469
+IDEAL_ONLY course=0 side=-600 speed=90 20s old_XTK=332.987 new_XTK=121.624
+IDEAL_ONLY course=0 side=-600 speed=120 20s old_XTK=243.983 new_XTK=117.973
+IDEAL_ONLY course=0 side=600 speed=48 20s old_XTK=457.593 new_XTK=149.469
+IDEAL_ONLY course=0 side=600 speed=90 20s old_XTK=332.987 new_XTK=121.624
+IDEAL_ONLY course=0 side=600 speed=120 20s old_XTK=243.983 new_XTK=117.973
+IDEAL_ONLY course=1 side=-600 speed=48 20s old_XTK=398.852 new_XTK=149.469
+IDEAL_ONLY course=1 side=-600 speed=90 20s old_XTK=222.848 new_XTK=121.624
+IDEAL_ONLY course=1 side=-600 speed=120 20s old_XTK=97.1302 new_XTK=75.2446
+IDEAL_ONLY course=1 side=600 speed=48 20s old_XTK=398.852 new_XTK=149.469
+IDEAL_ONLY course=1 side=600 speed=90 20s old_XTK=222.848 new_XTK=121.624
+IDEAL_ONLY course=1 side=600...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="benchmark_evidence_integrity" classname="benchmark_evidence_integrity" time="0.00419847" status="run">
+		<properties/>
+		<system-out>Legacy virtual dt=0.0005s x200000: elapsed freezes at 32.768s; new accepted duration=100s, storage=65536. Not hardware FPS.
+Capacity boundary: sample 65537 triggers early NOT_EVALUATED at 32.7685 virtual seconds.
+Normal target tiers/full-run P95 preserved; insufficient 60s evidence has no performance verdict.
+Invalid intervals, accumulation overflow, malformed stats and report NA/NOT_EVALUATED checks passed.
+Benchmark CPU clock/report checks passed; no Windows, GPU FPS or HD6000 measurement performed.
+</system-out>
+	</testcase>
+	<testcase name="rolling_frame_statistics" classname="rolling_frame_statistics" time="0.223971" status="run">
+		<properties/>
+		<system-out>PASS 85002 exact oracle comparisons: all partial window sizes, repeated queries, ring wraps, resets, duplicates, long frames, rejected samples. CPU only.
+</system-out>
+	</testcase>
+	<testcase name="asynchronous_terrain_stream" classname="asynchronous_terrain_stream" time="0.00306925" status="run">
+		<properties/>
+		<system-out>PASS: stale terrain rejection, latest request, single worker, cached return, failure retention/recovery
+</system-out>
+	</testcase>
+	<testcase name="laboratory_surface_sweep" classname="laboratory_surface_sweep" time="0.0124922" status="run">
+		<properties/>
+		<system-out>Wrote /workspace/scratch/f28b7c9ab582/work_v046/out/build/linux/lab_check/sweep/surface_sweep.csv
+</system-out>
+	</testcase>
+	<testcase name="laboratory_engine_out" classname="laboratory_engine_out" time="0.0908896" status="run">
+		<properties/>
+		<system-out>samples=901
+duration_s=90
+min_altitude_m=1489.52188
+max_altitude_m=1500
+max_tas_mps=109.2637459
+max_abs_roll_deg=2.264352508
+max_abs_aoa_deg=6.428679148
+max_egt_C=444
+max_thrust_difference_N=112500
+crashed=0
+Output: /workspace/scratch/f28b7c9ab582/work_v046/out/build/linux/lab_check/engine_out
+</system-out>
+	</testcase>
+</testsuite>

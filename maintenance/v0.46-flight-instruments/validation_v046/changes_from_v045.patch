@@ -1,0 +1,167 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,7 +1,7 @@
+ cmake_minimum_required(VERSION 3.22)
+ include("${CMAKE_CURRENT_LIST_DIR}/tools/repair_build_timestamps.cmake")
+ fcair_check_build_timestamps("${CMAKE_CURRENT_LIST_DIR}" FALSE)
+-project(FlightCareerAir VERSION 0.45.0 LANGUAGES C CXX)
++project(FlightCareerAir VERSION 0.46.0 LANGUAGES C CXX)
+ set(CMAKE_CXX_STANDARD 17)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+ set(CMAKE_CXX_EXTENSIONS OFF)
+@@ -52,10 +52,12 @@
+ add_executable(benchmark_check benchmark_tests.cpp)
+ add_executable(performance_window_check performance_window_tests.cpp)
+ add_executable(launch_options_check launch_options_tests.cpp)
++add_executable(flight_instrument_check flight_instrument_tests.cpp)
+ find_package(Threads REQUIRED)
+ add_executable(terrain_stream_check terrain_stream_tests.cpp)
+ target_link_libraries(terrain_stream_check PRIVATE Threads::Threads)
+ enable_testing()
++add_test(NAME primary_instrument_text COMMAND flight_instrument_check)
+ add_test(NAME exact_launch_options COMMAND launch_options_check)
+ find_package(Python3 QUIET COMPONENTS Interpreter)
+ if(Python3_Interpreter_FOUND AND CMAKE_GENERATOR MATCHES "^Ninja")
+@@ -99,9 +101,17 @@
+ add_test(NAME laboratory_surface_sweep COMMAND flight_lab sweep "${CMAKE_CURRENT_BINARY_DIR}/lab_check/sweep")
+ add_test(NAME laboratory_engine_out COMMAND flight_lab scenario --surface --aircraft 3 --seconds 90 --fail-left 15 --output "${CMAKE_CURRENT_BINARY_DIR}/lab_check/engine_out")
+ if(WIN32)
++ add_executable(flight_instrument_layout_check flight_instrument_layout_tests.cpp)
++ target_compile_definitions(flight_instrument_layout_check PRIVATE UNICODE _UNICODE NOMINMAX)
++ target_link_libraries(flight_instrument_layout_check PRIVATE gdi32 user32 d3dcompiler)
++ add_test(NAME windows_instrument_glyph_bounds COMMAND flight_instrument_layout_check)
++ if(MSVC)
++  target_compile_options(flight_instrument_layout_check PRIVATE /W4 /WX /utf-8 /EHsc)
++ endif()
+  add_executable(windows_text_check windows_text_tests.cpp)
+  add_test(NAME windows_utf8_device_log COMMAND windows_text_check)
+  if(MSVC)
++  target_compile_options(flight_instrument_check PRIVATE /W4 /WX /utf-8 /EHsc)
+   target_compile_options(windows_text_check PRIVATE /W4 /WX /utf-8 /EHsc)
+  endif()
+  add_executable(windows_launch_check windows_launch_tests.cpp)
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -111,7 +111,7 @@
+   L"存档/照片/日志：%LOCALAPPDATA%\\FlightCareerAir\n"
+   L"诊断输出另存：diagnostics\\benchmark 或 diagnostics\\smoke；不保存游戏生涯。\n"
+   L"DX12初始化失败会自动尝试DX11；可用--dx11强制兼容模式。",
+-  L"飞行生涯 v0.45 · 中文操作说明",MB_OK);
++  L"飞行生涯 v0.46 · 中文操作说明",MB_OK);
+ }
+ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
+  std::filesystem::path folder;
+@@ -119,7 +119,7 @@
+   const auto args=launch::currentOptions();const bool benchmark=args.has(L"--benchmark");const bool low=args.has(L"--low")||benchmark;const bool smoke=args.has(L"--smoke-test");int smokeFrames=0;
+   const runfiles::RunFiles runFiles(dataFolder(),benchmark,smoke);
+   folder=runFiles.folder();std::filesystem::create_directories(folder);
+-  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.45 startup");
++  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.46 startup");
+   if(!runFiles.gameSavesEnabled())logLine("Diagnostic output isolated; live game saves disabled");
+   sim::Snapshot state;bool loaded=false,primaryValid=false;
+   {std::ifstream saved(folder/L"state.txt");if(saved){if(!state.read(saved))logLine("Invalid state.txt ignored; attempting legacy career");else {loaded=primaryValid=true;logLine("Loaded compatible full flight state");}}}
+@@ -149,7 +149,7 @@
+   const DWORD style=WS_OVERLAPPEDWINDOW;
+   WNDCLASSW wc{};wc.lpfnWndProc=windowProc;wc.hInstance=instance;wc.lpszClassName=L"FlightCareerAir";wc.hCursor=LoadCursor(nullptr,IDC_ARROW);if(!RegisterClassW(&wc))throw std::runtime_error("Window registration failed");
+   RECT bounds{0,0,low?640:1600,low?360:900};HMENU nativeMenu=createChineseMenu();AdjustWindowRect(&bounds,style,TRUE);
+-  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.45 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
++  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.46 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
+   if(!window)throw std::runtime_error("Window creation failed");ShowWindow(window,SW_SHOW);
+   if(args.has(L"--fullscreen"))toggleFullscreen(window);
+   if(args.has(L"--native"))renderScale=1;
+@@ -446,12 +446,12 @@
+     perf.flush();reportTime=0;
+    }
+    std::wostringstream display;display<<std::fixed<<std::setprecision(0);
+-   display<<L"飞行生涯 v0.45  |  "<<wideUtf8(renderer->name())<<L"  |  "<<frameStats.fps<<L" 帧/秒  |  "<<(walking?L"步行":L"飞行")<<((paused||menuPage!=ui::Page::None)?L" · 已暂停":L"")<<L"\n";
++   display<<L"飞行生涯 v0.46  |  "<<wideUtf8(renderer->name())<<L"  |  "<<frameStats.fps<<L" 帧/秒  |  "<<(walking?L"步行":L"飞行")<<((paused||menuPage!=ui::Page::None)?L" · 已暂停":L"")<<L"\n";
+    const auto air=sim::airData(flight,state.avionics.qnh);
+    display<<L"航电 "<<(state.avionics.powered(flight)?L"在线":L"断电")<<L" · IAS "<<air.ias*3.6<<L" · TAS "<<air.tas*3.6<<L" · GS "<<air.groundSpeed*3.6<<L" km/h · QNH "<<state.avionics.qnh<<L"\n";
+    display<<flight.spec().name<<L"  空速 "<<flight.airspeed()*3.6<<L" 公里/时  高度 "<<flight.y<<L" 米  升降 "<<flight.vy<<L" 米/秒\n";
+    display<<L"油门 "<<flight.throttle*100<<L"%  燃油 "<<flight.fuel<<L"%  起落架 "<<(flight.gear?L"放下":L"收起")<<L"  襟翼 "<<flight.flap*100<<L"%  辅助 "<<(flight.assist?L"开":L"关")<<L"\n";
+-   display<<L"俯仰 "<<flight.pitch*180/sim::pi<<L"°  坡度 "<<flight.roll*180/sim::pi<<L"°  航向 "<<std::fmod(flight.yaw*180/sim::pi+360,360)<<L"°  乘客 "<<flight.passengers<<L"/"<<flight.spec().seats<<L"\n";
++   display<<L"俯仰 "<<flight.pitch*180/sim::pi<<L"°  坡度 "<<flight.roll*180/sim::pi<<L"°  航向 "<<instruments::heading(flight.yaw)<<L"°  乘客 "<<flight.passengers<<L"/"<<flight.spec().seats<<L"\n";
+    display<<career.name()<<L" · 阶段 "<<career.stage<<L"/3  积分 "<<career.credits<<L"  机队 "<<career.fleet<<L"  摄影 "<<career.photos<<L"  计时 "<<career.elapsed<<L" 秒\n";
+    if(state.navigationHold&&sim::validNavigationWaypoint(state.navigationWaypoint))display<<L"导航点 "<<state.navigationWaypoint+1<<L"  距离 "<<sim::navigationDistance(state)<<L" 米  航路偏差 "<<sim::navigationCrossTrack(state)<<L" 米（右为正）\n";
+    else if(state.navigationHold)display<<L"导航航点无效 · 检查训练航路\n";
+@@ -484,7 +484,7 @@
+    if(smoke&&++smokeFrames>=3){logLine("Smoke test: three rendered frames and BMP capture succeeded");DestroyWindow(window);}
+    if(benchmark&&timing::benchmarkFinished(benchmarkStarted,benchmarkSamples)){
+     std::ofstream summary(folder/L"performance_summary.txt",std::ios::trunc);
+-    const auto result=timing::writeBenchmarkSummary(summary,"v0.45",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples);
++    const auto result=timing::writeBenchmarkSummary(summary,"v0.46",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples);
+     summary.flush();if(!summary)logLine("Benchmark summary write failed; no report file success claimed");
+     pendingPhoto=folder/L"benchmark_final.bmp";renderer->draw(mesh,hud,XMMatrixLookToLH(XMVectorZero(),viewDirection,up)*reversedPerspective(activeFov,cockpit::viewportAspect,presentation::worldNear,presentation::worldFar),daylight,pendingPhoto,cabin,cabinView);pendingPhoto.clear();
+     logLine(result.complete?"Benchmark completed with valid full-run statistics":"Benchmark ended without a valid performance verdict; inspect summary status/counts");DestroyWindow(window);
+--- a/src/cockpit.h
++++ b/src/cockpit.h
+@@ -4,6 +4,7 @@
+ #include "autopilot.h"
+ #include "approach.h"
+ #include "cockpit_detail.h"
++#include "flight_instruments.h"
+ inline cockpit::SpatialInput cockpitInput;
+ inline void cockpitText(std::vector<Vertex>& out,const std::wstring& text,float x,float y,float z,float width,const XMMATRIX& transform,XMFLOAT3 color={.4f,1,.75f}){
+  const size_t first=out.size();
+@@ -24,13 +25,14 @@
+  auto n=[](double v){return std::to_wstring(int(std::lround(v)));};
+  const bool waypointValid=sim::validNavigationWaypoint(state.navigationWaypoint);
+  const std::wstring waypointNumber=waypointValid?n(state.navigationWaypoint+1):L"--";
+- int heading=int(std::lround(f.yaw*180/sim::pi));if(heading<0)heading+=360;
+- int targetHeading=int(std::lround(state.targetHeading*180/sim::pi));if(targetHeading<0)targetHeading+=360;
++ const auto heading=instruments::heading(f.yaw);
++ const auto targetHeading=instruments::heading(state.targetHeading);
+  const bool powered=state.avionics.powered(f);const auto data=sim::airData(f,state.avionics.qnh);
+  if(powered){
+  cockpitAttitude(out,-.55f,-.735f,.876f,f.pitch,f.roll,transform);
+- cockpitText(out,L"IAS "+n(data.ias*3.6)+L"  ALT "+n(data.altitude),-.76f,-.60f,.870f,.42f,transform);
+- cockpitText(out,L"HDG "+n(heading)+L"° VS "+n(data.verticalSpeed),-.76f,-.85f,.870f,.42f,transform);
++ const auto primary=instruments::primary(data.ias,data.altitude,data.verticalSpeed,f.yaw);
++ cockpitText(out,primary.speedAltitude,-.76f,-.60f,.870f,.42f,transform);
++ cockpitText(out,primary.headingVertical,-.76f,-.85f,.870f,.42f,transform);
+  // Navigation display range rings and heading marker.
+  for(float radius:{.045f,.085f,.12f})for(int i=0;i<48;i++){
+   float a=i*XM_2PI/48;
+@@ -41,7 +43,7 @@
+   const auto& waypoint=sim::navigationRoute[state.navigationWaypoint];double bearing=std::atan2(waypoint.x-f.x,waypoint.z-f.z);float a=float(bearing-f.yaw);
+   cockpitFace(out,std::sin(a)*.09f,-.75f+std::cos(a)*.09f,.870f,.005f,.005f,{1,.2f,.8f},transform);
+  }
+- cockpitText(out,L"导航  "+n(heading)+L"°",-.19f,-.60f,.870f,.40f,transform);
++ cockpitText(out,L"导航  "+heading+L"°",-.19f,-.60f,.870f,.40f,transform);
+  cockpitText(out,waypointValid?L"航点 "+waypointNumber+L"  "+n(sim::navigationDistance(state))+L"m":L"航点无效",-.19f,-.85f,.870f,.40f,transform);
+  cockpitText(out,L"双发监控",.35f,-.60f,.870f,.40f,transform);
+  for(int i=0;i<2;i++){
+@@ -85,7 +87,7 @@
+  }
+  if(powered){
+  const double crossTrack=sim::navigationCrossTrack(state);
+- cockpitText(out,L"目标 "+n(targetHeading)+L"° / "+n(state.targetAltitude)+L"m  点"+waypointNumber+L" "+n(sim::navigationDistance(state))+L"m\n航路偏差 "+(crossTrack>=0?L"右 ":L"左 ")+n(std::abs(crossTrack))+L"m",-.72f,-.19f,.69f,.66f,transform);
++ cockpitText(out,L"目标 "+targetHeading+L"° / "+n(state.targetAltitude)+L"m  点"+waypointNumber+L" "+n(sim::navigationDistance(state))+L"m\n航路偏差 "+(crossTrack>=0?L"右 ":L"左 ")+n(std::abs(crossTrack))+L"m",-.72f,-.19f,.69f,.66f,transform);
+  const auto approach=sim::approachGuidance(state);
+  if(approach.valid)cockpitText(out,std::wstring(L"训练进近 ")+approach.runway->name+(approach.direction==1?L" 正":L" 反")+L"  LOC "+(approach.localizer>=0?L"右 ":L"左 ")+n(std::abs(approach.localizer))+L"m  GS "+(approach.glideslope>=0?L"高 ":L"低 ")+n(std::abs(approach.glideslope))+L"m",-.72f,-.12f,.69f,.66f,transform,{1.f,.82f,.3f});
+  }
+--- a/tools/check_portable.sh
++++ b/tools/check_portable.sh
+@@ -4,7 +4,7 @@
+ task_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+ task_build="${1:-$task_root/out/portable}"
+ mkdir -p -- "$task_build"
+-for task_test in tests aero_avionics_tests engineering_tests stability_tests terrain_stream_tests frame_geometry_tests shader_cache_tests keyboard_state_tests keyboard_event_tests cockpit_input_tests cockpit_solids_tests approach_tests navigation_tests navigation_track_tests benchmark_tests performance_window_tests launch_options_tests; do
++for task_test in tests aero_avionics_tests engineering_tests stability_tests terrain_stream_tests frame_geometry_tests shader_cache_tests keyboard_state_tests keyboard_event_tests cockpit_input_tests cockpit_solids_tests approach_tests navigation_tests navigation_track_tests benchmark_tests performance_window_tests launch_options_tests flight_instrument_tests; do
+     g++ -std=c++17 -O2 -pthread -Wall -Wextra -Werror -pedantic \
+         "$task_root/$task_test.cpp" -o "$task_build/$task_test"
+     case "$task_test" in
+--- a/tools/check_windows_source.ps1
++++ b/tools/check_windows_source.ps1
+@@ -8,9 +8,9 @@
+ try {
+     & cmake -S $project -B $build -G 'Visual Studio 17 2022' -A x64 -DFCAIR_WITH_ASSIMP=OFF -DFCAIR_COPY_RUNTIME_ASSETS=OFF
+     if ($LASTEXITCODE -ne 0) { throw 'Source-only configuration failed' }
+-    & cmake --build $build --config Release --parallel 2 --target FlightCareerAir shader_check windows_launch_check launch_options_check windows_text_check
++    & cmake --build $build --config Release --parallel 2 --target FlightCareerAir shader_check windows_launch_check launch_options_check windows_text_check flight_instrument_check flight_instrument_layout_check
+     if ($LASTEXITCODE -ne 0) { throw 'Application or check compilation failed' }
+-    & ctest --test-dir $build -C Release --output-on-failure -R '^(hlsl_shader_compilation|windows_command_line_parsing|exact_launch_options|windows_utf8_device_log)$'
++    & ctest --test-dir $build -C Release --output-on-failure -R '^(hlsl_shader_compilation|windows_command_line_parsing|exact_launch_options|windows_utf8_device_log|primary_instrument_text|windows_instrument_glyph_bounds)$'
+     if ($LASTEXITCODE -ne 0) { throw 'Windows CPU checks failed' }
+     if (!(Test-Path (Join-Path $build 'Release/FlightCareerAir.exe'))) { throw 'Application executable missing' }
+     Write-Host 'Application compiled with Assimp OFF. Native fcmesh loading remains compiled. Runtime assets are NOT copied. No application/GPU/HD6000 execution was performed.'

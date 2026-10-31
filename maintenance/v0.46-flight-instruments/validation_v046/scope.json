@@ -1,0 +1,13 @@
+{
+  "baseline": "v0.45 file version26",
+  "baseline_manifest_hashes_verified": 1982,
+  "existing_file_changes": [
+    "CMakeLists.txt",
+    "src/cockpit.h",
+    "src/main.cpp",
+    "tools/check_portable.sh",
+    "tools/check_windows_source.ps1"
+  ],
+  "assets_and_third_party": "byte-identical",
+  "new_product_header": "src/flight_instruments.h"
+}

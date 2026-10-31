@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-31",
+  "version": "0.46",
+  "baseline": "v0.45 file version26; 1982 hashes verified",
+  "linux_release": "PASS 256 steps, Assimp ON",
+  "linux_ctest": "27/27 PASS, JUnit 0 failures 0 skipped",
+  "strict_cpp17": "PASS",
+  "new_sanitizer": "instrument formatting ASan/UBSan PASS detect_leaks=0",
+  "heading_range_cases": 40001,
+  "windows": "MSVC19.44 x64 Release full main compiled with Assimp OFF/resource copy OFF",
+  "windows_ctest": "6/6 PASS",
+  "windows_gdi": "90 primary text rows fit logical 300x21 glyph bounds; no GPU or full screen validation",
+  "windows_tested_commit": "c6e789c4db51ff2b0096683c5fcd80b8c414f8a2",
+  "windows_run": "https://github.com/zhangchenrui7891/fiycare/actions/runs/41183414666",
+  "application_runtime": "NOT RUN",
+  "windows_default_assimp_build": "NOT TESTED",
+  "target_HD6000_performance": "NOT MEASURED",
+  "source_zip_includes_exe": false
+}
