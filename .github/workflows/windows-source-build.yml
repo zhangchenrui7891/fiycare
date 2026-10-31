@@ -1,8 +1,8 @@
 name: Windows application source build
 on:
   push:
-    branches: ['codex/v0.45-windows-build']
-    paths: ['maintenance/v0.45-windows-build/**', '.github/workflows/windows-source-build.yml']
+    branches: ['codex/v0.46-flight-instruments']
+    paths: ['maintenance/v0.46-flight-instruments/**', '.github/workflows/windows-source-build.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -15,13 +15,13 @@ jobs:
       - name: Compile full application and check actual HLSL and launch modules
         shell: pwsh
         run: |
-          & ./maintenance/v0.45-windows-build/tools/check_windows_source.ps1
+          & ./maintenance/v0.46-flight-instruments/tools/check_windows_source.ps1
       - name: Preserve evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: windows-source-build-evidence
           path: |
-            maintenance/v0.45-windows-build/out/build/windows-source-check/windows-source-check.log
-            maintenance/v0.45-windows-build/out/build/windows-source-check/Testing/Temporary/LastTest.log
+            maintenance/v0.46-flight-instruments/out/build/windows-source-check/windows-source-check.log
+            maintenance/v0.46-flight-instruments/out/build/windows-source-check/Testing/Temporary/LastTest.log
           if-no-files-found: warn
