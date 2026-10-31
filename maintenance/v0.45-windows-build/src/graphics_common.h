@@ -1,5 +1,6 @@
 #pragma once
 #include <windows.h>
+#include "windows_text.h"
 #include <wrl.h>
 #include <d3dcompiler.h>
 #include <DirectXMath.h>

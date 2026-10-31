@@ -25,7 +25,7 @@ struct Renderer11 final : IRenderer {
   D3D_FEATURE_LEVEL levels[]={D3D_FEATURE_LEVEL_11_0};D3D_FEATURE_LEVEL obtained{};
   check(D3D11CreateDeviceAndSwapChain(nullptr,software?D3D_DRIVER_TYPE_WARP:D3D_DRIVER_TYPE_HARDWARE,nullptr,0,levels,1,D3D11_SDK_VERSION,&sd,&swap,&device,&obtained,&context),"D3D11CreateDeviceAndSwapChain");
   ComPtr<IDXGIDevice> dxgi;check(device.As(&dxgi));ComPtr<IDXGIAdapter> adapter;check(dxgi->GetAdapter(&adapter));DXGI_ADAPTER_DESC ad{};check(adapter->GetDesc(&ad));
-  std::wstring desc(ad.Description);logLine(std::string("DX11 adapter: ")+std::string(desc.begin(),desc.end()));
+  std::wstring desc(ad.Description);logLine(std::string("DX11 adapter: ")+windowsUtf8(desc));
   ComPtr<IDXGIFactory> factory;check(adapter->GetParent(IID_PPV_ARGS(&factory)));check(factory->MakeWindowAssociation(window,DXGI_MWA_NO_ALT_ENTER));
   ComPtr<ID3D11Texture2D> back;check(swap->GetBuffer(0,IID_PPV_ARGS(&back)));check(device->CreateRenderTargetView(back.Get(),nullptr,&target));
   D3D11_TEXTURE2D_DESC td{};td.Width=width;td.Height=height;td.MipLevels=1;td.ArraySize=1;td.Format=DXGI_FORMAT_D32_FLOAT;td.SampleDesc.Count=1;td.BindFlags=D3D11_BIND_DEPTH_STENCIL;

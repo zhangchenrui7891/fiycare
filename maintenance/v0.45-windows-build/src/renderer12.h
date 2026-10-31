@@ -18,7 +18,7 @@ struct Renderer12 final : IRenderer {
  void init(HWND h,bool software)override{
   window=h;ComPtr<IDXGIFactory4> factory;check(CreateDXGIFactory1(IID_PPV_ARGS(&factory)));
   ComPtr<IDXGIAdapter1> adapter;for(UINT i=0;!software&&factory->EnumAdapters1(i,&adapter)!=DXGI_ERROR_NOT_FOUND;i++){
-   DXGI_ADAPTER_DESC1 d{};check(adapter->GetDesc1(&d));if(!(d.Flags&DXGI_ADAPTER_FLAG_SOFTWARE)&&SUCCEEDED(D3D12CreateDevice(adapter.Get(),D3D_FEATURE_LEVEL_11_0,IID_PPV_ARGS(&device)))){std::wstring desc(d.Description);logLine(std::string("DX12 adapter: ")+std::string(desc.begin(),desc.end()));break;}adapter.Reset();
+   DXGI_ADAPTER_DESC1 d{};check(adapter->GetDesc1(&d));if(!(d.Flags&DXGI_ADAPTER_FLAG_SOFTWARE)&&SUCCEEDED(D3D12CreateDevice(adapter.Get(),D3D_FEATURE_LEVEL_11_0,IID_PPV_ARGS(&device)))){std::wstring desc(d.Description);logLine(std::string("DX12 adapter: ")+windowsUtf8(desc));break;}adapter.Reset();
   }
   if(!device&&!software)throw std::runtime_error("DX12 hardware unavailable. Check Boot Camp graphics driver and dxdiag. Software test only: launch with --warp.");
   if(!device){ComPtr<IDXGIAdapter> warp;check(factory->EnumWarpAdapter(IID_PPV_ARGS(&warp)));check(D3D12CreateDevice(warp.Get(),D3D_FEATURE_LEVEL_11_0,IID_PPV_ARGS(&device)));}
