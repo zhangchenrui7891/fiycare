@@ -1,0 +1,118 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,10 +1,11 @@
+ cmake_minimum_required(VERSION 3.22)
+ include("${CMAKE_CURRENT_LIST_DIR}/tools/repair_build_timestamps.cmake")
+ fcair_check_build_timestamps("${CMAKE_CURRENT_LIST_DIR}" FALSE)
+-project(FlightCareerAir VERSION 0.44.0 LANGUAGES C CXX)
++project(FlightCareerAir VERSION 0.45.0 LANGUAGES C CXX)
+ set(CMAKE_CXX_STANDARD 17)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+ set(CMAKE_CXX_EXTENSIONS OFF)
++option(FCAIR_COPY_RUNTIME_ASSETS "Copy runtime assets beside the Windows executable" ON)
+ option(FCAIR_WITH_ASSIMP "Build and use the multi-format aircraft importer" ON)
+ if(FCAIR_WITH_ASSIMP)
+  set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+@@ -98,6 +99,11 @@
+ add_test(NAME laboratory_surface_sweep COMMAND flight_lab sweep "${CMAKE_CURRENT_BINARY_DIR}/lab_check/sweep")
+ add_test(NAME laboratory_engine_out COMMAND flight_lab scenario --surface --aircraft 3 --seconds 90 --fail-left 15 --output "${CMAKE_CURRENT_BINARY_DIR}/lab_check/engine_out")
+ if(WIN32)
++ add_executable(windows_text_check windows_text_tests.cpp)
++ add_test(NAME windows_utf8_device_log COMMAND windows_text_check)
++ if(MSVC)
++  target_compile_options(windows_text_check PRIVATE /W4 /WX /utf-8 /EHsc)
++ endif()
+  add_executable(windows_launch_check windows_launch_tests.cpp)
+  target_link_libraries(windows_launch_check PRIVATE shell32)
+  add_test(NAME windows_command_line_parsing COMMAND windows_launch_check)
+@@ -117,7 +123,11 @@
+   target_link_libraries(FlightCareerAir PRIVATE aircraft_asset_pipeline)
+   target_compile_definitions(FlightCareerAir PRIVATE FCAIR_WITH_ASSIMP)
+  endif()
+- add_custom_command(TARGET FlightCareerAir POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/assets" "$<TARGET_FILE_DIR:FlightCareerAir>/assets")
++ if(FCAIR_COPY_RUNTIME_ASSETS)
++  add_custom_command(TARGET FlightCareerAir POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/assets" "$<TARGET_FILE_DIR:FlightCareerAir>/assets")
++ else()
++  message(STATUS "Runtime asset copy disabled: executable requires separately supplied assets before launch")
++ endif()
+  target_compile_definitions(FlightCareerAir PRIVATE UNICODE _UNICODE NOMINMAX)
+  target_link_libraries(FlightCareerAir PRIVATE d3d12 d3d11 dxgi d3dcompiler user32 gdi32 comdlg32 shell32)
+  if(MSVC)
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -111,7 +111,7 @@
+   L"存档/照片/日志：%LOCALAPPDATA%\\FlightCareerAir\n"
+   L"诊断输出另存：diagnostics\\benchmark 或 diagnostics\\smoke；不保存游戏生涯。\n"
+   L"DX12初始化失败会自动尝试DX11；可用--dx11强制兼容模式。",
+-  L"飞行生涯 v0.44 · 中文操作说明",MB_OK);
++  L"飞行生涯 v0.45 · 中文操作说明",MB_OK);
+ }
+ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
+  std::filesystem::path folder;
+@@ -119,7 +119,7 @@
+   const auto args=launch::currentOptions();const bool benchmark=args.has(L"--benchmark");const bool low=args.has(L"--low")||benchmark;const bool smoke=args.has(L"--smoke-test");int smokeFrames=0;
+   const runfiles::RunFiles runFiles(dataFolder(),benchmark,smoke);
+   folder=runFiles.folder();std::filesystem::create_directories(folder);
+-  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.44 startup");
++  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.45 startup");
+   if(!runFiles.gameSavesEnabled())logLine("Diagnostic output isolated; live game saves disabled");
+   sim::Snapshot state;bool loaded=false,primaryValid=false;
+   {std::ifstream saved(folder/L"state.txt");if(saved){if(!state.read(saved))logLine("Invalid state.txt ignored; attempting legacy career");else {loaded=primaryValid=true;logLine("Loaded compatible full flight state");}}}
+@@ -149,7 +149,7 @@
+   const DWORD style=WS_OVERLAPPEDWINDOW;
+   WNDCLASSW wc{};wc.lpfnWndProc=windowProc;wc.hInstance=instance;wc.lpszClassName=L"FlightCareerAir";wc.hCursor=LoadCursor(nullptr,IDC_ARROW);if(!RegisterClassW(&wc))throw std::runtime_error("Window registration failed");
+   RECT bounds{0,0,low?640:1600,low?360:900};HMENU nativeMenu=createChineseMenu();AdjustWindowRect(&bounds,style,TRUE);
+-  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.44 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
++  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.45 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
+   if(!window)throw std::runtime_error("Window creation failed");ShowWindow(window,SW_SHOW);
+   if(args.has(L"--fullscreen"))toggleFullscreen(window);
+   if(args.has(L"--native"))renderScale=1;
+@@ -446,7 +446,7 @@
+     perf.flush();reportTime=0;
+    }
+    std::wostringstream display;display<<std::fixed<<std::setprecision(0);
+-   display<<L"飞行生涯 v0.44  |  "<<wideUtf8(renderer->name())<<L"  |  "<<frameStats.fps<<L" 帧/秒  |  "<<(walking?L"步行":L"飞行")<<((paused||menuPage!=ui::Page::None)?L" · 已暂停":L"")<<L"\n";
++   display<<L"飞行生涯 v0.45  |  "<<wideUtf8(renderer->name())<<L"  |  "<<frameStats.fps<<L" 帧/秒  |  "<<(walking?L"步行":L"飞行")<<((paused||menuPage!=ui::Page::None)?L" · 已暂停":L"")<<L"\n";
+    const auto air=sim::airData(flight,state.avionics.qnh);
+    display<<L"航电 "<<(state.avionics.powered(flight)?L"在线":L"断电")<<L" · IAS "<<air.ias*3.6<<L" · TAS "<<air.tas*3.6<<L" · GS "<<air.groundSpeed*3.6<<L" km/h · QNH "<<state.avionics.qnh<<L"\n";
+    display<<flight.spec().name<<L"  空速 "<<flight.airspeed()*3.6<<L" 公里/时  高度 "<<flight.y<<L" 米  升降 "<<flight.vy<<L" 米/秒\n";
+@@ -484,7 +484,7 @@
+    if(smoke&&++smokeFrames>=3){logLine("Smoke test: three rendered frames and BMP capture succeeded");DestroyWindow(window);}
+    if(benchmark&&timing::benchmarkFinished(benchmarkStarted,benchmarkSamples)){
+     std::ofstream summary(folder/L"performance_summary.txt",std::ios::trunc);
+-    const auto result=timing::writeBenchmarkSummary(summary,"v0.44",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples);
++    const auto result=timing::writeBenchmarkSummary(summary,"v0.45",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples);
+     summary.flush();if(!summary)logLine("Benchmark summary write failed; no report file success claimed");
+     pendingPhoto=folder/L"benchmark_final.bmp";renderer->draw(mesh,hud,XMMatrixLookToLH(XMVectorZero(),viewDirection,up)*reversedPerspective(activeFov,cockpit::viewportAspect,presentation::worldNear,presentation::worldFar),daylight,pendingPhoto,cabin,cabinView);pendingPhoto.clear();
+     logLine(result.complete?"Benchmark completed with valid full-run statistics":"Benchmark ended without a valid performance verdict; inspect summary status/counts");DestroyWindow(window);
+--- a/src/graphics_common.h
++++ b/src/graphics_common.h
+@@ -1,5 +1,6 @@
+ #pragma once
+ #include <windows.h>
++#include "windows_text.h"
+ #include <wrl.h>
+ #include <d3dcompiler.h>
+ #include <DirectXMath.h>
+--- a/src/renderer11.h
++++ b/src/renderer11.h
+@@ -25,7 +25,7 @@
+   D3D_FEATURE_LEVEL levels[]={D3D_FEATURE_LEVEL_11_0};D3D_FEATURE_LEVEL obtained{};
+   check(D3D11CreateDeviceAndSwapChain(nullptr,software?D3D_DRIVER_TYPE_WARP:D3D_DRIVER_TYPE_HARDWARE,nullptr,0,levels,1,D3D11_SDK_VERSION,&sd,&swap,&device,&obtained,&context),"D3D11CreateDeviceAndSwapChain");
+   ComPtr<IDXGIDevice> dxgi;check(device.As(&dxgi));ComPtr<IDXGIAdapter> adapter;check(dxgi->GetAdapter(&adapter));DXGI_ADAPTER_DESC ad{};check(adapter->GetDesc(&ad));
+-  std::wstring desc(ad.Description);logLine(std::string("DX11 adapter: ")+std::string(desc.begin(),desc.end()));
++  std::wstring desc(ad.Description);logLine(std::string("DX11 adapter: ")+windowsUtf8(desc));
+   ComPtr<IDXGIFactory> factory;check(adapter->GetParent(IID_PPV_ARGS(&factory)));check(factory->MakeWindowAssociation(window,DXGI_MWA_NO_ALT_ENTER));
+   ComPtr<ID3D11Texture2D> back;check(swap->GetBuffer(0,IID_PPV_ARGS(&back)));check(device->CreateRenderTargetView(back.Get(),nullptr,&target));
+   D3D11_TEXTURE2D_DESC td{};td.Width=width;td.Height=height;td.MipLevels=1;td.ArraySize=1;td.Format=DXGI_FORMAT_D32_FLOAT;td.SampleDesc.Count=1;td.BindFlags=D3D11_BIND_DEPTH_STENCIL;
+--- a/src/renderer12.h
++++ b/src/renderer12.h
+@@ -18,7 +18,7 @@
+  void init(HWND h,bool software)override{
+   window=h;ComPtr<IDXGIFactory4> factory;check(CreateDXGIFactory1(IID_PPV_ARGS(&factory)));
+   ComPtr<IDXGIAdapter1> adapter;for(UINT i=0;!software&&factory->EnumAdapters1(i,&adapter)!=DXGI_ERROR_NOT_FOUND;i++){
+-   DXGI_ADAPTER_DESC1 d{};check(adapter->GetDesc1(&d));if(!(d.Flags&DXGI_ADAPTER_FLAG_SOFTWARE)&&SUCCEEDED(D3D12CreateDevice(adapter.Get(),D3D_FEATURE_LEVEL_11_0,IID_PPV_ARGS(&device)))){std::wstring desc(d.Description);logLine(std::string("DX12 adapter: ")+std::string(desc.begin(),desc.end()));break;}adapter.Reset();
++   DXGI_ADAPTER_DESC1 d{};check(adapter->GetDesc1(&d));if(!(d.Flags&DXGI_ADAPTER_FLAG_SOFTWARE)&&SUCCEEDED(D3D12CreateDevice(adapter.Get(),D3D_FEATURE_LEVEL_11_0,IID_PPV_ARGS(&device)))){std::wstring desc(d.Description);logLine(std::string("DX12 adapter: ")+windowsUtf8(desc));break;}adapter.Reset();
+   }
+   if(!device&&!software)throw std::runtime_error("DX12 hardware unavailable. Check Boot Camp graphics driver and dxdiag. Software test only: launch with --warp.");
+   if(!device){ComPtr<IDXGIAdapter> warp;check(factory->EnumWarpAdapter(IID_PPV_ARGS(&warp)));check(D3D12CreateDevice(warp.Get(),D3D_FEATURE_LEVEL_11_0,IID_PPV_ARGS(&device)));}

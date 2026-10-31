@@ -1,0 +1,105 @@
+Source: https://github.com/zhangchenrui7891/fiycare/actions/runs/41162546641
+Commit: b50f54fec4344dec9dccd4eba969a658e942f2d0
+2026-10-31T03:01:58.3146781Z -- The C compiler identification is MSVC 19.44.35229.0
+2026-10-31T03:01:59.5942279Z -- The CXX compiler identification is MSVC 19.44.35229.0
+2026-10-31T03:01:59.6965301Z -- Detecting C compiler ABI info
+2026-10-31T03:02:00.6913413Z -- Detecting C compiler ABI info - done
+2026-10-31T03:02:00.7051845Z -- Check for working C compiler: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+2026-10-31T03:02:00.7064634Z -- Detecting C compile features
+2026-10-31T03:02:00.7076947Z -- Detecting C compile features - done
+2026-10-31T03:02:00.7279944Z -- Detecting CXX compiler ABI info
+2026-10-31T03:02:01.4079961Z -- Detecting CXX compiler ABI info - done
+2026-10-31T03:02:01.4213410Z -- Check for working CXX compiler: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+2026-10-31T03:02:01.4217477Z -- Detecting CXX compile features
+2026-10-31T03:02:01.4230956Z -- Detecting CXX compile features - done
+2026-10-31T03:02:01.4528835Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+2026-10-31T03:02:02.9602520Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+2026-10-31T03:02:02.9603050Z -- Looking for pthread_create in pthreads
+2026-10-31T03:02:03.5445631Z -- Looking for pthread_create in pthreads - not found
+2026-10-31T03:02:03.5446402Z -- Looking for pthread_create in pthread
+2026-10-31T03:02:04.0998806Z -- Looking for pthread_create in pthread - not found
+2026-10-31T03:02:04.1222051Z -- Found Threads: TRUE
+2026-10-31T03:02:05.3052078Z -- Runtime asset copy disabled: executable requires separately supplied assets before launch
+2026-10-31T03:02:05.3052968Z -- Configuring done (16.7s)
+2026-10-31T03:02:05.4274110Z -- Generating done (0.1s)
+2026-10-31T03:02:05.4281710Z -- Build files have been written to: D:/a/fiycare/fiycare/maintenance/v0.45-windows-build/out/build/windows-source-check
+2026-10-31T03:02:05.5428514Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-10-31T03:02:05.5727516Z 
+2026-10-31T03:02:05.9171511Z   1>Checking Build System
+2026-10-31T03:02:06.0217567Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.45-windows-build/CMakeLists.txt
+2026-10-31T03:02:06.1649318Z   main.cpp
+2026-10-31T03:02:09.9856210Z D:\a\fiycare\fiycare\maintenance\v0.45-windows-build\src\renderer12.h(64,95): warning C4458: declaration of 'footprint' hides class member [D:\a\fiycare\fiycare\maintenance\v0.45-windows-build\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-10-31T03:02:09.9891445Z   (compiling source file '../../../src/main.cpp')
+2026-10-31T03:02:09.9891990Z       D:\a\fiycare\fiycare\maintenance\v0.45-windows-build\src\renderer12.h(10,37):
+2026-10-31T03:02:09.9896976Z       see declaration of 'Renderer12::footprint'
+2026-10-31T03:02:09.9897283Z   
+2026-10-31T03:02:10.3160424Z D:\a\fiycare\fiycare\maintenance\v0.45-windows-build\src\menus.h(54,140): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.45-windows-build\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-10-31T03:02:10.3162280Z   (compiling source file '../../../src/main.cpp')
+2026-10-31T03:02:10.3162741Z   
+2026-10-31T03:02:10.7026949Z D:\a\fiycare\fiycare\maintenance\v0.45-windows-build\src\main.cpp(441,76): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.45-windows-build\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-10-31T03:02:10.7032667Z D:\a\fiycare\fiycare\maintenance\v0.45-windows-build\src\main.cpp(442,57): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.45-windows-build\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-10-31T03:02:10.7034982Z D:\a\fiycare\fiycare\maintenance\v0.45-windows-build\src\main.cpp(442,136): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.45-windows-build\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-10-31T03:02:10.7037159Z D:\a\fiycare\fiycare\maintenance\v0.45-windows-build\src\main.cpp(442,265): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.45-windows-build\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-10-31T03:02:10.7039107Z D:\a\fiycare\fiycare\maintenance\v0.45-windows-build\src\main.cpp(442,310): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.45-windows-build\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-10-31T03:02:11.2739121Z C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\include\xutility(4813,18): warning C4244: '=': conversion from 'wchar_t' to 'char', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.45-windows-build\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-10-31T03:02:11.2740388Z   (compiling source file '../../../src/main.cpp')
+2026-10-31T03:02:11.2740929Z       C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\include\xutility(4813,18):
+2026-10-31T03:02:11.2741504Z       the template instantiation context (the oldest one first) is
+2026-10-31T03:02:11.2741966Z           D:\a\fiycare\fiycare\maintenance\v0.45-windows-build\src\renderer12.h(21,270):
+2026-10-31T03:02:11.2743156Z           see reference to function template instantiation 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>::basic_string<std::_String_iterator<std::_String_val<std::_Simple_types<_Elem>>>,0>(_Iter,_Iter,const _Alloc &)' being compiled
+2026-10-31T03:02:11.2744087Z           with
+2026-10-31T03:02:11.2744256Z           [
+2026-10-31T03:02:11.2744430Z               _Elem=wchar_t,
+2026-10-31T03:02:11.2744771Z               _Iter=std::_String_iterator<std::_String_val<std::_Simple_types<wchar_t>>>,
+2026-10-31T03:02:11.2745162Z               _Alloc=std::allocator<char>
+2026-10-31T03:02:11.2745396Z           ]
+2026-10-31T03:02:11.2745708Z               D:\a\fiycare\fiycare\maintenance\v0.45-windows-build\src\renderer12.h(21,228):
+2026-10-31T03:02:11.2746411Z               see the first reference to 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>::basic_string' in 'Renderer12::init'
+2026-10-31T03:02:11.2747194Z           C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\include\xstring(812,17):
+2026-10-31T03:02:11.2748267Z           see reference to function template instantiation 'void std::basic_string<char,std::char_traits<char>,std::allocator<char>>::_Construct_from_iter<wchar_t*,wchar_t*,_Size_type>(_Iter,const _Sent,_Size)' being compiled
+2026-10-31T03:02:11.2749398Z           with
+2026-10-31T03:02:11.2749562Z           [
+2026-10-31T03:02:11.2749738Z               _Size_type=unsigned __int64,
+2026-10-31T03:02:11.2749991Z               _Iter=wchar_t *,
+2026-10-31T03:02:11.2750214Z               _Sent=wchar_t *,
+2026-10-31T03:02:11.2750433Z               _Size=unsigned __int64
+2026-10-31T03:02:11.2750662Z           ]
+2026-10-31T03:02:11.2751058Z           C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\include\xstring(968,18):
+2026-10-31T03:02:11.2751883Z           see reference to function template instantiation '_OutIt *std::_Copy_n_unchecked4<wchar_t*,_Size,char*>(_InIt,_SizeTy,_OutIt)' being compiled
+2026-10-31T03:02:11.2752464Z           with
+2026-10-31T03:02:11.2753584Z           [
+2026-10-31T03:02:11.2816048Z               _OutIt=char *,
+2026-10-31T03:02:11.2816486Z               _Size=unsigned __int64,
+2026-10-31T03:02:11.2816868Z               _InIt=wchar_t *,
+2026-10-31T03:02:11.2817204Z               _SizeTy=unsigned __int64
+2026-10-31T03:02:11.2817548Z           ]
+2026-10-31T03:02:11.2817795Z   
+2026-10-31T03:02:17.8629824Z   FlightCareerAir.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.45-windows-build\out\build\windows-source-check\Release\FlightCareerAir.exe
+2026-10-31T03:02:17.9599198Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-10-31T03:02:17.9909789Z 
+2026-10-31T03:02:18.3285311Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.45-windows-build/CMakeLists.txt
+2026-10-31T03:02:18.4582466Z   shader_tests.cpp
+2026-10-31T03:02:20.4471646Z   shader_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.45-windows-build\out\build\windows-source-check\Release\shader_check.exe
+2026-10-31T03:02:20.5387793Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-10-31T03:02:20.5686779Z 
+2026-10-31T03:02:20.9022355Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.45-windows-build/CMakeLists.txt
+2026-10-31T03:02:21.0251607Z   windows_launch_tests.cpp
+2026-10-31T03:02:22.2721045Z   windows_launch_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.45-windows-build\out\build\windows-source-check\Release\windows_launch_check.exe
+2026-10-31T03:02:22.3648112Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-10-31T03:02:22.3949763Z 
+2026-10-31T03:02:22.7454662Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.45-windows-build/CMakeLists.txt
+2026-10-31T03:02:22.8745975Z   launch_options_tests.cpp
+2026-10-31T03:02:24.0264555Z   launch_options_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.45-windows-build\out\build\windows-source-check\Release\launch_options_check.exe
+2026-10-31T03:02:24.4622233Z Internal ctest changing into directory: D:/a/fiycare/fiycare/maintenance/v0.45-windows-build/out/build/windows-source-check
+2026-10-31T03:02:24.5505300Z Test project D:/a/fiycare/fiycare/maintenance/v0.45-windows-build/out/build/windows-source-check
+2026-10-31T03:02:24.5925547Z     Start  1: exact_launch_options
+2026-10-31T03:02:24.6026842Z 1/3 Test  #1: exact_launch_options .............   Passed    0.01 sec
+2026-10-31T03:02:24.6082995Z     Start 22: windows_command_line_parsing
+2026-10-31T03:02:24.6184817Z 2/3 Test #22: windows_command_line_parsing .....   Passed    0.01 sec
+2026-10-31T03:02:24.6187698Z     Start 23: hlsl_shader_compilation
+2026-10-31T03:02:24.7817279Z 3/3 Test #23: hlsl_shader_compilation ..........   Passed    0.16 sec
+2026-10-31T03:02:24.7824126Z 
+2026-10-31T03:02:24.7824563Z 100% tests passed, 0 tests failed out of 3
+2026-10-31T03:02:24.7824887Z 
+2026-10-31T03:02:24.7824988Z Total Test time (real) =   0.23 sec
+2026-10-31T03:02:24.8284034Z Application compiled with Assimp OFF. Native fcmesh loading remains compiled. Runtime assets are NOT copied. No application/GPU/HD6000 execution was performed.

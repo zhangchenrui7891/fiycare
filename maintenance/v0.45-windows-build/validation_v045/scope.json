@@ -1,0 +1,18 @@
+{
+  "baseline": "v0.44 file version25",
+  "baseline_manifest_files_verified": 1963,
+  "existing_file_changes_at_review": [
+    "CMakeLists.txt",
+    "src/main.cpp"
+  ],
+  "all_assets_and_third_party_files": "byte-identical",
+  "windows_source_snapshot": "81 source/build files, excludes runtime assets and third-party sources; exact tested hashes recorded",
+  "existing_product_changes": [
+    "CMakeLists.txt",
+    "src/main.cpp",
+    "src/graphics_common.h",
+    "src/renderer11.h",
+    "src/renderer12.h"
+  ],
+  "new_product_header": "src/windows_text.h"
+}

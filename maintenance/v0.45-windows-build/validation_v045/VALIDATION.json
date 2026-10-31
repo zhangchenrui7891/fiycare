@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-31",
+  "version": "0.45",
+  "baseline": "v0.44 file version25; 1963 manifest hashes verified",
+  "linux_release_assimp": "PASS 254 steps; Assimp ON; asset copy default ON",
+  "linux_ctest": "26/26 PASS; final recheck PASS",
+  "strict_cpp17": "PASS",
+  "new_asan_ubsan": "NOT RUN this iteration",
+  "windows_source_build": "MSVC19.44 x64 Release full main executable linked; Assimp OFF; resource copy OFF",
+  "windows_ctest": "4/4 PASS; 7 Unicode cases; 4 SM5 shaders and 80 cache hits",
+  "windows_tested_commit": "25a66c6ee50f72ec4e44c6336d3124ee3feb282e",
+  "windows_run": "https://github.com/zhangchenrui7891/fiycare/actions/runs/41162739903",
+  "windows_remaining_warnings": 7,
+  "application_runtime": "NOT RUN",
+  "windows_default_assimp_build": "NOT TESTED",
+  "HD6000_performance": "NOT MEASURED",
+  "source_zip_includes_exe": false,
+  "github_scope": "core source snapshot and iteration evidence, without binary runtime assets or third party sources"
+}
