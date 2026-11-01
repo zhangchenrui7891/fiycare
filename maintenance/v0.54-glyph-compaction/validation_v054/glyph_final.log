@@ -1,0 +1,2 @@
+3000 masks exact coverage, no overlap; idempotence, gaps, width changes, negative bearings passed
+Synthetic rectangles 539602 -> 494983; 13-row stem vertices 78 -> 6. Not GDI/FPS evidence.

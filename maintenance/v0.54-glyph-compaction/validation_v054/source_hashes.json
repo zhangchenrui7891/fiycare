@@ -1,0 +1,10 @@
+{
+  "src/glyph_runs.h": "d925d9f776e7bb4591ef54a64b87b6a4cb4917cba24cffd09e7608c5eb45b792",
+  "src/chinese_text.h": "faaab494082b106c01595e2e08bfb6018d6646318b2dd1d59420468cea6402a9",
+  "src/main.cpp": "cea56f5ffbe281e68ed94b91a4bea4bc705bdcaa800c359cae1dc772af062f3f",
+  "CMakeLists.txt": "ff9663a3f53d2b02b81ac9e7d2c41093ac30b75774551a788945ff411ca552a6",
+  "glyph_runs_tests.cpp": "259c51be415276bd6dc0a93ca009220bf69ec7d5fda579485c97710d0d3ca679",
+  "windows_glyph_tests.cpp": "fc2f2323962d6c604c18ee87a294c1a4dc564265f32274d37636577728e5dae8",
+  "tools/check_windows_source.ps1": "69a9e6b4b7476d095f4ef74cb40cfb889220fff757a68e961d04d4c6c6d40c8f",
+  "tools/check_portable.sh": "1f7f0a72ba0755725780db55791e9a0c8d86c5b3e083fd40d1fa227e9b9255ff"
+}
