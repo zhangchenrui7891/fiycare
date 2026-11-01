@@ -1,3 +1,6 @@
+#define near
+#define far
+// Match the legacy Windows SDK macros before including production scenery.
 #include "src/scenery.h"
 #include <fstream>
 #include <iostream>

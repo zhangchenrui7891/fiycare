@@ -60,9 +60,9 @@ inline void roof(std::vector<Vertex>& out,float x,float y,float z,float w,float 
     triangle(out,{x-w,y,z-d},{x,y+rise,z-d},{x+w,y,z-d},color);
     triangle(out,{x+w,y,z+d},{x,y+rise,z+d},{x-w,y,z+d},color);
 }
-inline void tree(std::vector<Vertex>& out,float x,float z,float height,Color foliage,bool near) {
+inline void tree(std::vector<Vertex>& out,float x,float z,float height,Color foliage,bool highDetail) {
     const float y=float(sim::terrain(x,z,1));
-    if(near)cuboid(out,x,y,z,.45f,height*.6f,.45f,{.28f,.21f,.13f});
+    if(highDetail)cuboid(out,x,y,z,.45f,height*.6f,.45f,{.28f,.21f,.13f});
     const float base=y+height*.35f,w=height*.35f;
     const Point top{x,y+height,z};
     triangle(out,{x-w,base,z-w},top,{x+w,base,z-w},foliage);
@@ -71,11 +71,11 @@ inline void tree(std::vector<Vertex>& out,float x,float z,float height,Color fol
     triangle(out,{x-w,base,z+w},top,{x-w,base,z-w},foliage);
 }
 inline void building(std::vector<Vertex>& out,float x,float z,float w,float d,float h,
-                     bool pitched,bool near,Color wall) {
+                     bool pitched,bool highDetail,Color wall) {
     const float y=float(sim::terrain(x,z,1))-.3f;
     cuboid(out,x,y,z,w,h,d,wall);
     if(pitched)roof(out,x,y+h,z,w+1,d+1,{.36f,.22f,.16f});
-    if(near) {
+    if(highDetail) {
         // Two narrow glazing bands on the long facades, omitted at middle/far LOD.
         for(float side:{-1.f,1.f}) {
             const float face=z+side*(d+.04f);
@@ -108,7 +108,7 @@ inline void append(std::vector<Vertex>& out,int anchorX,int anchorZ,Color foliag
     for(std::size_t i=0;i<count;i++) {
         const auto c=cells[i];const auto n=seed(c.x,c.z);
         const float x=c.x*cellSize,z=c.z*cellSize;
-        const bool near=c.distance<=1600,middle=c.distance<=2800;
+        const bool highDetail=c.distance<=1600,middle=c.distance<=2800;
         cell.clear();
         // Shared cell-edge roads join exactly. Small field plots leave the
         // existing satellite image visible between the illustrative features.
@@ -120,20 +120,20 @@ inline void append(std::vector<Vertex>& out,int anchorX,int anchorZ,Color foliag
         if(district==0 || c.x<=-10) {
             if(middle)for(float offset:{-85.f,85.f})
                 surface(cell,x+offset,z,70,145,{foliage.r*.85f,foliage.g*.85f,foliage.b*.7f},.18f);
-            building(cell,x+25,z+35,11,17,6,true,near,{.64f,.59f,.49f});
+            building(cell,x+25,z+35,11,17,6,true,highDetail,{.64f,.59f,.49f});
         } else if(district==1) {
-            building(cell,x-45,z,55,36,12,false,near,{.57f,.61f,.62f});
-            if(near)cuboid(cell,x-45,float(sim::terrain(x-45,z,1))+11.7f,z,57,.7f,38,{.25f,.35f,.39f});
+            building(cell,x-45,z,55,36,12,false,highDetail,{.57f,.61f,.62f});
+            if(highDetail)cuboid(cell,x-45,float(sim::terrain(x-45,z,1))+11.7f,z,57,.7f,38,{.25f,.35f,.39f});
         } else {
             for(int k=0;k<3;k++) {
                 const float bx=x-100+float(k)*95;
                 const float bz=z+float(int((n>>(k*4+3))&31u)-16)*3;
                 const float h=district==4?24+float((n>>(k+12))&15u):7+float((n>>(k+12))&7u);
-                building(cell,bx,bz,17,23,h,district!=4,near,{.66f,.63f,.55f});
+                building(cell,bx,bz,17,23,h,district!=4,highDetail,{.66f,.63f,.55f});
             }
         }
         if(middle)for(int k=0;k<4;k++)
-            tree(cell,x-125+float(k)*80,z+135,10+float((n>>(k*3))&7u),foliage,near);
+            tree(cell,x-125+float(k)*80,z+135,10+float((n>>(k*3))&7u),foliage,highDetail);
         if(out.size()-initial+cell.size()>vertexBudget)break; // whole cells, nearest first
         out.insert(out.end(),cell.begin(),cell.end());
     }
