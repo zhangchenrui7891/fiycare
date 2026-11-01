@@ -12,7 +12,7 @@ import tempfile
 
 
 def run(args, ok=True):
-    p = subprocess.run(args, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    p = subprocess.run(args, text=True, encoding="utf-8", errors="replace", stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     if (p.returncode == 0) != ok:
         raise RuntimeError(f'{args}: exit {p.returncode}\n{p.stdout}')
     return p.stdout
@@ -47,7 +47,7 @@ file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/exe-$<CONFIG>.txt" CONTENT "$<TARGET_F
                         '--target', 'fixture', '--parallel', '2'], ok)
 
         compile_fixture()
-        exe = Path((build / 'exe-Release.txt').read_text())
+        exe = Path((build / 'exe-Release.txt').read_text(encoding='utf-8'))
         output = exe.parent / 'assets/机模/test.fcmesh'
         assert output.read_bytes() == asset.read_bytes()
         stamp = (exe.stat().st_mtime_ns, hashlib.sha256(exe.read_bytes()).hexdigest())
