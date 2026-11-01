@@ -1,0 +1,8 @@
+{
+  "project": "Assimp",
+  "version": "5.4.3",
+  "source": "https://github.com/assimp/assimp/releases/tag/v5.4.3",
+  "archive_sha256": "66dfbaee288f2bc43172440a55d0235dfc7bf885dda6435c038e8000e79582cb",
+  "scope": "code, include, contrib, CMake build support; upstream tests and model assets omitted",
+  "license": "BSD-3-Clause and bundled dependency licenses"
+}
