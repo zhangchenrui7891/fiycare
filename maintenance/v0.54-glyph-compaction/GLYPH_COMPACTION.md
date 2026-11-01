@@ -1,3 +1,6 @@
+
+本轮Windows最终证据：2026-11-01 GitHub Actions run41315044625成功，Windows2022/MSVC主程序编译链接成功，11/11 CPU检查通过（含真实GDI像素覆盖/字距、HLSL编译）。Assimp OFF、资源复制OFF，没有运行游戏。日志有8条MSVC警告，未宣称零警告。结果：https://github.com/zhangchenrui7891/fiycare/actions/runs/41315044625 。最终代码与受检提交420162c5f9cd1afd7cd611ebcabd912a4caf73f2一致；后续仅补文档证据。
+
 ## v0.54 · 2026-11-01（字体几何合并）
 基线：读取v0.53（文件版本34），ZIP CRC及2151项SHA256通过；十机型、27控件共用座舱、PFD/NAV/ENGINE三屏、训练导航/进近、生涯、示意地景、浦东影像、FXAA和账号网站入口保留。网站不绑定游戏存档；本轮未更改站点发布状态，不能确认所有地区连通。
 

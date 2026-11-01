@@ -1,0 +1,21 @@
+2026-11-01T14:13:17.5286791Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\renderer12.h(64,95): warning C4458: declaration of 'footprint' hides class member [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-01T14:13:17.8592745Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\menus.h(61,140): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-01T14:13:18.2631299Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(458,76): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-01T14:13:18.2633928Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(459,57): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-01T14:13:18.2636677Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(459,136): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-01T14:13:18.2639386Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(459,265): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-01T14:13:18.2641650Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(459,310): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-01T14:13:18.3855444Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\cockpit_avionics.h(116,21): warning C4244: 'argument': conversion from 'size_t' to 'double', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-01T14:13:24.9773267Z   FlightCareerAir.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\FlightCareerAir.exe
+2026-11-01T14:13:45.1977804Z  1/11 Test  #1: compact_glyph_coverage ..................   Passed    0.15 sec
+2026-11-01T14:13:45.3700393Z  2/11 Test  #3: offline_scenery_geometry ................   Passed    0.17 sec
+2026-11-01T14:13:45.3796076Z  3/11 Test  #5: autopilot_disconnect_feedback ...........   Passed    0.01 sec
+2026-11-01T14:13:45.4016013Z  4/11 Test  #6: primary_instrument_text .................   Passed    0.02 sec
+2026-11-01T14:13:45.4091904Z  5/11 Test  #7: exact_launch_options ....................   Passed    0.01 sec
+2026-11-01T14:13:45.6631941Z  6/11 Test #30: windows_compact_glyph_coverage ..........   Passed    0.25 sec
+2026-11-01T14:13:45.7282803Z  7/11 Test #31: windows_autopilot_notice_glyph_bounds ...   Passed    0.06 sec
+2026-11-01T14:13:45.7492195Z  8/11 Test #32: windows_instrument_glyph_bounds .........   Passed    0.02 sec
+2026-11-01T14:13:45.7570261Z  9/11 Test #33: windows_utf8_device_log .................   Passed    0.01 sec
+2026-11-01T14:13:45.7675452Z 10/11 Test #34: windows_command_line_parsing ............   Passed    0.01 sec
+2026-11-01T14:13:45.9293016Z 11/11 Test #35: hlsl_shader_compilation .................   Passed    0.16 sec
+2026-11-01T14:13:45.9300346Z 100% tests passed, 0 tests failed out of 11
