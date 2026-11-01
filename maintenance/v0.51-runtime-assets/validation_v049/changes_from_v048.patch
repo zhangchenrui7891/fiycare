@@ -1,0 +1,136 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,7 +1,7 @@
+ cmake_minimum_required(VERSION 3.22)
+ include("${CMAKE_CURRENT_LIST_DIR}/tools/repair_build_timestamps.cmake")
+ fcair_check_build_timestamps("${CMAKE_CURRENT_LIST_DIR}" FALSE)
+-project(FlightCareerAir VERSION 0.48.0 LANGUAGES C CXX)
++project(FlightCareerAir VERSION 0.49.0 LANGUAGES C CXX)
+ set(CMAKE_CXX_STANDARD 17)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+ set(CMAKE_CXX_EXTENSIONS OFF)
+@@ -57,10 +57,12 @@
+ add_executable(launch_options_check launch_options_tests.cpp)
+ add_executable(flight_instrument_check flight_instrument_tests.cpp)
+ add_executable(autopilot_feedback_check autopilot_feedback_tests.cpp)
++add_executable(asset_length_check asset_length_tests.cpp)
+ find_package(Threads REQUIRED)
+ add_executable(terrain_stream_check terrain_stream_tests.cpp)
+ target_link_libraries(terrain_stream_check PRIVATE Threads::Threads)
+ enable_testing()
++add_test(NAME native_asset_payload_lengths COMMAND asset_length_check)
+ add_test(NAME autopilot_disconnect_feedback COMMAND autopilot_feedback_check)
+ add_test(NAME primary_instrument_text COMMAND flight_instrument_check)
+ add_test(NAME exact_launch_options COMMAND launch_options_check)
+@@ -108,6 +110,9 @@
+ add_test(NAME laboratory_surface_sweep COMMAND flight_lab sweep "${CMAKE_CURRENT_BINARY_DIR}/lab_check/sweep")
+ add_test(NAME laboratory_engine_out COMMAND flight_lab scenario --surface --aircraft 3 --seconds 90 --fail-left 15 --output "${CMAKE_CURRENT_BINARY_DIR}/lab_check/engine_out")
+ if(WIN32)
++ if(MSVC)
++  target_compile_options(asset_length_check PRIVATE /W4 /utf-8 /EHsc)
++ endif()
+  add_executable(autopilot_feedback_layout_check autopilot_feedback_layout_tests.cpp)
+  target_compile_definitions(autopilot_feedback_layout_check PRIVATE UNICODE _UNICODE NOMINMAX)
+  target_link_libraries(autopilot_feedback_layout_check PRIVATE gdi32 user32 d3dcompiler)
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -112,7 +112,7 @@
+   L"存档/照片/日志：%LOCALAPPDATA%\\FlightCareerAir\n"
+   L"诊断输出另存：diagnostics\\benchmark 或 diagnostics\\smoke；不保存游戏生涯。\n"
+   L"DX12初始化失败会自动尝试DX11；可用--dx11强制兼容模式。",
+-  L"飞行生涯 v0.48 · 中文操作说明",MB_OK);
++  L"飞行生涯 v0.49 · 中文操作说明",MB_OK);
+ }
+ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
+  std::filesystem::path folder;
+@@ -120,7 +120,7 @@
+   const auto args=launch::currentOptions();const bool benchmark=args.has(L"--benchmark");const bool low=args.has(L"--low")||benchmark;const bool smoke=args.has(L"--smoke-test");int smokeFrames=0;
+   const runfiles::RunFiles runFiles(dataFolder(),benchmark,smoke);
+   folder=runFiles.folder();std::filesystem::create_directories(folder);
+-  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.48 startup");
++  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.49 startup");
+   if(!runFiles.gameSavesEnabled())logLine("Diagnostic output isolated; live game saves disabled");
+   sim::Snapshot state;bool loaded=false,primaryValid=false;
+   {std::ifstream saved(folder/L"state.txt");if(saved){if(!state.read(saved))logLine("Invalid state.txt ignored; attempting legacy career");else {loaded=primaryValid=true;logLine("Loaded compatible full flight state");}}}
+@@ -150,7 +150,7 @@
+   const DWORD style=WS_OVERLAPPEDWINDOW;
+   WNDCLASSW wc{};wc.lpfnWndProc=windowProc;wc.hInstance=instance;wc.lpszClassName=L"FlightCareerAir";wc.hCursor=LoadCursor(nullptr,IDC_ARROW);if(!RegisterClassW(&wc))throw std::runtime_error("Window registration failed");
+   RECT bounds{0,0,low?640:1600,low?360:900};HMENU nativeMenu=createChineseMenu();AdjustWindowRect(&bounds,style,TRUE);
+-  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.48 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
++  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.49 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
+   if(!window)throw std::runtime_error("Window creation failed");ShowWindow(window,SW_SHOW);
+   if(args.has(L"--fullscreen"))toggleFullscreen(window);
+   if(args.has(L"--native"))renderScale=1;
+@@ -456,7 +456,7 @@
+     perf.flush();reportTime=0;
+    }
+    std::wostringstream display;display<<std::fixed<<std::setprecision(0);
+-   display<<L"飞行生涯 v0.48  |  "<<wideUtf8(renderer->name())<<L"  |  "<<frameStats.fps<<L" 帧/秒  |  "<<(walking?L"步行":L"飞行")<<((paused||menuPage!=ui::Page::None)?L" · 已暂停":L"")<<L"\n";
++   display<<L"飞行生涯 v0.49  |  "<<wideUtf8(renderer->name())<<L"  |  "<<frameStats.fps<<L" 帧/秒  |  "<<(walking?L"步行":L"飞行")<<((paused||menuPage!=ui::Page::None)?L" · 已暂停":L"")<<L"\n";
+    const auto air=sim::airData(flight,state.avionics.qnh);
+    display<<L"航电 "<<(state.avionics.powered(flight)?L"在线":L"断电")<<L" · IAS "<<air.ias*3.6<<L" · TAS "<<air.tas*3.6<<L" · GS "<<air.groundSpeed*3.6<<L" km/h · QNH "<<state.avionics.qnh<<L"\n";
+    display<<flight.spec().name<<L"  空速 "<<flight.airspeed()*3.6<<L" 公里/时  高度 "<<flight.y<<L" 米  升降 "<<flight.vy<<L" 米/秒\n";
+@@ -494,7 +494,7 @@
+    if(smoke&&++smokeFrames>=3){logLine("Smoke test: three rendered frames and BMP capture succeeded");DestroyWindow(window);}
+    if(benchmark&&timing::benchmarkFinished(benchmarkStarted,benchmarkSamples)){
+     std::ofstream summary(folder/L"performance_summary.txt",std::ios::trunc);
+-    const auto result=timing::writeBenchmarkSummary(summary,"v0.48",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples);
++    const auto result=timing::writeBenchmarkSummary(summary,"v0.49",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples);
+     summary.flush();if(!summary)logLine("Benchmark summary write failed; no report file success claimed");
+     pendingPhoto=folder/L"benchmark_final.bmp";renderer->draw(mesh,hud,XMMatrixLookToLH(XMVectorZero(),viewDirection,up)*reversedPerspective(activeFov,cockpit::viewportAspect,presentation::worldNear,presentation::worldFar),daylight,pendingPhoto,cabin,cabinView);pendingPhoto.clear();
+     logLine(result.complete?"Benchmark completed with valid full-run statistics":"Benchmark ended without a valid performance verdict; inspect summary status/counts");DestroyWindow(window);
+--- a/src/assets.h
++++ b/src/assets.h
+@@ -13,9 +13,19 @@
+ struct ImportedModel{std::vector<Vertex> vertices;std::vector<unsigned char> gear;};
+ inline uint32_t assetU32(std::istream& in){std::array<unsigned char,4> b{};in.read(reinterpret_cast<char*>(b.data()),4);return uint32_t(b[0])|(uint32_t(b[1])<<8)|(uint32_t(b[2])<<16)|(uint32_t(b[3])<<24);}
+ inline void assetMagic(std::istream& in,const char* expected){char b[8]{};in.read(b,8);if(!in||std::memcmp(b,expected,8))throw std::runtime_error("Invalid asset header");}
++// Confirm the opened file has exactly the advertised payload before allocation.
++inline void assetPayloadSize(std::ifstream& in,std::uintmax_t expected,const char* message){
++ const auto start=in.tellg();
++ if(start==std::streampos(-1))throw std::runtime_error(message);
++ in.seekg(0,std::ios::end);const auto end=in.tellg();
++ if(end==std::streampos(-1)||end<start||static_cast<std::uintmax_t>(end-start)!=expected)
++  throw std::runtime_error(message);
++ in.seekg(start);if(!in)throw std::runtime_error(message);
++}
+ inline AtlasImage loadAtlas(const std::filesystem::path& p){
+  std::ifstream in(p,std::ios::binary);assetMagic(in,"FCTEX005");AtlasImage a;a.width=assetU32(in);a.height=assetU32(in);
+  if(!a.width||!a.height||a.width>4096||a.height>4096)throw std::runtime_error("Invalid atlas dimensions");
++ assetPayloadSize(in,std::uintmax_t(a.width)*a.height*4,"Invalid atlas payload size");
+  a.rgba.resize(size_t(a.width)*a.height*4);in.read(reinterpret_cast<char*>(a.rgba.data()),static_cast<std::streamsize>(a.rgba.size()));
+  if(!in||in.peek()!=std::char_traits<char>::eof())throw std::runtime_error("Invalid atlas payload");
+  return a;
+@@ -25,6 +35,7 @@
+  if(!in||(!colored&&std::memcmp(meshMagic,"FCMESH06",8)))throw std::runtime_error("Invalid mesh header");
+  const auto n=assetU32(in),stride=assetU32(in),triangles=assetU32(in);
+  if(!n||n>3000000||n%3||stride!=12||triangles!=n/3)throw std::runtime_error("Invalid mesh dimensions");
++ assetPayloadSize(in,std::uintmax_t(n)*sizeof(Vertex)+triangles,"Invalid mesh payload size");
+  ImportedModel m;m.vertices.resize(n);m.gear.resize(triangles);in.read(reinterpret_cast<char*>(m.vertices.data()),static_cast<std::streamsize>(n*sizeof(Vertex)));in.read(reinterpret_cast<char*>(m.gear.data()),triangles);
+  if(!in||in.peek()!=std::char_traits<char>::eof())throw std::runtime_error("Invalid mesh payload");
+  for(const auto& v:m.vertices)if(!std::isfinite(v.x)||!std::isfinite(v.y)||!std::isfinite(v.z)||!std::isfinite(v.r)||!std::isfinite(v.g)||!std::isfinite(v.b)||!std::isfinite(v.u)||!std::isfinite(v.v)||v.u<0||v.u>1||v.v<0||v.v>1||(colored?v.textured!=0:v.textured!=1)||!std::isfinite(v.nx)||!std::isfinite(v.ny)||!std::isfinite(v.nz)||std::abs(v.nx*v.nx+v.ny*v.ny+v.nz*v.nz-1)>.02)throw std::runtime_error("Invalid mesh vertex");
+--- a/tools/check_portable.sh
++++ b/tools/check_portable.sh
+@@ -4,7 +4,7 @@
+ task_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+ task_build="${1:-$task_root/out/portable}"
+ mkdir -p -- "$task_build"
+-for task_test in tests aero_avionics_tests engineering_tests stability_tests terrain_stream_tests frame_geometry_tests shader_cache_tests keyboard_state_tests keyboard_event_tests cockpit_input_tests cockpit_solids_tests approach_tests navigation_tests navigation_track_tests benchmark_tests performance_window_tests launch_options_tests flight_instrument_tests autopilot_feedback_tests; do
++for task_test in tests aero_avionics_tests engineering_tests stability_tests terrain_stream_tests frame_geometry_tests shader_cache_tests keyboard_state_tests keyboard_event_tests cockpit_input_tests cockpit_solids_tests approach_tests navigation_tests navigation_track_tests benchmark_tests performance_window_tests launch_options_tests flight_instrument_tests autopilot_feedback_tests asset_length_tests; do
+     g++ -std=c++17 -O2 -pthread -Wall -Wextra -Werror -pedantic \
+         "$task_root/$task_test.cpp" -o "$task_build/$task_test"
+     case "$task_test" in
+--- a/tools/check_windows_importer.ps1
++++ b/tools/check_windows_importer.ps1
+@@ -10,9 +10,9 @@
+     if ($LASTEXITCODE -ne 0) { throw 'Pinned Assimp restoration failed' }
+     & cmake -S $project -B $build -G 'Visual Studio 17 2022' -A x64 -DFCAIR_WITH_ASSIMP=ON -DFCAIR_COPY_RUNTIME_ASSETS=OFF
+     if ($LASTEXITCODE -ne 0) { throw 'Assimp-enabled configuration failed' }
+-    & cmake --build $build --config Release --parallel 2 --target FlightCareerAir asset_import asset_fixture_check shader_check windows_launch_check launch_options_check windows_text_check flight_instrument_check flight_instrument_layout_check autopilot_feedback_check autopilot_feedback_layout_check
++    & cmake --build $build --config Release --parallel 2 --target FlightCareerAir asset_import asset_fixture_check shader_check windows_launch_check launch_options_check windows_text_check flight_instrument_check flight_instrument_layout_check autopilot_feedback_check autopilot_feedback_layout_check asset_length_check
+     if ($LASTEXITCODE -ne 0) { throw 'Assimp-enabled application or checks failed to compile' }
+-    & ctest --test-dir $build -C Release --output-on-failure -R '^(self_contained_asset_import|pinned_assimp_source_restore|hlsl_shader_compilation|windows_command_line_parsing|exact_launch_options|windows_utf8_device_log|primary_instrument_text|windows_instrument_glyph_bounds|autopilot_disconnect_feedback|windows_autopilot_notice_glyph_bounds)$'
++    & ctest --test-dir $build -C Release --output-on-failure -R '^(native_asset_payload_lengths|self_contained_asset_import|pinned_assimp_source_restore|hlsl_shader_compilation|windows_command_line_parsing|exact_launch_options|windows_utf8_device_log|primary_instrument_text|windows_instrument_glyph_bounds|autopilot_disconnect_feedback|windows_autopilot_notice_glyph_bounds)$'
+     if ($LASTEXITCODE -ne 0) { throw 'Windows importer/CPU checks failed' }
+     if (!(Test-Path (Join-Path $build 'Release/FlightCareerAir.exe'))) { throw 'Application executable missing' }
+     Write-Host 'Application compiled with Assimp ON and exact pinned bundled sources. CPU import fixtures and checks passed. Runtime assets NOT copied; application/GPU/HD6000 NOT run.'

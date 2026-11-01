@@ -1,0 +1,30 @@
+name: Windows v0.51 build and runtime staging
+on:
+  push:
+    branches: ['codex/v0.51-runtime-assets']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-2022
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - name: Source build and CPU checks
+        shell: pwsh
+        run: |
+          & ./maintenance/v0.51-runtime-assets/tools/check_windows_source.ps1
+      - name: Incremental resource staging on Visual Studio
+        shell: pwsh
+        run: |
+          python maintenance/v0.51-runtime-assets/tools/test_runtime_assets.py --generator "Visual Studio 17 2022"
+          if ($LASTEXITCODE -ne 0) { throw 'Runtime staging regression failed' }
+      - name: Preserve evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-v051-evidence
+          path: |
+            maintenance/v0.51-runtime-assets/out/build/windows-source-check/windows-source-check.log
+            maintenance/v0.51-runtime-assets/out/build/windows-source-check/Testing/Temporary/LastTest.log

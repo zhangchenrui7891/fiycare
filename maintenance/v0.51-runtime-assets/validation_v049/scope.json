@@ -1,0 +1,13 @@
+{
+  "baseline": "v0.48 file version29",
+  "baseline_manifest_files_verified": 2053,
+  "existing_product_build_changes": [
+    "CMakeLists.txt",
+    "src/assets.h",
+    "src/main.cpp",
+    "tools/check_portable.sh",
+    "tools/check_windows_importer.ps1"
+  ],
+  "assets_and_third_party": "byte-identical",
+  "format_and_vertex_validation": "unchanged; only payload-length preflight added"
+}

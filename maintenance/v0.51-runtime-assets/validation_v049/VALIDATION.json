@@ -1,0 +1,25 @@
+{
+  "date": "2026-11-01",
+  "version": "0.49",
+  "baseline": "v0.48 file version29; 2053 hashes verified",
+  "linux_release": "PASS 262 steps, Assimp ON",
+  "linux_ctest": "31/31 PASS final JUnit 0 failures 0 skipped",
+  "strict_cpp17": "PASS",
+  "new_sanitizer": "native asset readers ASan/UBSan PASS detect_leaks=0",
+  "malformed_payload_cases": 368,
+  "valid_formats_checked": [
+    "FCTEX005",
+    "FCMESH06",
+    "FCMESH07"
+  ],
+  "allocation_probe": "Old header-only cases request at least 67108864/144000000 bytes, intercepted before allocation; new cases no C++ new requests above 1MiB. Not RSS/FPS/GPU measurement.",
+  "windows": "MSVC19.44 x64 Release Assimp ON/resource copy OFF; main and importer linked",
+  "windows_ctest": "11/11 PASS",
+  "windows_tested_commit": "414f64bfae88ff17e1b93fcfa118f8133a5082fc",
+  "windows_run": "https://github.com/zhangchenrui7891/fiycare/actions/runs/41251384085",
+  "warnings": 7,
+  "application_runtime": "NOT RUN",
+  "resource_copy": "NOT TESTED on Windows",
+  "target_HD6000_performance": "NOT MEASURED",
+  "source_zip_includes_exe": false
+}

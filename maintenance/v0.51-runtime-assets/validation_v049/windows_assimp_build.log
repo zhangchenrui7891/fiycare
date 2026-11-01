@@ -1,0 +1,30 @@
+Source: https://github.com/zhangchenrui7891/fiycare/actions/runs/41251384085
+Commit: 414f64bfae88ff17e1b93fcfa118f8133a5082fc
+Scope: Assimp ON, resource copy OFF. Native CPU allocation-failure/reader, importer/HLSL/GDI checks; no game/GPU/HD6000 runtime.
+Selected raw build/test lines (full compile log remains at the run URL):
+2026-10-31T23:10:37.8954137Z Verified exact bundled Assimp subset: 1630 file hashes; no dependency upgrade.
+2026-10-31T23:10:49.1045690Z -- The C compiler identification is MSVC 19.44.35229.0
+2026-10-31T23:10:50.4444399Z -- The CXX compiler identification is MSVC 19.44.35229.0
+2026-10-31T23:13:38.4431106Z D:\a\fiycare\fiycare\maintenance\v0.49-asset-lengths\src\renderer12.h(64,95): warning C4458: declaration of 'footprint' hides class member [D:\a\fiycare\fiycare\maintenance\v0.49-asset-lengths\out\build\windows-importer-check\FlightCareerAir.vcxproj]
+2026-10-31T23:13:38.7427674Z D:\a\fiycare\fiycare\maintenance\v0.49-asset-lengths\src\menus.h(54,140): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.49-asset-lengths\out\build\windows-importer-check\FlightCareerAir.vcxproj]
+2026-10-31T23:13:39.1097094Z D:\a\fiycare\fiycare\maintenance\v0.49-asset-lengths\src\main.cpp(451,76): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.49-asset-lengths\out\build\windows-importer-check\FlightCareerAir.vcxproj]
+2026-10-31T23:13:39.1100498Z D:\a\fiycare\fiycare\maintenance\v0.49-asset-lengths\src\main.cpp(452,57): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.49-asset-lengths\out\build\windows-importer-check\FlightCareerAir.vcxproj]
+2026-10-31T23:13:39.1102754Z D:\a\fiycare\fiycare\maintenance\v0.49-asset-lengths\src\main.cpp(452,136): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.49-asset-lengths\out\build\windows-importer-check\FlightCareerAir.vcxproj]
+2026-10-31T23:13:39.1104953Z D:\a\fiycare\fiycare\maintenance\v0.49-asset-lengths\src\main.cpp(452,265): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.49-asset-lengths\out\build\windows-importer-check\FlightCareerAir.vcxproj]
+2026-10-31T23:13:39.1107111Z D:\a\fiycare\fiycare\maintenance\v0.49-asset-lengths\src\main.cpp(452,310): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.49-asset-lengths\out\build\windows-importer-check\FlightCareerAir.vcxproj]
+2026-10-31T23:13:46.7258268Z   FlightCareerAir.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.49-asset-lengths\out\build\windows-importer-check\Release\FlightCareerAir.exe
+2026-10-31T23:13:49.2590175Z   asset_import.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.49-asset-lengths\out\build\windows-importer-check\Release\asset_import.exe
+2026-10-31T23:14:11.1415355Z   asset_length_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.49-asset-lengths\out\build\windows-importer-check\Release\asset_length_check.exe
+2026-10-31T23:14:11.7938005Z  1/11 Test  #1: native_asset_payload_lengths ............   Passed    0.09 sec
+2026-10-31T23:14:11.8076959Z  2/11 Test  #2: autopilot_disconnect_feedback ...........   Passed    0.01 sec
+2026-10-31T23:14:11.8281970Z  3/11 Test  #3: primary_instrument_text .................   Passed    0.02 sec
+2026-10-31T23:14:11.8363464Z  4/11 Test  #4: exact_launch_options ....................   Passed    0.01 sec
+2026-10-31T23:14:12.8512198Z  5/11 Test  #5: pinned_assimp_source_restore ............   Passed    1.01 sec
+2026-10-31T23:14:12.8834112Z  6/11 Test  #8: self_contained_asset_import .............   Passed    0.03 sec
+2026-10-31T23:14:13.0984143Z  7/11 Test #28: windows_autopilot_notice_glyph_bounds ...   Passed    0.21 sec
+2026-10-31T23:14:13.1255196Z  8/11 Test #29: windows_instrument_glyph_bounds .........   Passed    0.03 sec
+2026-10-31T23:14:13.1338664Z  9/11 Test #30: windows_utf8_device_log .................   Passed    0.01 sec
+2026-10-31T23:14:13.1441887Z 10/11 Test #31: windows_command_line_parsing ............   Passed    0.01 sec
+2026-10-31T23:14:13.3101547Z 11/11 Test #32: hlsl_shader_compilation .................   Passed    0.17 sec
+2026-10-31T23:14:13.3109195Z 100% tests passed, 0 tests failed out of 11
+2026-10-31T23:14:13.3585207Z Application compiled with Assimp ON and exact pinned bundled sources. CPU import fixtures and checks passed. Runtime assets NOT copied; application/GPU/HD6000 NOT run.
