@@ -1,5 +1,6 @@
 #pragma once
 #include <cmath>
+#include <cstdint>
 #include <iomanip>
 #include <locale>
 #include <sstream>
@@ -18,6 +19,18 @@ inline std::wstring heading(double radians){
 inline std::wstring whole(double value){
  if(!std::isfinite(value))return L"---";
  if(std::abs(value)<.5)value=0; // Avoid a displayed negative zero.
+ // Flight instruments normally need only a few integer digits. Avoid a
+ // locale/stream object for each label each frame; keep the old path for
+ // unusually large finite values so its fixed-format behaviour is retained.
+ if(std::abs(value)<=1e15){
+  const auto rounded=static_cast<std::int64_t>(std::round(value));
+  const bool negative=rounded<0;
+  auto remaining=static_cast<std::uint64_t>(negative?-rounded:rounded);
+  wchar_t buffer[32];wchar_t* end=buffer+32;wchar_t* begin=end;
+  do{*--begin=wchar_t(L'0'+remaining%10);remaining/=10;}while(remaining);
+  if(negative)*--begin=L'-';
+  return std::wstring(begin,end);
+ }
  std::wostringstream out;out.imbue(std::locale::classic());
  out<<std::fixed<<std::setprecision(0)<<std::round(value);return out.str();
 }
