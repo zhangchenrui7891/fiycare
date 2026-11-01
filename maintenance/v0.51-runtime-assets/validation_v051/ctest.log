@@ -1,0 +1,74 @@
+Internal ctest changing into directory: /workspace/scratch/f28b7c9ab582/work_v051/out/build/release
+Test project /workspace/scratch/f28b7c9ab582/work_v051/out/build/release
+      Start  1: offline_scenery_geometry
+ 1/34 Test  #1: offline_scenery_geometry ............   Passed    0.09 sec
+      Start  2: native_asset_payload_lengths
+ 2/34 Test  #2: native_asset_payload_lengths ........   Passed    0.07 sec
+      Start  3: autopilot_disconnect_feedback
+ 3/34 Test  #3: autopilot_disconnect_feedback .......   Passed    0.00 sec
+      Start  4: primary_instrument_text
+ 4/34 Test  #4: primary_instrument_text .............   Passed    0.00 sec
+      Start  5: exact_launch_options
+ 5/34 Test  #5: exact_launch_options ................   Passed    0.00 sec
+      Start  6: build_timestamp_recovery
+ 6/34 Test  #6: build_timestamp_recovery ............   Passed    1.05 sec
+      Start  7: scenery_landscape_integration
+ 7/34 Test  #7: scenery_landscape_integration .......   Passed    1.52 sec
+      Start  8: launch_renderer_integration
+ 8/34 Test  #8: launch_renderer_integration .........   Passed    0.54 sec
+      Start  9: rebuilt_diagnostic_storage
+ 9/34 Test  #9: rebuilt_diagnostic_storage ..........   Passed    1.33 sec
+      Start 10: rebuilt_cockpit_text
+10/34 Test #10: rebuilt_cockpit_text ................   Passed    0.85 sec
+      Start 11: incremental_runtime_asset_staging
+11/34 Test #11: incremental_runtime_asset_staging ...   Passed    0.58 sec
+      Start 12: pinned_assimp_source_restore
+12/34 Test #12: pinned_assimp_source_restore ........   Passed    0.07 sec
+      Start 13: release_package_safety
+13/34 Test #13: release_package_safety ..............   Passed    0.11 sec
+      Start 14: release_manifest_verifier
+14/34 Test #14: release_manifest_verifier ...........   Passed    0.07 sec
+      Start 15: self_contained_asset_import
+15/34 Test #15: self_contained_asset_import .........   Passed    0.02 sec
+      Start 16: asset_import_and_new_fleet
+16/34 Test #16: asset_import_and_new_fleet ..........   Passed    0.08 sec
+      Start 17: physics_and_career
+17/34 Test #17: physics_and_career ..................   Passed    0.13 sec
+      Start 18: aero_and_avionics
+18/34 Test #18: aero_and_avionics ...................   Passed    0.06 sec
+      Start 19: engineering_systems
+19/34 Test #19: engineering_systems .................   Passed    0.13 sec
+      Start 20: render_and_surface_stability
+20/34 Test #20: render_and_surface_stability ........   Passed    1.07 sec
+      Start 21: reusable_frame_geometry
+21/34 Test #21: reusable_frame_geometry .............   Passed    0.21 sec
+      Start 22: shader_bytecode_cache
+22/34 Test #22: shader_bytecode_cache ...............   Passed    0.00 sec
+      Start 23: keyboard_focus_recovery
+23/34 Test #23: keyboard_focus_recovery .............   Passed    0.03 sec
+      Start 24: keyboard_short_taps
+24/34 Test #24: keyboard_short_taps .................   Passed    0.00 sec
+      Start 25: cockpit_throttle_event_coalescing
+25/34 Test #25: cockpit_throttle_event_coalescing ...   Passed    0.05 sec
+      Start 26: cockpit_fixed_control_geometry
+26/34 Test #26: cockpit_fixed_control_geometry ......   Passed    0.06 sec
+      Start 27: training_approach_guidance
+27/34 Test #27: training_approach_guidance ..........   Passed    0.00 sec
+      Start 28: navigation_leg_capture
+28/34 Test #28: navigation_leg_capture ..............   Passed    0.02 sec
+      Start 29: navigation_leg_tracking
+29/34 Test #29: navigation_leg_tracking .............   Passed    0.14 sec
+      Start 30: benchmark_evidence_integrity
+30/34 Test #30: benchmark_evidence_integrity ........   Passed    0.01 sec
+      Start 31: rolling_frame_statistics
+31/34 Test #31: rolling_frame_statistics ............   Passed    0.22 sec
+      Start 32: asynchronous_terrain_stream
+32/34 Test #32: asynchronous_terrain_stream .........   Passed    0.00 sec
+      Start 33: laboratory_surface_sweep
+33/34 Test #33: laboratory_surface_sweep ............   Passed    0.01 sec
+      Start 34: laboratory_engine_out
+34/34 Test #34: laboratory_engine_out ...............   Passed    0.10 sec
+
+100% tests passed, 0 tests failed out of 34
+
+Total Test time (real) =   8.64 sec
