@@ -1,0 +1,1 @@
+120027 old/new integer-format comparisons passed, including rounding, finite bounds, invalid values and non-classic global locale. No FPS claim.

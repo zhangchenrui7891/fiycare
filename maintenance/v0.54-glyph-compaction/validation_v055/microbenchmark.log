@@ -1,0 +1,1 @@
+Linux host microbenchmark only; GCC O2, median of 5, 200000 labels: legacy_ms=81.1021, current_ms=5.17762. Includes returned strings. Not game/Windows/FPS/HD6000.

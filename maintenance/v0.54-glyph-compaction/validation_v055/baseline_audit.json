@@ -1,0 +1,12 @@
+{
+  "baseline": "v0.54",
+  "manifest_entries": 2168,
+  "changed_existing": [
+    "CMakeLists.txt",
+    "src/flight_instruments.h",
+    "src/main.cpp",
+    "tools/check_portable.sh",
+    "tools/check_windows_source.ps1"
+  ],
+  "assets_third_party_unchanged": true
+}
