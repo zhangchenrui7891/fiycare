@@ -1,6 +1,7 @@
 #include "src/model_restore.h"
 #include <iostream>
 #include <chrono>
+#include <string>
 void check(bool ok,const char* text){if(!ok)throw std::runtime_error(text);}
 int main(){
  const auto dir=std::filesystem::temp_directory_path()/("fcair-restore-"+std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
