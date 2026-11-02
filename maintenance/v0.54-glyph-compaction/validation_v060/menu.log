@@ -1,0 +1,1 @@
+PASS: production menu catches missing default, preserves model/file/tag and sets notice. CPU stand-ins only.

@@ -364,7 +364,7 @@
     "windows_game": false,
     "hd6000_tested": false
   },
-  "latest_version": "0.59",
+  "latest_version": "0.60",
   "v058": {
     "baseline": "v0.57, file version38",
     "baseline_sha256_entries": 2210,
@@ -400,5 +400,20 @@
     "linux_build": "Assimp ON Release passed",
     "linux_ctest": "43/43",
     "strict_portable": "exit 0"
+  },
+  "v060": {
+    "baseline": "v0.59 file version40",
+    "linux_build": "Assimp ON Release passed",
+    "linux_ctest": "44/44 after restoring execute permission on three test binaries",
+    "strict_portable": "exit0",
+    "asan_ubsan": "passed detect_leaks=0",
+    "menu_regression": "old production switch throws; fixed switch preserves model/file/tag and displays notice",
+    "windows_initial": "test missing explicit string header; fixed",
+    "windows_final": "17/17 checks; MSVC x64 Release main program compiled; Assimp OFF/assets copy OFF",
+    "product_commit": "282a271eb58376f3438afe390a35960275215afe",
+    "windows_game": false,
+    "hd6000_tested": false,
+    "windows_run": 41516530040,
+    "existing_warnings": 8
   }
 }

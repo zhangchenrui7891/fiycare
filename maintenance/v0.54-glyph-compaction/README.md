@@ -1,3 +1,6 @@
+# v0.60：默认机模恢复失败保护
+见MODEL_RESTORE.md与TODAY_REVIEW.md；源码资源包，无EXE。
+
 # v0.59：HDG接管NAV模式
 修复NAV无法通过HDG按钮退出的问题，详见LATERAL_MODE.md和TODAY_REVIEW.md。源码资源包，无EXE。
 
