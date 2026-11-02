@@ -4,6 +4,7 @@
 #include "approach.h"
 #include "flight_instruments.h"
 #include <array>
+#include "map_clip.h"
 
 // Three 300 x 200 logical displays, drawn as self-lit planar geometry.
 // Coordinates stay within the existing bezels; no change to control hit boxes.
@@ -105,17 +106,28 @@ template<class Text> inline void draw(std::vector<Vertex>& out,const sim::Snapsh
  for(int a=-90;a<=90;a+=30){float r=float(a*sim::pi/180);nav.line(150+std::sin(r)*92,111-std::cos(r)*92,150+std::sin(r)*98,111-std::cos(r)*98,white);}
  nav.label(L"2 km",226,138,muted,.65f);nav.aircraft(150,111,white);
  constexpr double range=2000;const double sn=std::sin(f.yaw),cs=std::cos(f.yaw);
- bool previous=false;float px=0,py=0;
+ // Draw all four legs, including the closing leg to waypoint one.
+ // Clip intersecting legs even when both waypoint symbols are off-screen.
+ std::array<std::array<double,2>,4> projected{};
+ for(size_t i=0;i<projected.size();++i){
+  const auto& w=sim::navigationRoute[i];const double dx=w.x-f.x,dz=w.z-f.z;
+  projected[i]={150+(dx*cs-dz*sn)/range*96,111-(dx*sn+dz*cs)/range*96};
+ }
+ for(size_t i=0;i<projected.size();++i){
+  const auto& a=projected[i];const auto& b=projected[(i+1)%projected.size()];
+  mapdisplay::Segment leg{a[0],a[1],b[0],b[1]};
+  // Inset one logical pixel so the 1.3px stroke stays inside the map.
+  if(mapdisplay::clip(leg,19,28,281,162))
+   nav.line(float(leg.ax),float(leg.ay),float(leg.bx),float(leg.by),magenta,1.3f);
+ }
  for(size_t i=0;i<4;i++){
   const auto& w=sim::navigationRoute[i];const double dx=w.x-f.x,dz=w.z-f.z;
   const float x=150+float((dx*cs-dz*sn)/range)*96,y=111-float((dx*sn+dz*cs)/range)*96;
   const bool inside=x>=18&&x<=282&&y>=27&&y<=163;
-  if(inside&&previous)nav.line(px,py,x,y,magenta,1.3f);
   if(inside){bool active=int(i)==state.navigationWaypoint;XMFLOAT3 col=active?magenta:cyan;
    nav.line(x,y-4,x+4,y,col);nav.line(x+4,y,x,y+4,col);nav.line(x,y+4,x-4,y,col);nav.line(x-4,y,x,y-4,col);
    nav.label(whole(i+1),x+6,y-6,col,.56f);
   }
-  previous=inside;px=x;py=y;
  }
  const bool valid=sim::validNavigationWaypoint(state.navigationWaypoint);
  nav.rect(0,165,300,35,black,6);

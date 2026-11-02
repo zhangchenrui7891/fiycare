@@ -58,6 +58,13 @@ int main(int argc,char** argv){
   if(on){require(contains(L"km/h")&&contains(L"ALT m")&&contains(L"VS -0.3 m/s"),"Metric units and precise vertical speed");require(contains(L"RPM")&&!contains(L"N1"),"Actual RPM, no invented jet N1");}
   ++cases;
  }
+ // At the origin both endpoints of the closing leg are off screen.
+ {sim::Snapshot origin;origin.flight.configure(3);origin.flight.x=0;origin.flight.z=0;origin.flight.yaw=0;
+  out.clear();labels.clear();glass::draw(out,origin,0,label);
+  int routeVertices=0;
+  for(const auto& v:out)if(v.x>-.224f&&v.x<.224f&&v.r==glass::magenta.x&&v.g==glass::magenta.y&&v.b==glass::magenta.z)++routeVertices;
+  require(routeVertices==6,"Closing route leg crossing viewport must remain visible with both endpoints outside");
+ }
  sim::Snapshot state;state.flight.configure(3);state.flight.rpm=2250;state.flight.vz=90;state.flight.y=1234;state.flight.vy=1.2;state.flight.pitch=.035;state.flight.roll=-.12;state.flight.throttle=.84;state.flight.flap=.5;state.flight.fuel=87;state.headingHold=true;state.navigationHold=true;state.flight.z=1000;
  out.clear();labels.clear();glass::draw(out,state,0,label);
  require(contains(L"2250")&&contains(L"FUEL 87%")&&contains(L"FLAP 50%")&&contains(L"THR 84%"),"Flight state feeds engine/system glass");
