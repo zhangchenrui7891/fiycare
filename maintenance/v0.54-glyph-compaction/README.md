@@ -1,3 +1,6 @@
+# v0.59：HDG接管NAV模式
+修复NAV无法通过HDG按钮退出的问题，详见LATERAL_MODE.md和TODAY_REVIEW.md。源码资源包，无EXE。
+
 # v0.58：航班重开状态一致性
 修复重新出发/换机后的机场对和旧评分残留，见CAREER_RESET.md及TODAY_REVIEW.md。源码资源包，无EXE。
 

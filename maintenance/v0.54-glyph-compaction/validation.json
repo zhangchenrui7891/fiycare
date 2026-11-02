@@ -364,7 +364,7 @@
     "windows_game": false,
     "hd6000_tested": false
   },
-  "latest_version": "0.58",
+  "latest_version": "0.59",
   "v058": {
     "baseline": "v0.57, file version38",
     "baseline_sha256_entries": 2210,
@@ -384,5 +384,21 @@
     "windows_game": false,
     "hd6000_tested": false,
     "full_flight_hardware_acceptance": false
+  },
+  "v059": {
+    "baseline": "v0.58 file version39",
+    "mode_sequences": 20,
+    "subsequent_updates": 2000,
+    "old_bug_reproduced": true,
+    "asan_ubsan": "passed detect_leaks=0",
+    "windows_build": "passed MSVC x64 Release; Assimp OFF/assets copy OFF",
+    "windows_cpu_checks": "16/16",
+    "windows_run": 41473357011,
+    "product_commit": "8d04efa73bec4d6a5db51e6dbeab810cdd9ccbc5",
+    "windows_game": false,
+    "hd6000_tested": false,
+    "linux_build": "Assimp ON Release passed",
+    "linux_ctest": "43/43",
+    "strict_portable": "exit 0"
   }
 }

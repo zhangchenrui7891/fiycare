@@ -1,0 +1,7 @@
+{
+  "cmake_build_ctest_shell_exit": 0,
+  "portable_shell_exit": 0,
+  "sanitizer_exit": 0,
+  "baseline_regression_exit": 1,
+  "note": "Background log snapshots can be partial; terminal exit and final CTest log are retained. No Windows game execution."
+}
