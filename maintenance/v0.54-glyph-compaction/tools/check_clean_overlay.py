@@ -7,6 +7,8 @@ root = Path(__file__).resolve().parents[1]
 main = (root/'src/main.cpp').read_text()
 cockpit = (root/'src/cockpit.h').read_text()
 overlay = main[main.index('   const bool inCockpit='):main.index('   if(smoke&&smokeFrames==2)')]
+panel = (root/'src/engineering_panel.h').read_text()
+panel = '\n'.join(line for line in panel.splitlines() if not line.startswith(('#include', '#pragma')))
 warning = cockpit[cockpit.index('inline void drawCockpit('):]
 if 'hudText(hud,display.str())' in main or '跑道：中心X=0' in main:
     raise RuntimeError('Verbose flight overlay was reintroduced')
@@ -15,6 +17,7 @@ if 'int camera=smoke?0:1;' not in main:
 code = r'''
 #include "storage.h"
 #include "flight_instruments.h"
+#include "flight_alerts.h"
 #include <vector>
 #include <stdexcept>
 #include <iostream>
@@ -25,16 +28,16 @@ void screenQuad(std::vector<Vertex>&,float,float,float,float,XMFLOAT3){}
 struct Font{void draw(std::vector<Vertex>&,const std::wstring& s,float x,float y,XMFLOAT3,int=900){labels.push_back({s,x,y});}};
 Font& chineseFont(){static Font value;return value;}
 std::wstring wideUtf8(const std::string& s){return std::wstring(s.begin(),s.end());}
-''' + warning + r'''
+''' + warning + panel + r'''
 namespace ui{enum class Page{None,Pause};}
 sim::Snapshot state;auto& flight=state.flight;
 struct Renderer{const char* name(){return "DX12";}} rendererValue,*renderer=&rendererValue;
 struct Stats{double fps=23,p95Ms=43.2;}frameStats;
 std::vector<Vertex> hud;int camera=1;bool walking=false,paused=false,powerSaver=false;
-ui::Page menuPage=ui::Page::None;int flightAlerts=0;std::wstring notice,lastOverlayNotice;
+ui::Page menuPage=ui::Page::None;sim::AlertManager flightAlerts;std::wstring notice,lastOverlayNotice;
 double overlayNoticeUntil=0,wallElapsed=0;std::map<int,int> customModels;
 void drawMenu(std::vector<Vertex>&,ui::Page,const sim::Snapshot&,bool,const std::wstring&){}
-void drawEngineeringPanel(std::vector<Vertex>&,const sim::Snapshot&,int){}
+
 void frame(){labels.clear();
 ''' + overlay + r'''
 }
@@ -53,6 +56,11 @@ int main(){
  paused=false;state.debugPanel=true;frame();require(has(L"P95")&&has(L"DX12"),"Performance is available on F2 only");
  state.debugPanel=false;frame();require(!has(L"P95")&&!has(L"帧/秒"),"Performance hidden by default");
  menuPage=ui::Page::Pause;frame();require(labels.size()==1,"Menu excludes flight overlay but preserves attribution");
+ menuPage=ui::Page::None;state.debugPanel=false;
+ flightAlerts.active={{"old",L"OLD WARNING",sim::AlertLevel::Warning,true},{"new",L"NEW WARNING",sim::AlertLevel::Warning,false}};
+ frame();require(has(L"NEW WARNING")&&!has(L"OLD WARNING"),"Actual panel foregrounds new same-severity warning");
+ flightAlerts.acknowledge();frame();require(has(L"OLD WARNING")&&has(L"已确认"),"Acknowledgement preserves active faults");
+ flightAlerts.active.clear();
  std::cout<<"PASS real main overlay statements: cockpit/exterior/menu, timed notifications, power/stall/crash/pause, F2 and required credits. CPU font adapters only.\n";
 }
 '''

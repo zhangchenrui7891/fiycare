@@ -5,8 +5,8 @@
 
 inline void drawEngineeringPanel(std::vector<Vertex>& out, const sim::Snapshot& state,
                                  const sim::AlertManager& alerts) {
-    if (!alerts.active.empty()) {
-        const auto& first = alerts.active.front();
+    if (const auto* selected = alerts.headline()) {
+        const auto& first = *selected;
         const auto color = first.level == sim::AlertLevel::Warning ? XMFLOAT3{1, .3f, .15f} : XMFLOAT3{1, .8f, .25f};
         chineseFont().draw(out, first.text + (first.acknowledged ? L" · 已确认" : L" · Backspace确认"),
                            12, 90, color, 610);

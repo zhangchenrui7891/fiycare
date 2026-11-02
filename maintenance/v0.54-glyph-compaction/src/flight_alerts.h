@@ -77,6 +77,18 @@ struct AlertManager {
         active = std::move(next);
     }
 
+    // Highest severity first; within that severity bring a newly unacknowledged
+    // fault forward. Keep collection order as a stable tie-breaker.
+    const FlightAlert* headline() const {
+        const FlightAlert* selected = nullptr;
+        for (const auto& alert : active) {
+            if (!selected || static_cast<int>(alert.level) > static_cast<int>(selected->level) ||
+                (alert.level == selected->level && selected->acknowledged && !alert.acknowledged))
+                selected = &alert;
+        }
+        return selected;
+    }
+
     void acknowledge() {
         for (auto& alert : active) alert.acknowledged = true;
     }
