@@ -1,16 +1,16 @@
-最终验证（2026-11-02）：Linux Assimp开启完整Release构建成功，41/41 CTest通过。Windows2022/MSVC x64 Release主程序编译链接成功，14/14检查通过，含新告警选择、真实GDI与HLSL检查；Assimp OFF、资源复制OFF。8条既有MSVC警告仍在。未运行游戏/真实键鼠或测试HD6000。Windows结果：https://github.com/zhangchenrui7891/fiycare/actions/runs/41392088100 。受检产品代码7da631ecb0633c6b4bfb82a5d9c994da388928b5，后续仅补资料。
+最终验证（2026-11-02）：Linux Assimp ON完整Release构建、42/42 CTest与严格便携检查通过；新增ASan/UBSan通过。Windows Server2022/MSVC x64 Release主程序编译链接成功，15/15检查通过，包含任务重置、真实GDI和HLSL；Assimp OFF、资源复制OFF，8条既有警告保留。没有游戏运行/GPU/HD6000或完整航班实机验证。CI：https://github.com/zhangchenrui7891/fiycare/actions/runs/41426107927 ，受检产品提交2ef8c00e743fe05087c9c55526a999ebe2a386bc，之后只补资料。
 
-## v0.57 · 2026-11-02（新告警显示优先级）
-基线：实际读取v0.56（文件版本37）、连续记录和当前告警/绘制代码。ZIP CRC及2198项SHA256通过，原assets与third_party逐字节一致。十机型、三屏航电、27控件共用驾驶舱、训练导航/进近、双机场任务、生涯、浦东影像、示意地景、FXAA和网站入口保留。网站账号未绑定游戏存档，本轮未改站点公开设置。
+## v0.58 · 2026-11-02（航班重开状态一致性）
+基线：实际读取最新v0.57（文件版本38）、PROGRESS、TODAY_REVIEW、任务/菜单/进近/存档代码。原ZIP CRC及2210项SHA256通过，1661项assets/third_party文件逐字节一致。上轮是新告警显示优先级修复，Linux41/41及Windows14/14均属已记录结果，不作为本轮结果。
 
-问题：告警栏直接显示active.front()，当首项已经确认但故障持续、后续同等级新故障出现时，告警栏仍显示旧项。以一号发动机失效已确认、二号发动机随后失效为例，第二条警告无法成为显示项。冻结v0.56 engineering_panel.h并运行新版绘制检查，确实在新告警可见性断言失败。
+当前功能：C++17、DX12/DX11、中文菜单，十机型含A330/A350，共用27控件三维驾驶舱、PFD/NAV/ENGINE、训练导航/几何进近、双机场任务与生涯、浦东离线影像、示意地景、FXAA及网站入口。账号未与游戏存档绑定。没有真实机型专用驾驶舱系统或成品验收证据。
 
-修复：AlertManager增加headline()选择器，优先最高严重程度；同等级优先未确认项；其余按原收集顺序稳定选择。engineering_panel绘制选择结果。选择器不重排或修改告警、不分配内存；确认操作仍确认全部当前告警，故障不因此消除。已确认Warning仍优先于未确认Caution，这是明确保留的严重程度策略；未增加告警浏览、声音、真实ECAM/EICAS或机型专属故障程序。
+实际缺陷：东海出发的返程任务在重开/换机后，飞机回浦东出生点但任务仍为东海→浦东；旧着陆与综合评分也残留。冻结v0.57头文件运行新增检查，分别在机场对与旧评分断言失败。修复Progress::resetFlight并接入任务选择、换机、重开，按实际出生位置重建机场对，清空本次进度/时间/评分。生涯资产、历史、选定任务和既有事故扣款不变。保留原先回浦东出生点的行为；未增加原地换机、调度或自动驾驶全状态重置。
 
-检查：九种双发机型共63次实际故障/确认/恢复/再次发生转换、36种等级与确认状态组合通过；覆盖空列表、最高等级、稳定顺序、不修改active以及故障再次发生重新需要确认。实际main覆盖层与engineering_panel函数使用CPU字体适配执行，确认debugPanel关闭时新告警仍可显示、确认后故障仍在。严格C++17全套便携回归及新增ASan/UBSan通过（detect_leaks=0）。最终CMake/CTest及Windows结果另补，不以旧结果替代。
+本轮Linux：Assimp ON完整Release构建276步成功，42/42 CTest通过；严格C++17全套便携检查通过，新增ASan/UBSan通过（detect_leaks=0）。新增400组重置/任务选择、40组旅客任务状态转换及存档往返覆盖。状态由测试构造，不是完整物理试飞，更不是Windows游戏或HD6000实测。日志见validation_v058。
 
-GitHub：codex/v0.57-alert-headline，受检产品提交7da631ecb0633c6b4bfb82a5d9c994da388928b5；继承目录maintenance/v0.54-glyph-compaction，内部版本0.57。核心源码和检查上传，完整资源/依赖在ZIP。main未改。
+GitHub：codex/v0.58-career-reset，受检产品提交2ef8c00e743fe05087c9c55526a999ebe2a386bc；核心路径继承maintenance/v0.54-glyph-compaction，内部版本0.58。源代码/检查上传；完整资源与依赖在ZIP；main未改。Windows CI：https://github.com/zhangchenrui7891/fiycare/actions/runs/41426107927 ，已完成，最终结果见本页首段。
 
-差距：真实机型系统/FMS、精细机场/高程、复杂天气、气动标定和完整航班仍不足。2026-11-02核对官方指南 https://www.flightsimulator.com/guide/new-flight-simmer-guide/ ，其物理、航电、天气及职业体验仍是长期参考。当前没有达到成品的图形/性能/完整功能证据，不承诺5350U/HD6000/8GB同等画质功能。
+差距：MSFS2024官方资料描述了全球场景、复杂天气、细化机型系统、航电与职业任务联动；官方EFB还含航线规划、机场图、清单及天气。本项目仍是局部双机场训练世界，缺完整FMS/导航数据库、真实系统深度、精细机场/DEM、复杂天气、气动标定与完整航班验收。参考：https://news.xbox.com/en-us/2024/11/15/microsoft-flight-simulator-2024-creating-career-mode-for-all-players/ 和 https://flightsimulator.zendesk.com/hc/en-us/articles/16959472213916-Electronic-Flight-Bag-EFB-introduction （本轮已检索）。不承诺i5-5350U/HD6000/8GB达到相同画质或功能。
 
-下一步验收：Windows完整构建并带资源启动，在双发机型依次触发一发失效、Backspace确认、二发失效，确认告警栏改为二发且提示未确认；再次确认后持续故障仍保留，F8复位后消失。再验收NAV和座舱实际画面，采固定场景60秒帧时、内存与截图。CPU检查不等于真实键盘消息/GDI显示/GPU或HD6000结果。无游戏EXE，继续迭代。
+下一步：目标Windows带资源构建启动，按CAREER_RESET.md执行返程重开/换机→保存载入→起飞返落出发地不结算→飞往到达地仅结算一次；同时验收告警、NAV和座舱鼠标操作，采同场景同配置60秒帧时、RAM和截图。没有Windows游戏运行、Boot Camp/HD6000或完整航班实机证据；包内无EXE，未达到成品，继续迭代。

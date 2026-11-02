@@ -1,0 +1,388 @@
+{
+  "date": "2026-11-01",
+  "version": "0.51",
+  "baseline": "0.50, Library version31",
+  "linux": {
+    "build": "Release, Assimp ON, all 264 steps completed; two non-executable test binaries explicitly relinked",
+    "ctest": "final after macro fix 34/34 passed; JUnit zero failed/skipped",
+    "strict_cpp17": "passed",
+    "staging": "Ninja and Ninja Multi-Config, seven scenarios each; old POST_BUILD fails resource-only update"
+  },
+  "windows": {
+    "status": "passed",
+    "run": "https://github.com/zhangchenrui7891/fiycare/actions/runs/41272267314",
+    "code_commit": "1125820b049320dad6aa6336a7eb730a6b94dca8",
+    "main_build": "Windows Server 2022 MSVC x64 Release, Assimp OFF and runtime copy OFF",
+    "cpu_checks": "9/9 passed",
+    "staging_fixture": "Visual Studio 17 2022, seven scenarios passed, actual production CMake helper; spaces and Chinese paths",
+    "boundary": "fixture copies synthetic bytes, not actual game assets; no game/GPU execution",
+    "warnings": "existing MSVC warnings retained"
+  },
+  "not_verified": [
+    "game startup",
+    "DX11/DX12 scene and input",
+    "HD6000 frame times and RAM",
+    "complete manual flight"
+  ],
+  "sanitizers": "not rerun: change is CMake/Python staging; no C++ algorithms added",
+  "fixes": [
+    "incremental runtime asset copy",
+    "Windows SDK near macro collision in v0.50 scenery"
+  ],
+  "code_commit": "1125820b049320dad6aa6336a7eb730a6b94dca8",
+  "historical_validation": {
+    "date": "2026-10-18",
+    "platform": "Linux g++",
+    "checks": [
+      "v0.23: strict portable C++17 full logic/resource suite passed",
+      "v0.23: ASan/UBSan full suite passed with detect_leaks=0",
+      "v0.23: cabin controls, outdoor parameter isolation, v13 roundtrip, v12 defaults and corrupt-tail rejection passed",
+      "v0.23: all 15 control rays and projections at 4:3,16:9,21:9 passed",
+      "v0.23: actual cockpit geometry compiled with portable math shim; nine attitudes; 22146 vertices excluding glyphs",
+      "v0.23: cabin surface/display material markers preserve existing world vertices",
+      "v0.22: strict portable C++17 full logic and resource suite passed",
+      "v0.22: real atlas produces five slices, 11 levels and 55 valid subresources",
+      "v0.22: cross-material isolation, gamma-aware reduction, odd source coverage and invalid payload tests passed",
+      "v0.22: ASan/UBSan passed with detect_leaks=0",
+      "v0.22: portable cockpit geometry compile passed, nine attitudes",
+      "v0.21: strict C++17 full logic/assets suite passed",
+      "v0.21: ASan/UBSan passed, leak detection disabled due runtime restriction",
+      "v0.21: control ray projection at 4:3,16:9,21:9 passed",
+      "v0.21: actual cockpit geometry compiled with portable math shim; nine attitude cases finite; 21714 vertices excluding glyphs",
+      "v0.20: full-run early stutter retention, invalid samples and overflow cap passed",
+      "v0.20: strict C++17 full suite and ASan/UBSan passed; Windows integration not verified",
+      "v0.19: report itemization, missing evidence, shared scoring and pending-flight guard passed",
+      "v0.19: strict C++17 full suite and ASan/UBSan passed; Windows report integration unverified",
+      "C++17 -O2 -Wall -Wextra -Werror -pedantic",
+      "AddressSanitizer + UndefinedBehaviorSanitizer, detect_leaks=0",
+      "Physics / career / saves / A330 and A350 full-load takeoff",
+      "Satellite north-up projection and mode separation",
+      "Native asset sizes, model scale and nose direction",
+      "Atlas PNG and model previews verified",
+      "Original GLB hashes retained",
+      "Lighting sun-vector unit length and day/night range",
+      "Exposure and shadow switch, v6 save roundtrip and v5 migration",
+      "Imported unit normals, updated 48-byte vertex layout",
+      "CPU asset lighting comparison inspected",
+      "Clickable cockpit actions and throttle drag/release/cancel",
+      "Jet flap detents and engine/gear switches",
+      "Parking brake holds a stationary aircraft at full throttle",
+      "3D control rays select physical buttons/throttle; sky/backward rays miss",
+      "Spatial throttle clamps and capture cancellation",
+      "v8 AA setting roundtrip and v7 migration",
+      "Ray picking remains aligned after cockpit yaw/pitch rotation",
+      "v0.9: 60 render frames produce 100 fixed physics steps",
+      "v0.9: 5-second stall limited to 8 steps without backlog",
+      "v0.9: pause clears fractional time; invalid time rejected",
+      "v0.9: strict g++ build and ASan/UBSan rerun passed",
+      "v0.10: wall-clock FPS, nearest-rank P95, long stall and bounded 300-frame ring",
+      "v0.10: invalid telemetry rejected and focus reset logic component",
+      "v0.10: strict g++ and ASan/UBSan suite passed",
+      "v0.11: strict g++ full logic/resource suite passed",
+      "v0.11: ASan/UBSan full suite passed (detect_leaks=0)",
+      "v0.11: workflow YAML parsed; triggers, runner and read-only permissions checked",
+      "v0.12: benchmark 30 FPS pass, 20 FPS tier, P95 stutter failure and short-run rejection",
+      "v0.12: strict g++ and ASan/UBSan full suite passed",
+      "v0.13: heading/altitude target capture and selector increments",
+      "v0.13: manual channel disconnect and low-speed/ground disconnect",
+      "v0.13: all 12 physical cockpit control rays",
+      "v0.13: v9 autopilot persistence and v8 migration",
+      "v0.13: strict g++ and ASan/UBSan full suite passed",
+      "v0.14: four-point navigation bearing and waypoint capture/sequence",
+      "v0.14: all 13 physical cockpit control rays",
+      "v0.14: v10 navigation persistence and legacy migrations",
+      "v0.14: strict g++ and ASan/UBSan full suite passed",
+      "v0.15: signed cross-track direction and metre distance",
+      "v0.15: touchdown score inputs, grading and invalid touchdown rejection",
+      "v0.15: strict g++ and ASan/UBSan full suite passed",
+      "v0.16: second runway selection and centreline-aware landing score",
+      "v0.16: three-degree glide path, localizer signs and approach envelope",
+      "v0.16: strict g++ and ASan/UBSan full suite passed",
+      "v0.17: airport-pair selection and destination-only passenger settlement",
+      "v0.17: time/fuel flight score, reward guard and v11 persistence",
+      "v0.17: strict g++ and ASan/UBSan full suite passed",
+      "v0.18: touchdown weighting, missing evidence, departure isolation and invalid arrival index",
+      "v0.18: v12 touchdown score persistence and v11 migration",
+      "v0.18: strict g++ and ASan/UBSan full logic/resource suite passed"
+    ],
+    "not_verified": [
+      "Windows/MSVC build",
+      "DX11/DX12 render and GPU capture",
+      "Chinese UI and clicking",
+      "MacBook Air HD6000 FPS",
+      "Windows HLSL compilation of new lighting shader",
+      "GPU sky, shadows and tone mapping",
+      "Windows mouse capture and actual cockpit UI interaction",
+      "FXAA HLSL compilation and actual edge filtering",
+      "3D cockpit geometry, text and mouse picking on GPU",
+      "v0.9 Windows message-loop timing integration and FPS",
+      "CMake/CTest (not installed in this run)",
+      "v0.10 Windows timing integration, HUD, CSV and telemetry overhead",
+      "v0.11: PowerShell script runtime, MSVC/CTest and GitHub Actions execution",
+      "v0.12: Windows benchmark integration, DX11 screenshot capture and HD6000 result",
+      "v0.13: Windows cockpit layout and mouse interaction for autopilot controls",
+      "v0.13: long-duration autopilot flight quality and target tracking error",
+      "v0.14: Windows cockpit layout and mouse interaction for navigation control",
+      "v0.14: long-duration waypoint tracking error and HD6000 performance",
+      "v0.15: Windows cockpit/HUD layout and landing-score presentation",
+      "v0.15: landing-score feel, long-duration navigation and HD6000 performance",
+      "v0.16: Windows cockpit/HUD LOC-GS layout and second-airport rendering",
+      "v0.16: actual approach usability and HD6000 performance",
+      "v0.17: Windows passenger-flight HUD layout and full-route usability",
+      "v0.17: actual HD6000 performance and Windows save migration"
+    ],
+    "source_sha256": {
+      "airbus_a350-900.glb": "2533db8c48f28d342c0e9a04facbbe2842372c4ab60c992a2bceedac308fa861",
+      "a330-300_plane.glb": "f80970b3f90cabb546d502b77a7854b6c7cbe7c52731bd5cfc35be5975268b06"
+    },
+    "version": "0.27",
+    "v021_unverified": [
+      "Windows/MSVC full build",
+      "DX11/DX12 shader execution",
+      "fullscreen/resize/window restoration",
+      "real Chinese glyph placement",
+      "hardware FPS"
+    ],
+    "v022_unverified": [
+      "Windows/MSVC full build",
+      "new shader_check execution",
+      "DX11/DX12 GPU filtering and image quality",
+      "fullscreen, Chinese layout and mouse input",
+      "hardware performance"
+    ],
+    "v023_unverified": [
+      "Windows/MSVC full application and HLSL compilation",
+      "DX11/DX12 cabin lighting appearance and night screenshot script",
+      "Chinese glyphs, real mouse controls, fullscreen and on-disk state migration",
+      "HD6000 performance, uncapped benchmark Windows integration"
+    ],
+    "save_version": 16,
+    "v024_verified": [
+      "Strict C++17 old logic/resources and new aero_avionics_check passed",
+      "ASan/UBSan both suites passed, detect_leaks=0",
+      "ISA, ideal subsonic pitot IAS/TAS/GS/QNH, lower stratosphere altitude checks",
+      "Stall sweep, drag, sideslip, wind invariance, body-frame lift, ground effect, trim",
+      "Battery/generator/master, drain, charge, power-loss AP disconnect",
+      "v14 roundtrip, v13 defaults, invalid/truncated save rejection",
+      "22 ray controls and 4:3/16:9/21:9 projections",
+      "Portable geometry: 19914 powered / 11520 unpowered vertices without glyphs; no powered instruments on power loss",
+      "Four 300-second no-wind altitude-hold scenarios; late error below 0.44m"
+    ],
+    "v024_unverified": [
+      "Windows/MSVC full build and CMake/CTest execution",
+      "DX11/DX12/HLSL execution, Chinese glyphs, occlusion/mouse/fullscreen",
+      "Windows flight_diagnostics.csv and on-disk state migration",
+      "Real aircraft calibration, full envelope, turbulent weather, route-level AP tracking",
+      "Hardware FPS, GPU screenshots; no EXE"
+    ],
+    "source_metrics": {
+      "v024_cpp_files": 34,
+      "v024_cpp_lines": 2360,
+      "v025_cpp_files": 46,
+      "v025_cpp_lines": 3975,
+      "new_cpp_files": 12,
+      "net_cpp_lines_added": 1615,
+      "scope": "src/*.h, src/*.cpp, root/*.cpp; includes tests"
+    },
+    "v025_verified": [
+      "Strict C++17 old/resource, aero/avionics and engineering suites passed",
+      "ASan/UBSan three suites passed, detect_leaks=0",
+      "Quaternion convention, angular impulse, panel symmetry/control signs/rotational flow",
+      "Independent twin engines, electrical failure isolation, scheduled faults, alert acknowledgment",
+      "v15 roundtrip and resumed trajectory, v14 migration, truncated records rejected",
+      "40-column CSV parsing and statistics; 1464-point surface sweep",
+      "Four 90-second surface-model takeoffs exceed 200m without crash",
+      "A350 left engine-out at t=15 through t=90: max bank 2.264deg, min altitude 1489.52m",
+      "27 control rays/projections; portable cockpit/debug arrows/panel compile"
+    ],
+    "v025_unverified": [
+      "Windows/MSVC complete application and HLSL",
+      "CMake/CTest, Windows batch and PowerShell runtime",
+      "DX11/DX12 geometry, actual Chinese glyphs, cockpit occlusion, mouse/fullscreen",
+      "Windows CSV and save disk integration, hardware FPS",
+      "Real aircraft aerodynamic/engine/inertia calibration, broad envelope and manual handling"
+    ],
+    "source_metrics_v026": {
+      "counting_note": "Headers included in repository counts; compiled counts include .cpp/.cc/.cxx only. Third-party code is not first-party work.",
+      "platform_of_verified_build": "Linux GCC 13.3, CMake 3.31.6, Release",
+      "first_party_all_cpp_and_headers": {
+        "files": 53,
+        "physical_lines": 4570,
+        "nonblank_lines": 4376,
+        "approx_noncomment_lines": 4322
+      },
+      "third_party_all_cpp_and_headers": {
+        "files": 1287,
+        "physical_lines": 477471,
+        "nonblank_lines": 409920,
+        "approx_noncomment_lines": 309405
+      },
+      "compiled_cpp": {
+        "files": 200,
+        "physical_lines": 111437,
+        "nonblank_lines": 94959,
+        "approx_noncomment_lines": 76482
+      },
+      "compiled_first_party_cpp": {
+        "files": 7,
+        "physical_lines": 1255,
+        "nonblank_lines": 1215,
+        "approx_noncomment_lines": 1213
+      },
+      "compiled_third_party_cpp": {
+        "files": 193,
+        "physical_lines": 110182,
+        "nonblank_lines": 93744,
+        "approx_noncomment_lines": 75269
+      },
+      "target_at_least_200_compiled_cpp": true,
+      "target_at_least_50000_physical_lines": true,
+      "target_at_least_50000_approx_noncomment_lines": true
+    },
+    "v026_verified": [
+      "Linux GCC13.3/CMake3.31.6 Release: 200 distinct C++ translation units built",
+      "6 CTest tests passed including existing logic/resources and real asset import",
+      "3 downloaded CC-BY-4.0 GLBs, embedded texture decode and immutable source hashes verified",
+      "A320 5229, B737 2670, B787 3378 triangles; native scaling, normals, colors and nose-forward orientation",
+      "3 new aircraft x 2 models x 90-second full-load automated takeoff scenarios passed",
+      "7 aircraft ids/capacities and v16 save roundtrip",
+      "Application-side importer and stb image decode ASan/UBSan passed; Assimp static library not instrumented",
+      "27 controls, portable geometry/supplemental gear, 16-button aircraft menu layout",
+      "Compiled source manifest and SHA-256 audit; license notices retained"
+    ],
+    "v026_unverified": [
+      "Windows/MSVC complete application, shaders and DX11/DX12 execution",
+      "Dynamic GPU vertex allocation, actual graphics, Unicode file dialog, mouse/Chinese/fullscreen",
+      "On-device custom model persistence/reset and hardware FPS",
+      "Assimp-wide sanitizer instrumentation, exhaustive parser fuzzing",
+      "Certified aircraft parameters, true cockpits/avionics, full PBR/animation or CFD"
+    ],
+    "v027_verified": [
+      "Linux GCC13.3/CMake3.31.6 Release complete default build; 201 distinct C++ translation units",
+      "7 CTest tests passed including asset import and render_and_surface_stability",
+      "Strict C++17 stability suite and ASan/UBSan passed; detect_leaks=0",
+      "Constant-speed interpolation at 30/60/100/144/240/1000 FPS; irregular frames; resets and quaternion wrap",
+      "Seven aircraft x five render schedules x 120 seconds surface flight: identical authoritative trajectories",
+      "Depth collision and large-coordinate millimetre loss reproduced; reverse depth/local cabin regressions passed",
+      "Actual landscape trunk vertices stable across four cache boundaries; actual projection helper compiled with CPU shim",
+      "Existing core/resource, aero/avionics, engineering, cockpit geometry and menu checks passed"
+    ],
+    "v027_unverified": [
+      "Windows/MSVC application build and HLSL compilation",
+      "DX11/DX12 GPU output, independent cockpit occlusion/lighting/picking and buffer offsets",
+      "Actual user flicker reproduction/visual acceptance; no video supplied",
+      "Hardware FPS, display tearing/drivers, fullscreen/window native integration",
+      "Broad aerodynamic envelope or real aircraft calibration; no CFD or Windows EXE"
+    ],
+    "source_metrics_v027": {
+      "counting_note": "Headers included in repository counts; compiled counts include .cpp/.cc/.cxx only. Third-party code is not first-party work.",
+      "platform_of_verified_build": "Linux GCC 13.3, CMake 3.31.6, Release",
+      "first_party_all_cpp_and_headers": {
+        "files": 55,
+        "physical_lines": 4825,
+        "nonblank_lines": 4618,
+        "approx_noncomment_lines": 4557
+      },
+      "third_party_all_cpp_and_headers": {
+        "files": 1287,
+        "physical_lines": 477471,
+        "nonblank_lines": 409920,
+        "approx_noncomment_lines": 309405
+      },
+      "compiled_cpp": {
+        "files": 201,
+        "physical_lines": 111588,
+        "nonblank_lines": 95104,
+        "approx_noncomment_lines": 76625
+      },
+      "compiled_first_party_cpp": {
+        "files": 8,
+        "physical_lines": 1406,
+        "nonblank_lines": 1360,
+        "approx_noncomment_lines": 1356
+      },
+      "compiled_third_party_cpp": {
+        "files": 193,
+        "physical_lines": 110182,
+        "nonblank_lines": 93744,
+        "approx_noncomment_lines": 75269
+      },
+      "target_at_least_200_compiled_cpp": true,
+      "target_at_least_50000_physical_lines": true,
+      "target_at_least_50000_approx_noncomment_lines": true
+    }
+  },
+  "v054": {
+    "baseline": "v0.53",
+    "linux_ctest": "38/38 passed",
+    "strict_portable": "passed",
+    "new_sanitizers": "passed, detect_leaks=0",
+    "windows_game": false,
+    "hd6000_tested": false,
+    "notes": "See validation_v054 and PROGRESS.md",
+    "windows_source_build": "MSVC success; Assimp OFF, runtime assets OFF",
+    "windows_cpu_tests": "11/11 including actual GDI coverage",
+    "windows_run": "https://github.com/zhangchenrui7891/fiycare/actions/runs/41315044625"
+  },
+  "v055": {
+    "baseline": "v0.54",
+    "linux_ctest": "39/39",
+    "integer_comparisons": 120027,
+    "strict_portable": "passed",
+    "asan_ubsan": "passed detect_leaks=0",
+    "windows_game": false,
+    "hd6000": false,
+    "windows_cpu_tests": "12/12",
+    "windows_source_build": "passed Assimp OFF/assets copy OFF",
+    "windows_run": 41339897687
+  },
+  "v056": {
+    "baseline": "v0.55",
+    "linux_ctest": "40/40",
+    "segment_grid_cases": 14641,
+    "glass_cases": 900,
+    "strict_portable": "passed",
+    "asan_ubsan": "passed detect_leaks=0",
+    "old_defect_reproduced": true,
+    "windows_game": false,
+    "hd6000_tested": false,
+    "windows_source_build": "passed; Assimp OFF, assets copy OFF",
+    "windows_cpu_tests": "13/13",
+    "windows_run": 41365113284
+  },
+  "v057": {
+    "baseline": "v0.56",
+    "linux_ctest": "41/41",
+    "fault_transitions": 63,
+    "priority_combinations": 36,
+    "old_panel_reproduced": true,
+    "strict_portable": "passed",
+    "asan_ubsan": "passed detect_leaks=0",
+    "windows_build": "MSVC Release success, Assimp OFF/assets copy OFF",
+    "windows_cpu_tests": "14/14",
+    "windows_run": 41392088100,
+    "windows_game": false,
+    "hd6000_tested": false
+  },
+  "latest_version": "0.58",
+  "v058": {
+    "baseline": "v0.57, file version38",
+    "baseline_sha256_entries": 2210,
+    "unchanged_assets_and_dependencies": 1661,
+    "linux_build": "Assimp ON Release, 276 steps",
+    "linux_ctest": "42/42",
+    "strict_portable": "passed",
+    "asan_ubsan": "passed, detect_leaks=0",
+    "reset_select_cases": 400,
+    "constructed_passenger_lifecycles": 40,
+    "old_score_and_route_defects_reproduced": true,
+    "windows_build": "MSVC x64 Release passed, Assimp OFF, runtime assets copy OFF",
+    "windows_cpu_checks": "15/15",
+    "existing_msvc_warnings": 8,
+    "windows_run": 41426107927,
+    "product_commit": "2ef8c00e743fe05087c9c55526a999ebe2a386bc",
+    "windows_game": false,
+    "hd6000_tested": false,
+    "full_flight_hardware_acceptance": false
+  }
+}
