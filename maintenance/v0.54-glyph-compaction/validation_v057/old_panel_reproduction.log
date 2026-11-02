@@ -1,0 +1,9 @@
+Frozen v0.56 panel fails new-alert visibility check as expected.
+terminate called after throwing an instance of 'std::runtime_error'
+  what():  Actual panel foregrounds new same-severity warning
+Traceback (most recent call last):
+  File "/tmp/tmpso3csu27/tools/check_clean_overlay.py", line 74, in <module>
+    subprocess.run([str(exe)],check=True)
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/tmp/tmp3xi7712a/overlay']' died with <Signals.SIGABRT: 6>.

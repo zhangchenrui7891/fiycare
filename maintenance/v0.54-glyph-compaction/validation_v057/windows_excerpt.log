@@ -1,0 +1,24 @@
+2026-11-02T05:07:16.7534121Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\renderer12.h(64,95): warning C4458: declaration of 'footprint' hides class member [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-02T05:07:17.1161906Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\menus.h(61,140): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-02T05:07:17.5116333Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(458,76): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-02T05:07:17.5118861Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(459,57): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-02T05:07:17.5120924Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(459,136): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-02T05:07:17.5123365Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(459,265): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-02T05:07:17.5125468Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(459,310): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-02T05:07:17.6364071Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\cockpit_avionics.h(129,21): warning C4244: 'argument': conversion from 'size_t' to 'double', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-02T05:07:24.1490876Z   FlightCareerAir.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\FlightCareerAir.exe
+2026-11-02T05:07:41.7333898Z  1/14 Test  #1: alert_headline_priority .................   Passed    0.01 sec
+2026-11-02T05:07:41.7481587Z  2/14 Test  #2: navigation_map_clipping .................   Passed    0.01 sec
+2026-11-02T05:07:41.8906082Z  3/14 Test  #3: instrument_integer_format ...............   Passed    0.14 sec
+2026-11-02T05:07:42.0387667Z  4/14 Test  #4: compact_glyph_coverage ..................   Passed    0.15 sec
+2026-11-02T05:07:42.2043047Z  5/14 Test  #6: offline_scenery_geometry ................   Passed    0.16 sec
+2026-11-02T05:07:42.2136459Z  6/14 Test  #8: autopilot_disconnect_feedback ...........   Passed    0.01 sec
+2026-11-02T05:07:42.2247507Z  7/14 Test  #9: primary_instrument_text .................   Passed    0.01 sec
+2026-11-02T05:07:42.2320146Z  8/14 Test #10: exact_launch_options ....................   Passed    0.01 sec
+2026-11-02T05:07:42.4859213Z  9/14 Test #33: windows_compact_glyph_coverage ..........   Passed    0.25 sec
+2026-11-02T05:07:42.5537285Z 10/14 Test #34: windows_autopilot_notice_glyph_bounds ...   Passed    0.07 sec
+2026-11-02T05:07:42.5733999Z 11/14 Test #35: windows_instrument_glyph_bounds .........   Passed    0.02 sec
+2026-11-02T05:07:42.5807138Z 12/14 Test #36: windows_utf8_device_log .................   Passed    0.01 sec
+2026-11-02T05:07:42.5903942Z 13/14 Test #37: windows_command_line_parsing ............   Passed    0.01 sec
+2026-11-02T05:07:42.7457377Z 14/14 Test #38: hlsl_shader_compilation .................   Passed    0.15 sec
+2026-11-02T05:07:42.7464480Z 100% tests passed, 0 tests failed out of 14
