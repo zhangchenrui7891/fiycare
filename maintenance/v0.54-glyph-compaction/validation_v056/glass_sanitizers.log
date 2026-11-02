@@ -1,0 +1,1 @@
+PASS production glass: 900 aircraft/pitch/bank/heading/power cases; units, RPM, fuel/flap/throttle bindings, bounds, vertex budget, invalid waypoint and stall warning. CPU adapters only.

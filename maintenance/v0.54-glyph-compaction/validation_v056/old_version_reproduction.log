@@ -1,0 +1,9 @@
+Frozen v0.55 fails the new integration assertion as expected.
+terminate called after throwing an instance of 'std::runtime_error'
+  what():  Closing route leg crossing viewport must remain visible with both endpoints outside
+Traceback (most recent call last):
+  File "/tmp/tmpn840ju04/tools/check_glass.py", line 118, in <module>
+    subprocess.run([str(exe), *([str(preview)] if '--preview' in sys.argv else [])], check=True,
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/tmp/fcair-glass-2vzfq_gf/glass']' died with <Signals.SIGABRT: 6>.

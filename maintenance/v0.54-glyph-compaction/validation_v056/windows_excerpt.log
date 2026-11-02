@@ -1,0 +1,23 @@
+2026-11-02T00:04:29.0495998Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\renderer12.h(64,95): warning C4458: declaration of 'footprint' hides class member [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-02T00:04:29.5208105Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\menus.h(61,140): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-02T00:04:30.0281610Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(458,76): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-02T00:04:30.0287941Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(459,57): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-02T00:04:30.0291363Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(459,136): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-02T00:04:30.0294729Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(459,265): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-02T00:04:30.0298913Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(459,310): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-02T00:04:30.1745702Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\cockpit_avionics.h(129,21): warning C4244: 'argument': conversion from 'size_t' to 'double', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-02T00:04:37.2714946Z   FlightCareerAir.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\FlightCareerAir.exe
+2026-11-02T00:04:56.0347271Z  1/13 Test  #1: navigation_map_clipping .................   Passed    0.02 sec
+2026-11-02T00:04:56.1820624Z  2/13 Test  #2: instrument_integer_format ...............   Passed    0.14 sec
+2026-11-02T00:04:56.3314796Z  3/13 Test  #3: compact_glyph_coverage ..................   Passed    0.15 sec
+2026-11-02T00:04:56.4978971Z  4/13 Test  #5: offline_scenery_geometry ................   Passed    0.17 sec
+2026-11-02T00:04:56.5077390Z  5/13 Test  #7: autopilot_disconnect_feedback ...........   Passed    0.01 sec
+2026-11-02T00:04:56.5192463Z  6/13 Test  #8: primary_instrument_text .................   Passed    0.01 sec
+2026-11-02T00:04:56.5272972Z  7/13 Test  #9: exact_launch_options ....................   Passed    0.01 sec
+2026-11-02T00:04:56.7820845Z  8/13 Test #32: windows_compact_glyph_coverage ..........   Passed    0.25 sec
+2026-11-02T00:04:56.8462872Z  9/13 Test #33: windows_autopilot_notice_glyph_bounds ...   Passed    0.06 sec
+2026-11-02T00:04:56.8658961Z 10/13 Test #34: windows_instrument_glyph_bounds .........   Passed    0.02 sec
+2026-11-02T00:04:56.8737002Z 11/13 Test #35: windows_utf8_device_log .................   Passed    0.01 sec
+2026-11-02T00:04:56.8838392Z 12/13 Test #36: windows_command_line_parsing ............   Passed    0.01 sec
+2026-11-02T00:04:57.0453712Z 13/13 Test #37: hlsl_shader_compilation .................   Passed    0.16 sec
+2026-11-02T00:04:57.0460797Z 100% tests passed, 0 tests failed out of 13

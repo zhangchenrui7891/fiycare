@@ -1,0 +1,85 @@
+Test project /workspace/scratch/f28b7c9ab582/run_v056/build
+      Start  1: navigation_map_clipping
+ 1/40 Test  #1: navigation_map_clipping .............   Passed    0.00 sec
+      Start  2: instrument_integer_format
+ 2/40 Test  #2: instrument_integer_format ...........   Passed    0.06 sec
+      Start  3: compact_glyph_coverage
+ 3/40 Test  #3: compact_glyph_coverage ..............   Passed    0.15 sec
+      Start  4: fleet_variants
+ 4/40 Test  #4: fleet_variants ......................   Passed    0.00 sec
+      Start  5: offline_scenery_geometry
+ 5/40 Test  #5: offline_scenery_geometry ............   Passed    0.10 sec
+      Start  6: native_asset_payload_lengths
+ 6/40 Test  #6: native_asset_payload_lengths ........   Passed    0.09 sec
+      Start  7: autopilot_disconnect_feedback
+ 7/40 Test  #7: autopilot_disconnect_feedback .......   Passed    0.00 sec
+      Start  8: primary_instrument_text
+ 8/40 Test  #8: primary_instrument_text .............   Passed    0.00 sec
+      Start  9: exact_launch_options
+ 9/40 Test  #9: exact_launch_options ................   Passed    0.00 sec
+      Start 10: build_timestamp_recovery
+10/40 Test #10: build_timestamp_recovery ............   Passed    1.33 sec
+      Start 11: glass_cockpit_geometry
+11/40 Test #11: glass_cockpit_geometry ..............   Passed    2.70 sec
+      Start 12: clean_overlay_and_approach
+12/40 Test #12: clean_overlay_and_approach ..........   Passed    0.91 sec
+      Start 13: scenery_landscape_integration
+13/40 Test #13: scenery_landscape_integration .......   Passed    1.43 sec
+      Start 14: launch_renderer_integration
+14/40 Test #14: launch_renderer_integration .........   Passed    0.54 sec
+      Start 15: rebuilt_diagnostic_storage
+15/40 Test #15: rebuilt_diagnostic_storage ..........   Passed    1.27 sec
+      Start 16: rebuilt_cockpit_text
+16/40 Test #16: rebuilt_cockpit_text ................   Passed    0.98 sec
+      Start 17: incremental_runtime_asset_staging
+17/40 Test #17: incremental_runtime_asset_staging ...   Passed    0.58 sec
+      Start 18: pinned_assimp_source_restore
+18/40 Test #18: pinned_assimp_source_restore ........   Passed    0.08 sec
+      Start 19: release_package_safety
+19/40 Test #19: release_package_safety ..............   Passed    0.10 sec
+      Start 20: release_manifest_verifier
+20/40 Test #20: release_manifest_verifier ...........   Passed    0.08 sec
+      Start 21: self_contained_asset_import
+21/40 Test #21: self_contained_asset_import .........   Passed    0.02 sec
+      Start 22: asset_import_and_new_fleet
+22/40 Test #22: asset_import_and_new_fleet ..........   Passed    0.17 sec
+      Start 23: physics_and_career
+23/40 Test #23: physics_and_career ..................   Passed    0.13 sec
+      Start 24: aero_and_avionics
+24/40 Test #24: aero_and_avionics ...................   Passed    0.06 sec
+      Start 25: engineering_systems
+25/40 Test #25: engineering_systems .................   Passed    0.13 sec
+      Start 26: render_and_surface_stability
+26/40 Test #26: render_and_surface_stability ........   Passed    1.66 sec
+      Start 27: reusable_frame_geometry
+27/40 Test #27: reusable_frame_geometry .............   Passed    0.23 sec
+      Start 28: shader_bytecode_cache
+28/40 Test #28: shader_bytecode_cache ...............   Passed    0.00 sec
+      Start 29: keyboard_focus_recovery
+29/40 Test #29: keyboard_focus_recovery .............   Passed    0.03 sec
+      Start 30: keyboard_short_taps
+30/40 Test #30: keyboard_short_taps .................   Passed    0.00 sec
+      Start 31: cockpit_throttle_event_coalescing
+31/40 Test #31: cockpit_throttle_event_coalescing ...   Passed    0.07 sec
+      Start 32: cockpit_fixed_control_geometry
+32/40 Test #32: cockpit_fixed_control_geometry ......   Passed    0.06 sec
+      Start 33: training_approach_guidance
+33/40 Test #33: training_approach_guidance ..........   Passed    0.00 sec
+      Start 34: navigation_leg_capture
+34/40 Test #34: navigation_leg_capture ..............   Passed    0.02 sec
+      Start 35: navigation_leg_tracking
+35/40 Test #35: navigation_leg_tracking .............   Passed    0.18 sec
+      Start 36: benchmark_evidence_integrity
+36/40 Test #36: benchmark_evidence_integrity ........   Passed    0.00 sec
+      Start 37: rolling_frame_statistics
+37/40 Test #37: rolling_frame_statistics ............   Passed    0.22 sec
+      Start 38: asynchronous_terrain_stream
+38/40 Test #38: asynchronous_terrain_stream .........   Passed    0.00 sec
+      Start 39: laboratory_surface_sweep
+39/40 Test #39: laboratory_surface_sweep ............   Passed    0.02 sec
+      Start 40: laboratory_engine_out
+40/40 Test #40: laboratory_engine_out ...............   Passed    0.10 sec
+
+100% tests passed out of 40
+
+Total Test time (real) =  13.58 sec
