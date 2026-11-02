@@ -28,7 +28,13 @@ inline void apply(sim::Snapshot& state,Action action,double value=0){
   case Action::Assist:f.assist=!f.assist;break;
   case Action::ParkingBrake:state.parkingBrake=!state.parkingBrake;break;
   case Action::Throttle:if(std::isfinite(value))f.throttle=std::clamp(value,0.0,1.0);break;
-  case Action::HeadingHold:state.headingHold=!state.headingHold;if(state.headingHold)state.targetHeading=f.yaw;break;
+  case Action::HeadingHold:
+   // NAV uses the heading controller internally. Selecting HDG from NAV
+   // transfers lateral control instead of toggling that internal flag off.
+   state.headingHold=state.navigationHold||!state.headingHold;
+   state.navigationHold=false;
+   if(state.headingHold)state.targetHeading=f.yaw;
+   break;
   case Action::AltitudeHold:state.altitudeHold=!state.altitudeHold;if(state.altitudeHold)state.targetAltitude=std::clamp(std::round(sim::airData(f,state.avionics.qnh).altitude/100)*100.,0.,12000.);break;
   case Action::HeadingMinus:state.targetHeading=sim::wrapAngle(state.targetHeading-10*sim::pi/180);break;
   case Action::HeadingPlus:state.targetHeading=sim::wrapAngle(state.targetHeading+10*sim::pi/180);break;
