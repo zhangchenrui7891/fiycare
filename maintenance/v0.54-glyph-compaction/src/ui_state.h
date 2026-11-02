@@ -14,7 +14,7 @@ inline int aircraftIdForCommand(int command){
 inline bool switchAircraft(sim::Snapshot& state,int id){
  if(id<0||id>=sim::aircraftCount||!state.career.parked(state.flight))return false;
  state.parkingBrake=false;state.flight=sim::Flight{};state.flight.configure(id);
- state.career.stage=state.career.gate=0;state.career.elapsed=state.career.raceLap=0;
+ state.career.resetFlight(state.flight);
  return true;
 }
 inline bool setPassengers(sim::Snapshot& state,int count){
@@ -25,6 +25,6 @@ inline void restart(sim::Snapshot& state){
  const int aircraft=state.flight.aircraftId,pax=state.flight.passengers;const double fuel=state.flight.fuel;
  if(state.flight.crashed){state.career.credits=std::max(0,state.career.credits-500);state.career.maintenance=std::max(.3,state.career.maintenance-.10);}
  state.parkingBrake=false;state.flight=sim::Flight{};state.flight.configure(aircraft);state.flight.passengers=pax;state.flight.fuel=fuel;
- state.career.stage=state.career.gate=0;state.career.elapsed=state.career.raceLap=0;
+ state.career.resetFlight(state.flight);
 }
 }

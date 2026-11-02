@@ -29,10 +29,15 @@ struct Progress {
  }
  std::array<Waypoint,4> route{{{0,1200},{900,1700},{1200,400},{0,-200}}};
  bool parked(const Flight& f)const{return !f.crashed&&f.grounded()&&f.speed()<1&&onRunway(f.x,f.z);}
+ // Start a fresh attempt from the aircraft's current spawn. Retain career
+ // history and mission type, but never reuse an old airport pair or score.
+ void resetFlight(const Flight& f){
+  stage=gate=0;elapsed=raceLap=0;lastFlightScore=0;arrivalLandingScore=-1;
+  departureRunway=nearestRunwayIndex(f.x,f.z);arrivalRunway=departureRunway?0:1;
+ }
  bool select(int m,const Flight& f){
   if(!parked(f)||m<0||m>4||(!licensed&&m!=0))return false;
-  mission=m;stage=gate=0;elapsed=raceLap=0;lastFlightScore=0;arrivalLandingScore=-1;
-  departureRunway=nearestRunwayIndex(f.x,f.z);arrivalRunway=departureRunway?0:1;
+  mission=m;resetFlight(f);
   return true;
  }
  const wchar_t* name()const{const wchar_t* n[]={L"执照训练",L"货物运输",L"旅客航班",L"计时竞速",L"摄影巡游"};return n[std::clamp(mission,0,4)];}
