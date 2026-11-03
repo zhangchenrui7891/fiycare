@@ -1,3 +1,6 @@
+# v0.62：性能日志区分分辨率与限帧
+见RENDER_METADATA.md与TODAY_REVIEW.md。源码资源包，无EXE。
+
 # v0.61：默认原生分辨率，超采样改为主动开启
 详见NATIVE_RENDERING.md和TODAY_REVIEW.md；源码资源包，无EXE。
 

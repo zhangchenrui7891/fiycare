@@ -1,20 +1,20 @@
-最终结果（2026-11-03）：Linux Assimp ON完整Release构建与44/44 CTest通过；全套严格C++17便携检查及渲染选择ASan/UBSan通过（detect_leaks=0）。Windows2022/MSVC x64 Release主程序编译链接成功，17/17 CPU检查通过；Assimp OFF、资源复制OFF，8条既有警告。没有游戏运行/GPU/HD6000实测或FPS提升数据。Windows证据：https://github.com/zhangchenrui7891/fiycare/actions/runs/41556622167 。受检代码207bfc85aa848937d7ae6cfca4554121488ac541；之后仅补资料。
+最终结果（2026-11-03）：Linux Assimp ON Release构建与最终44/44 CTest通过，损坏的asset_fixture_check重新链接后通过；全套严格C++17便携检查及新增ASan/UBSan通过（detect_leaks=0）。Windows2022/MSVC主程序编译链接成功，17/17 CPU检查通过（含GDI/HLSL）；Assimp OFF、资源复制OFF，8条既有警告。没有Windows游戏、GPU帧时或HD6000实测。Windows证据：https://github.com/zhangchenrui7891/fiycare/actions/runs/41587187218 。受检产品代码ec8d4afd013677c3924b34ba7fab05285d5b253b，之后仅补资料。
 
-验证环境记录：Linux首轮asset_pipeline_check缺少可执行权限（BAD_COMMAND），已恢复权限并重跑；保留ctest_initial.log，不将无法执行算作通过。
+环境修正：Linux初轮asset_fixture_check缺少执行权限而无法运行（BAD_COMMAND）；恢复权限后该文件仍无法执行（file识别为data，shell语法错误），因此删除损坏的构建产物并重新链接，再重跑完整测试。初轮及损坏文件失败日志均保留，不把无法执行计为通过。
 
-## v0.61 · 2026-11-03（默认渲染负载）
-基线：实际读取v0.60（文件版本41）、PROGRESS/TODAY_REVIEW及启动/渲染配置。原ZIP CRC及2252项哈希通过，1661项资源和依赖逐字节一致。上轮模型恢复失败保护及Linux44/44、Windows17/17均为历史结果，本轮独立验证。
+## v0.62 · 2026-11-03（渲染配置与性能记录）
+基线：读取最新v0.61（文件版本42）、PROGRESS/TODAY_REVIEW与渲染/统计代码。CRC及2264项哈希通过，1661项资源/第三方文件逐字节一致。上轮将默认比例从2改为1，44/44 Linux与17/17 Windows为上轮证据，未证明HD6000帧率提升。
 
-功能特点：C++17、DX12/DX11、中文菜单、十机型含A330/A350、共用27控件三维座舱、三屏航电、训练导航/进近、双机场生涯、浦东离线底图、示意地景、FXAA和网站入口。网站账号未绑定游戏存档，本轮未改变站点访问权限。
+当前特点：C++17、DX12/DX11、中文菜单、十机型含A330/A350、共用27控件三维驾驶舱、PFD/NAV/ENGINE、训练导航/进近、双机场生涯、浦东离线影像、示意地景、FXAA和网站入口。账号未绑定游戏存档，本轮未改变站点公开设置。
 
-问题与改动：默认renderScale=2导致宽高各2倍，即四倍像素，对HD6000默认负载过高。现在默认原生比例1；增加精确--supersample开关，--native优先且顺序无关。高画质脚本显式开启超采样，菜单切换仍保留。low/benchmark仍固定640×360。FXAA及已有存档设置不变，原生可能比超采样更显细小锯齿，不能声称画面完全相同。
+问题：performance.csv的low_mode错误记录powerSaver，benchmark固定640×360但不限帧会被标成非low；CSV也没有原生/超采样尺寸证据。本轮修复low_mode语义，追加render_width/render_height/software_frame_cap。创建渲染器和记录共用尺寸函数，CSV使用已应用比例而非待生效菜单请求。每5秒仅多写三个数字，没有新资产或逐帧采样任务；不宣称FPS变化。
 
-性能边界：1600×900客户区的渲染目标由3200×1800降为1600×900，像素数从5,760,000降到1,440,000。只是像素预算计算，不是帧率、显存或HD6000实测；模型、CPU模拟及其他负载不随之等比例减少。未修改资产、气动、地景或生涯。
+验证：新增脚本执行实际main CSV语句，16组配置组合通过；旧版在新增表头断言失败。共享尺寸测试及原有DX11/DX12创建/回退替身检查通过；全套严格C++17便携检查及新增ASan/UBSan通过（detect_leaks=0）。完整构建与Windows结果见首段。测试均不等于真实窗口、GPU或HD6000。
 
-检查：生产createRenderer以CPU API/渲染器替身执行，覆盖默认、显式2×、切回原生、DX11回退、low/benchmark重建。启动参数覆盖19标志、133误导字符串及native优先级。旧版默认尺寸在新增断言失败。严格便携与新增ASan/UBSan结果和完整构建见页首；不等于Windows真实窗口/GPU验收。
+GitHub：codex/v0.62-render-metadata，受检代码ec8d4afd013677c3924b34ba7fab05285d5b253b；继承目录maintenance/v0.54-glyph-compaction，内部版本0.62；main未改，完整资源和依赖在ZIP。
 
-GitHub：codex/v0.61-native-default，受检代码207bfc85aa848937d7ae6cfca4554121488ac541；继承核心目录maintenance/v0.54-glyph-compaction，内部版本0.61。main未改；完整资产/第三方依赖在ZIP。
+兼容与限制：CSV追加三列，解析器需读取表头；low_mode历史含义改变，旧日志不能按新语义解释。现有统计仍为CPU墙钟/300帧滚动窗口，非GPU帧时；切换FXAA/机型等可能混合样本，需稳定配置后等待窗口刷新。本轮不增加内存采样、自动原生benchmark或实际性能数据。
 
-差距：2026-11-03复核官方指南 https://www.flightsimulator.com/guide/new-flight-simmer-guide/ ，其物理、航电、天气和职业体验仍为长期参考；项目缺真实机型专属系统/FMS、精细机场/DEM、复杂天气、气动标定与完整航班实机验收。当前没有接近成品的功能/画面与实机性能证据，不承诺5350U/HD6000/8GB达到同等画质功能。
+差距：2026-11-03检索微软官方指南 https://www.flightsimulator.com/guide/new-flight-simmer-guide/ ，其物理、航电、天气和职业体验仍为参考；当前缺真实机型系统/FMS、精细机场/DEM、复杂天气、气动标定及完整航班实机验收。没有接近成品的画面或性能证据，不承诺5350U/HD6000/8GB达到相同画质功能。
 
-下一步：目标Windows带资源启动，固定机场、机型、视角与FXAA，比较原生和2×超采样各60秒帧时/RAM与截图，尤其检验座舱小字和机翼边缘。既有640×360 benchmark不代表此次原生/超采样对比。包内无EXE，未运行Windows游戏或HD6000；继续迭代。
+下一步：带资源Windows启动，固定机场/机型/视角/FXAA后分别测原生与超采样60秒帧时、内存和截图，并核对新增CSV列；原生1600×900应记录1600/900，2×为3200/1800，low/benchmark为640/360。包内无EXE，未运行Windows游戏或测HD6000，继续迭代。
