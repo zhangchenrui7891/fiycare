@@ -31,6 +31,13 @@ int main(){
   require(launch::initialRenderScale(launch::Options({L"--supersample"}))==2,"Explicit supersampling");
   for(const auto& opts:std::vector<std::vector<std::wstring>>{{L"--native"},{L"--supersample",L"--native"},{L"--native",L"--supersample"},{L"--supersample-old"},{L"--supersample=2"}})
    require(launch::initialRenderScale(launch::Options(opts))==1,"Native precedence and exact tokens");
+  for(unsigned scale:{1u,2u}){
+   const auto native=launch::renderExtent(800,450,scale,false);
+   require(native.width==800*scale&&native.height==450*scale,"Configured render extent");
+   const auto low=launch::renderExtent(800,450,scale,true);
+   require(low.width==640&&low.height==360,"Low extent independent of scale");
+  }
+  const auto zero=launch::renderExtent(0,0,1,false);require(zero.width==1&&zero.height==1,"Zero client clamped");
   std::cout<<"PASS launch options: 19 flags, "<<cases<<" misleading tokens, forcing/copy and backend checks. Tokenized CPU inputs only.\n";
   return 0;
  }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}

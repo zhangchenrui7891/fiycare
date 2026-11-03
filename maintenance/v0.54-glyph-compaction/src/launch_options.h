@@ -25,4 +25,10 @@ public:
 inline unsigned initialRenderScale(const Options& options){
  return options.has(L"--supersample")&&!options.has(L"--native")?2u:1u;
 }
+struct RenderExtent {unsigned width,height;};
+// Shared by renderer creation and CSV metadata; scale is the applied scale,
+// not a menu request that has yet to recreate the renderer.
+inline RenderExtent renderExtent(unsigned width,unsigned height,unsigned scale,bool low){
+ return low?RenderExtent{640,360}:RenderExtent{std::max(1u,width)*scale,std::max(1u,height)*scale};
+}
 }
