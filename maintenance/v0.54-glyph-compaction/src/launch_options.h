@@ -20,4 +20,9 @@ public:
   return result;
  }
 };
+// Native resolution is the low-overhead default; supersampling is opt-in.
+// An explicit native override wins independent of argument order.
+inline unsigned initialRenderScale(const Options& options){
+ return options.has(L"--supersample")&&!options.has(L"--native")?2u:1u;
+}
 }

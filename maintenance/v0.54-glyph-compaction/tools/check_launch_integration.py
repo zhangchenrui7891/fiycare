@@ -9,6 +9,8 @@ import tempfile
 root = Path(__file__).resolve().parents[1]
 main = (root/'src/main.cpp').read_text()
 graphics = (root/'src/graphics.h').read_text()
+assert 'renderScale=launch::initialRenderScale(args);' in main
+assert '--supersample' in (root/'run_high_quality.bat').read_text()
 assert 'args.find(' not in main+graphics
 assert 'const auto args=launch::currentOptions();' in main
 assert main.count('createRenderer(window,renderArgs)') == 2
@@ -34,7 +36,12 @@ void require(bool ok,const char* why){if(!ok)throw std::runtime_error(why);}
 int main(){
  try{
   auto a=createRenderer(0,launch::Options({L"--dx11-extra",L"--low=1",L"C:\\--warp.txt"}));
-  require(a->backend()==12&&a->width==1600&&a->height==900&&!a->software,"Misleading options must not change default backend/quality");
+  require(a->backend()==12&&a->width==800&&a->height==450&&!a->software,"Misleading options must not change default backend/quality");
+  renderScale=2;
+  auto high=createRenderer(0,launch::Options());require(high->width==1600&&high->height==900,"Explicit supersampling keeps four times the pixels");
+  fail12=true;auto fallback=createRenderer(0,launch::Options());require(fallback->backend()==11&&fallback->width==1600&&fallback->height==900,"Fallback preserves explicit scale");fail12=false;
+  renderScale=1;
+  auto nativeAgain=createRenderer(0,launch::Options());require(nativeAgain->width==800&&nativeAgain->height==450,"Switching back recreates native resolution");
   auto b=createRenderer(0,launch::Options({L"--dx11",L"--low",L"--warp"}));
   require(b->backend()==11&&b->width==640&&b->height==360&&b->software,"Exact diagnostic options");
   auto c=createRenderer(0,launch::Options({L"--dx11",L"--dx12"}));

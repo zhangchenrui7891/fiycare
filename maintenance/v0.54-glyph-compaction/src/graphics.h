@@ -2,7 +2,7 @@
 #include "renderer12.h"
 #include "renderer11.h"
 #include "launch_options.h"
-inline UINT renderScale=2;
+inline UINT renderScale=1;
 inline std::unique_ptr<IRenderer> createRenderer(HWND window,const launch::Options& args){
  RECT client{};GetClientRect(window,&client);
  const UINT renderWidth=UINT(std::max(1L,client.right)),renderHeight=UINT(std::max(1L,client.bottom));

@@ -8,7 +8,7 @@ int main(){
   const std::vector<std::wstring> flags={L"--benchmark",L"--low",L"--smoke-test",L"--airliner",
    L"--a330",L"--a350",L"--sunset",L"--no-aa",L"--night",L"--flood-off",
    L"--panel-dim",L"--surface-flight",L"--fullscreen",L"--native",L"--cockpit",
-   L"--dx11",L"--dx12",L"--warp"};
+   L"--dx11",L"--dx12",L"--warp",L"--supersample"};
   std::size_t cases=0;
   for(const auto& flag:flags){
    require(launch::Options({flag}).has(flag),"Exact token must match");
@@ -27,7 +27,11 @@ int main(){
   require(!launch::Options({L"--BENCHMARK"}).has(L"--benchmark"),"Flags remain case sensitive");
   const auto renderer=launch::Options({L"--benchmark",L"--dx11"}).with(L"--low");
   require(renderer.has(L"--benchmark")&&renderer.has(L"--dx11")&&renderer.has(L"--low"),"Diagnostic renderer retains exact backend");
-  std::cout<<"PASS launch options: 18 flags, "<<cases<<" misleading tokens, forcing/copy and backend checks. Tokenized CPU inputs only.\n";
+  require(launch::initialRenderScale(launch::Options())==1,"Default scale is native");
+  require(launch::initialRenderScale(launch::Options({L"--supersample"}))==2,"Explicit supersampling");
+  for(const auto& opts:std::vector<std::vector<std::wstring>>{{L"--native"},{L"--supersample",L"--native"},{L"--native",L"--supersample"},{L"--supersample-old"},{L"--supersample=2"}})
+   require(launch::initialRenderScale(launch::Options(opts))==1,"Native precedence and exact tokens");
+  std::cout<<"PASS launch options: 19 flags, "<<cases<<" misleading tokens, forcing/copy and backend checks. Tokenized CPU inputs only.\n";
   return 0;
  }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}
 }
