@@ -1,3 +1,6 @@
+# v0.61：默认原生分辨率，超采样改为主动开启
+详见NATIVE_RENDERING.md和TODAY_REVIEW.md；源码资源包，无EXE。
+
 # v0.60：默认机模恢复失败保护
 见MODEL_RESTORE.md与TODAY_REVIEW.md；源码资源包，无EXE。
 

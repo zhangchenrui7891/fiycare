@@ -364,7 +364,7 @@
     "windows_game": false,
     "hd6000_tested": false
   },
-  "latest_version": "0.60",
+  "latest_version": "0.61",
   "v058": {
     "baseline": "v0.57, file version38",
     "baseline_sha256_entries": 2210,
@@ -414,6 +414,34 @@
     "windows_game": false,
     "hd6000_tested": false,
     "windows_run": 41516530040,
+    "existing_warnings": 8
+  },
+  "v061": {
+    "baseline": "v0.60 file version41",
+    "baseline_hashes": 2252,
+    "unchanged_resource_dependency_files": 1661,
+    "default_scale": 1,
+    "supersample_scale": 2,
+    "native_override_precedence": true,
+    "strict_portable": "exit0",
+    "asan_ubsan": "production renderer integration passed detect_leaks=0",
+    "pixel_budget_example": {
+      "client": [
+        1600,
+        900
+      ],
+      "old_pixels": 5760000,
+      "new_pixels": 1440000,
+      "measurement": false
+    },
+    "windows_game": false,
+    "hd6000_tested": false,
+    "product_commit": "207bfc85aa848937d7ae6cfca4554121488ac541",
+    "linux_build": "Assimp ON Release passed",
+    "linux_ctest": "44/44 after fixing asset_pipeline_check execute permission",
+    "windows_build": "MSVC x64 Release passed, Assimp OFF/assets copy OFF",
+    "windows_cpu_checks": "17/17",
+    "windows_run": 41556622167,
     "existing_warnings": 8
   }
 }

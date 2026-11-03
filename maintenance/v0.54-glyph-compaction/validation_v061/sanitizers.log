@@ -1,0 +1,1 @@
+PASS actual renderer selection: misleading/exact flags, DX11 precedence, fallback/forced failure, benchmark copy and recreation. CPU renderer/API substitutes only.
