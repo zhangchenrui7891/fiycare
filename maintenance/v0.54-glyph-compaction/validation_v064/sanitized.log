@@ -1,0 +1,6 @@
+PASS 11 configuration mutations after valid full runs, sticky invalidation, early change, and report suppression. CPU only.
+Legacy virtual dt=0.0005s x200000: elapsed freezes at 32.768s; new accepted duration=100s, storage=65536. Not hardware FPS.
+Capacity boundary: sample 65537 triggers early NOT_EVALUATED at 32.7685 virtual seconds.
+Normal target tiers/full-run P95 preserved; insufficient 60s evidence has no performance verdict.
+Invalid intervals, accumulation overflow, malformed stats and report NA/NOT_EVALUATED checks passed.
+Benchmark CPU clock/report checks passed; no Windows, GPU FPS or HD6000 measurement performed.

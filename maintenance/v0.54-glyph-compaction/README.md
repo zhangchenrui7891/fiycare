@@ -1,3 +1,6 @@
+# v0.64：benchmark配置改变后拒绝性能判定
+见BENCHMARK_CONFIGURATION.md与TODAY_REVIEW.md。源码资源包，无EXE。
+
 # v0.63：切换配置后重新累计滚动性能统计
 详见PERFORMANCE_SEGMENTS.md和TODAY_REVIEW.md；源码资源包，无EXE。
 

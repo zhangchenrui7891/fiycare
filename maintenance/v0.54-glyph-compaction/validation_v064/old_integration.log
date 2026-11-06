@@ -1,0 +1,2 @@
+Changed production context still permits benchmark verdict
+Expected failure exit=1

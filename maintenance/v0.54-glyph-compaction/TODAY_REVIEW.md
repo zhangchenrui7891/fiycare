@@ -1,19 +1,21 @@
-## v0.63 · 2026-11-06（滚动性能统计配置边界）
+## v0.64 · 2026-11-07（benchmark配置失效保护）
 
-基线：读取最新v0.62（文件版本43）、PROGRESS/TODAY_REVIEW与主循环/性能记录代码；原ZIP CRC与2279项SHA256通过，1661项assets/third_party逐字节一致。上轮修正low_mode并追加渲染尺寸与限帧字段，其44/44 Linux和17/17 Windows属于历史证据。
+基线：最新v0.63（文件版本44），读取PROGRESS/TODAY_REVIEW及benchmark/main实现。CRC及2294项SHA256通过。上轮45/45 Linux、18/18 Windows是历史结果，仅解决滚动窗口，不保证完整benchmark配置一致。
 
-功能特点：C++17、DX12/DX11、中文菜单、十机型含A330/A350，共用27控件三维驾驶舱、PFD/NAV/ENGINE、训练导航/进近、双机场生涯、浦东离线影像、示意地景、FXAA与账号网站入口。机模和气动参数仍是近似原型；网站账号未绑定游戏存档，本轮未改变网站访问设置。
+功能特点：C++17、DX12/DX11、中文菜单、十机型含A330/A350、共用27控件驾驶舱、PFD/NAV/ENGINE、训练导航/进近、双机场生涯、浦东影像、FXAA与账号网站入口保留。机型外观/参数仍为原型，网站账号未绑定游戏存档。
 
-发现与改动：主循环先采样后处理输入，新配置CSV可能混入旧配置帧时。新增固定大小FrameContext，在统计/输出前检测机型、视角、地形、菜单、FXAA、low、模拟活动、步行、限帧和已应用宽高变化，清空300帧窗口与五秒计时，排除下一过渡帧。稳定配置重新累计再报告。CSV15列兼容，不增加资产或逐帧堆分配，不宣称FPS提升。
+本轮：BenchmarkSamples观察首次FrameContext，之后任一已跟踪字段变化即永久标记configuration_valid=0。valid/summary/结束条件和报告统一拒绝该次性能判定；切回原配置也不能恢复。主循环在生成报告前调用观察函数。报告改称initial_scene，显式声明continuous_scene_not_locked及FrameContext_11_fields覆盖范围。无效报告输出NA和NOT_EVALUATED，而非PASS/FAIL。没有实测FPS收益。
 
-本轮验证：Linux Assimp ON Release完整282步构建成功，45/45 CTest通过（14.23秒）；全套严格C++17便携检查退出0。新增11种配置边界/6600稳定帧检查，实际main采样与重置语句覆盖8种切换、过渡帧、五秒重新累计、失焦恢复；ASan/UBSan通过（detect_leaks=0）。旧v0.62 main在相同检查中退出1，复现旧样本/计时未清空。v0.62 CSV16组兼容检查通过。日志见validation_v063。
+检查：11种配置变化、33011次稳定配置采样、切回初始配置、提前变化及报告抑制检查通过。生产main语句替身检查通过，旧v0.63 main在“Changed production context still permits benchmark verdict”断言退出1。新增ASan/UBSan检查（detect_leaks=0）通过；严格C++17全套便携检查退出0。
 
-Windows2022/MSVC x64 Release主程序编译链接成功，18/18 CPU检查通过（含新增配置边界、GDI及HLSL），8条既有警告。Assimp OFF、资源复制OFF；未运行Windows游戏、GPU或HD6000。证据：https://github.com/zhangchenrui7891/fiycare/actions/runs/42230227288 ，日志摘录validation_v063/windows_excerpt.log。
+Linux Assimp ON Release完整282步构建成功，45/45 CTest通过（13.59秒）。1661项资源/第三方文件逐字节保持不变。
 
-GitHub：codex/v0.63-performance-segment，受检产品代码09a332cb9499cd6602fda769974e5982f81f58cb；继承目录maintenance/v0.54-glyph-compaction，内部版本0.63；GitHub默认main分支未改，完整资源与依赖在ZIP。后续提交仅补记录。
+Windows2022/MSVC x64 Release主程序编译链接成功，19/19 CPU检查通过（含benchmark、GDI与HLSL），8条既有警告。Assimp OFF、资源复制OFF；未启动游戏或验证GPU/HD6000。证据：https://github.com/zhangchenrui7891/fiycare/actions/runs/42276538544 ，关键日志见validation_v064/windows_excerpt.log。
 
-限制：只处理列出的11字段，不自动固定位置、观察方向、光照或模型替换；整段benchmark仍可混合不同配置，未强制锁定场景。统计仍为CPU墙钟，切换帧被排除，不适合测切换卡顿。没有Windows游戏/GPU/HD6000实测、内存测量或画面验收；启动资源缺失仍可能阻止启动。包内无EXE。
+GitHub：codex/v0.64-benchmark-guard，受检代码38559e00c6dbf7a70f89f10f7a9c7a1a0b432585；目录继承maintenance/v0.54-glyph-compaction，内部版本0.64，默认main分支不变。完整资源和依赖在ZIP，无EXE。
 
-差距：2026-11-06检索微软官方指南 https://www.flightsimulator.com/guide/new-flight-simmer-guide/ ，其物理、航电、天气及职业体验作为参考。当前缺真实机型系统/FMS、精细机场/DEM、复杂天气、气动标定及完整航班实机验收。没有接近成品的可核查画面和性能证据，不承诺5350U/HD6000/8GB达到同等画质或功能。
+限制：此保护以第一次观察为基线，不验证第一次观察之前用户是否已改配置。11字段为机型、视角模式、地形、菜单页、FXAA、low、模拟活动、步行、限帧及渲染宽高。不监控飞行位置、观察角、时间/光照、模型替换等全部场景变化，不锁定交互。configuration_valid=1只表示未发现所跟踪字段改变，不证明固定场景；完整benchmark依然是640×360、CPU墙钟，非GPU帧时。报告initial_scene是预设初始场景说明，非全程实景证明。未增加资源/逐帧堆分配，未宣称性能提升。
 
-下一步：优先取得带完整资源的Windows启动证据，在目标Boot Camp固定机场/机型/视角/光照，比较原生与2×超采样各60秒帧时、内存和截图，并验证切换后CSV重新累计。代码侧后续可处理benchmark场景变更的有效性标记；这是待办，尚未实现。仍非成品，继续迭代。
+差距：对照2026-11-07检索的微软官方指南 https://www.flightsimulator.com/guide/new-flight-simmer-guide/ ，当前仍缺真实机型系统/FMS、精细机场/DEM、复杂天气、气动标定及完整航班验收。没有接近成品的画面/性能证据，不承诺5350U/HD6000/8GB达到相同画质功能。
+
+下一步：优先带资源Windows启动和座舱验收，固定机场/机型/视角/光照，记录原生与2×各60秒帧时、RAM和截图；benchmark中按C或切换FXAA应得到NOT_EVALUATED并结束，重新启动才能重新测。当前没有目标Boot Camp机器连接，未进行Windows游戏/GPU/HD6000实测。尚非成品，继续迭代。
