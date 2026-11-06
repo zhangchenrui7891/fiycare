@@ -3,7 +3,27 @@
 #include <array>
 #include <cmath>
 #include <cstddef>
+#include <tuple>
 namespace timing {
+// Configuration boundaries for the rolling HUD/CSV window. Continuous flight,
+// sun movement and camera look are deliberately not treated as fixed scenes.
+struct FrameContext {
+ int aircraft=0,camera=0,terrain=0,menu=0;
+ bool antiAlias=false,low=false,active=false,walking=false,powerSaver=false;
+ unsigned width=0,height=0;
+ bool operator==(const FrameContext& other)const{
+  return std::tie(aircraft,camera,terrain,menu,antiAlias,low,active,walking,powerSaver,width,height)==
+         std::tie(other.aircraft,other.camera,other.terrain,other.menu,other.antiAlias,other.low,other.active,other.walking,other.powerSaver,other.width,other.height);
+ }
+};
+class FrameContextGate {
+ FrameContext previous{};bool initialized=false;
+public:
+ bool changed(const FrameContext& current){
+  const bool result=!initialized||!(previous==current);
+  previous=current;initialized=true;return result;
+ }
+};
 // CPU wall-clock frame intervals, including Present/wait; never GPU timings.
 struct FrameStats {double fps=0,p95Ms=0,maxMs=0;std::size_t samples=0;};
 class FrameWindow {
