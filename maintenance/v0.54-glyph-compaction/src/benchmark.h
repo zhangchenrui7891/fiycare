@@ -12,9 +12,17 @@ class BenchmarkSamples {
  std::vector<double> frames;
  double total=0;
  std::size_t observed=0,rejected=0;
- bool overflow=false,invalidTime=false;
+ bool overflow=false,invalidTime=false,configurationChanged=false,contextObserved=false;
+ FrameContext initialContext{};
 public:
  static constexpr std::size_t sampleLimit=65536;
+ // Sticky invalidation: returning to the original configuration cannot repair
+ // a run that already contains different workloads.
+ void observeContext(const FrameContext& context){
+  if(!contextObserved){initialContext=context;contextObserved=true;}
+  else if(!(initialContext==context))configurationChanged=true;
+ }
+ bool configurationValid()const{return !configurationChanged;}
  void add(double seconds){
   if(!std::isfinite(seconds)||seconds<=0){++rejected;invalidTime=true;return;}
   ++observed;
@@ -27,7 +35,7 @@ public:
   frames.push_back(seconds);
  }
  double elapsed()const{return total;}
- bool valid()const{return !overflow&&!invalidTime;}
+ bool valid()const{return !overflow&&!invalidTime&&!configurationChanged;}
  bool overflowed()const{return overflow;}
  bool timingValid()const{return !invalidTime;}
  std::size_t storedSamples()const{return frames.size();}
@@ -74,9 +82,10 @@ inline BenchmarkResult writeBenchmarkSummary(std::ostream& out,const std::string
  const std::string& backend,bool fxaa,bool powerSaver,const BenchmarkSamples& samples){
  const auto stats=samples.summary();const auto result=assessBenchmark(samples.elapsed(),stats,samples.valid());
  out<<"FlightCareerAir "<<version<<" fixed benchmark\nbackend="<<backend
-    <<"\nscene=PVG,A350,cockpit,noon,low\nscene_assumption=unchanged_during_run_not_enforced\nfxaa="<<(fxaa?"on":"off")
+    <<"\ninitial_scene=PVG,A350,cockpit,noon,low\nscene_assumption=continuous_scene_not_locked\nconfiguration_guard=FrameContext_11_fields\nfxaa="<<(fxaa?"on":"off")
     <<"\nsoftware_frame_cap="<<(powerSaver?20:0)<<"\nrender_size=640x360\nsample_scope=full_active_run\ntiming_source=CPU_wall_frame_intervals_not_GPU_timestamps"
     <<"\nsample_limit="<<BenchmarkSamples::sampleLimit<<"\nsample_overflow="<<samples.overflowed()
+    <<"\nconfiguration_valid="<<samples.configurationValid()
     <<"\ntiming_valid="<<samples.timingValid()<<"\nsamples_valid="<<samples.valid()
     <<"\nelapsed_s="<<samples.elapsed()<<"\nsamples="<<stats.samples
     <<"\nsamples_stored="<<samples.storedSamples()<<"\nsamples_observed="<<samples.observedSamples()

@@ -92,8 +92,35 @@ void malformedEvidence(){
  require(!timing::assessBenchmark(INFINITY,good).complete&&!timing::assessBenchmark(NAN,good).complete,"Nonfinite elapsed is not complete evidence");
  std::cout<<"Invalid intervals, accumulation overflow, malformed stats and report NA/NOT_EVALUATED checks passed.\n";
 }
+void configurationChanges(){
+ const timing::FrameContext base{3,1,1,0,true,true,true,false,false,640,360};
+ for(int field=0;field<11;++field){
+  timing::BenchmarkSamples run;run.observeContext(base);
+  for(int i=0;i<3001;++i){run.observeContext(base);run.add(.02);}
+  require(run.valid()&&timing::assessBenchmark(run.elapsed(),run.summary()).complete,"Stable context remains assessable");
+  auto changed=base;
+  switch(field){
+   case 0:changed.aircraft=2;break;case 1:changed.camera=0;break;
+   case 2:changed.terrain=0;break;case 3:changed.menu=1;break;
+   case 4:changed.antiAlias=false;break;case 5:changed.low=false;break;
+   case 6:changed.active=false;break;case 7:changed.walking=true;break;
+   case 8:changed.powerSaver=true;break;case 9:changed.width=800;break;
+   case 10:changed.height=600;break;
+  }
+  run.observeContext(changed);
+  require(!run.valid()&&!run.configurationValid()&&run.timingValid()&&!run.overflowed(),"Changed configuration invalidates only its own evidence flag");
+  require(timing::benchmarkFinished(true,run),"Changed run finishes instead of waiting for 60 seconds");
+  noVerdict(run);
+  require(report(run).find("configuration_valid=0")!=std::string::npos,"Report exposes configuration invalidation");
+  run.observeContext(base);run.add(.02);noVerdict(run);
+ }
+ timing::BenchmarkSamples early;early.observeContext(base);auto changed=base;changed.camera=0;early.observeContext(changed);
+ require(!timing::benchmarkFinished(false,early),"Unstarted guard retains existing start rule");
+ early.add(.02);require(timing::benchmarkFinished(true,early),"First sampled invalid run ends early");noVerdict(early);
+ std::cout<<"PASS 11 configuration mutations after valid full runs, sticky invalidation, early change, and report suppression. CPU only.\n";
+}
 int main(){
- try{diagnosticRouting();reproduceLegacyClock();capacityBoundaryAndEarlyEnd();normalAndIncompleteRuns();malformedEvidence();
+ try{configurationChanges();diagnosticRouting();reproduceLegacyClock();capacityBoundaryAndEarlyEnd();normalAndIncompleteRuns();malformedEvidence();
   std::cout<<"Benchmark CPU clock/report checks passed; no Windows, GPU FPS or HD6000 measurement performed.\n";
  }catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 1;}
 }
