@@ -1,3 +1,6 @@
+# v0.63：切换配置后重新累计滚动性能统计
+详见PERFORMANCE_SEGMENTS.md和TODAY_REVIEW.md；源码资源包，无EXE。
+
 # v0.62：性能日志区分分辨率与限帧
 见RENDER_METADATA.md与TODAY_REVIEW.md。源码资源包，无EXE。
 

@@ -1,3 +1,5 @@
+> v0.63后续：已对列出的11个配置字段增加滚动统计边界，见PERFORMANCE_SEGMENTS.md；下文保留v0.62历史说明。
+
 # v0.62 性能日志配置证据
 
 v0.61的performance.csv中low_mode实际输出powerSaver（20FPS限速开关）。例如benchmark固定640×360但不限帧，会写low_mode=0，造成误判；原生与2×超采样也没有尺寸字段可区分。

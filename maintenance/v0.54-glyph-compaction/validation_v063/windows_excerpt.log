@@ -1,0 +1,30 @@
+2026-11-06T14:02:33.6335324Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\renderer12.h(64,95): warning C4458: declaration of 'footprint' hides class member [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-06T14:02:34.0664729Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\menus.h(61,140): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-06T14:02:34.6180376Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(464,76): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-06T14:02:34.6183481Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(465,57): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-06T14:02:34.6186489Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(465,136): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-06T14:02:34.6189474Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(465,265): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-06T14:02:34.6191942Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(465,310): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-06T14:02:34.7452217Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\cockpit_avionics.h(129,21): warning C4244: 'argument': conversion from 'size_t' to 'double', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-06T14:02:41.6486936Z   FlightCareerAir.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\FlightCareerAir.exe
+2026-11-06T14:03:00.8525417Z  1/18 Test  #1: default_model_restore_transaction ........   Passed    0.02 sec
+2026-11-06T14:03:00.8623998Z  2/18 Test  #2: cockpit_lateral_mode_transfer ............   Passed    0.01 sec
+2026-11-06T14:03:00.8954676Z  3/18 Test  #3: career_flight_reset ......................   Passed    0.03 sec
+2026-11-06T14:03:00.9037016Z  4/18 Test  #4: alert_headline_priority ..................   Passed    0.01 sec
+2026-11-06T14:03:00.9147410Z  5/18 Test  #5: navigation_map_clipping ..................   Passed    0.01 sec
+2026-11-06T14:03:01.0699481Z  6/18 Test  #6: instrument_integer_format ................   Passed    0.15 sec
+2026-11-06T14:03:01.2199233Z  7/18 Test  #7: compact_glyph_coverage ...................   Passed    0.15 sec
+2026-11-06T14:03:01.3867380Z  8/18 Test  #9: offline_scenery_geometry .................   Passed    0.17 sec
+2026-11-06T14:03:01.3968201Z  9/18 Test #11: autopilot_disconnect_feedback ............   Passed    0.01 sec
+2026-11-06T14:03:01.4088554Z 10/18 Test #12: primary_instrument_text ..................   Passed    0.01 sec
+2026-11-06T14:03:01.4165992Z 11/18 Test #13: exact_launch_options .....................   Passed    0.01 sec
+2026-11-06T14:03:01.4245750Z 12/18 Test #33: rolling_frame_configuration_boundaries ...   Passed    0.01 sec
+2026-11-06T14:03:01.7918613Z 13/18 Test #37: windows_compact_glyph_coverage ...........   Passed    0.37 sec
+2026-11-06T14:03:01.8785311Z 14/18 Test #38: windows_autopilot_notice_glyph_bounds ....   Passed    0.09 sec
+2026-11-06T14:03:01.9000656Z 15/18 Test #39: windows_instrument_glyph_bounds ..........   Passed    0.02 sec
+2026-11-06T14:03:01.9086111Z 16/18 Test #40: windows_utf8_device_log ..................   Passed    0.01 sec
+2026-11-06T14:03:01.9193200Z 17/18 Test #41: windows_command_line_parsing .............   Passed    0.01 sec
+2026-11-06T14:03:02.0917337Z 18/18 Test #42: hlsl_shader_compilation ..................   Passed    0.17 sec
+2026-11-06T14:03:02.0925185Z 100% tests passed, 0 tests failed out of 18
+2026-11-06T14:03:02.0925717Z Total Test time (real) =   1.32 sec
+2026-11-06T14:03:02.1458898Z Application compiled with Assimp OFF. Native fcmesh loading remains compiled. Runtime assets are NOT copied. No application/GPU/HD6000 execution was performed.
