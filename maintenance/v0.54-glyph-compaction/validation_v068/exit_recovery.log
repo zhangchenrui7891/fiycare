@@ -1,0 +1,1 @@
+PASS actual exit handler: save-before-destroy, default-No cancellation, explicit unsaved exit, retry, diagnostics bypass, duplicate commands, input/timing reset, destroy/dialog failure. CPU substitutes only.

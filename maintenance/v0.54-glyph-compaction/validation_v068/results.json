@@ -1,0 +1,16 @@
+{
+  "baseline": "v0.67",
+  "baseline_sha256": "4cf87be17b9717b2870f2ddcc3481e9ffea7df571341fa97873a73b232867d2a",
+  "baseline_manifest_entries": 2344,
+  "unchanged_assets_and_third_party_files": 1661,
+  "linux_build": "Assimp ON Release, 282 steps, exit 0",
+  "linux_ctest": "46/46, 12.74 seconds, exit 0",
+  "portable": "strict C++17 and actual-source integration scripts, exit 0",
+  "storage_sanitizer": "ASan/UBSan, detect_leaks=0, exit 0",
+  "exit_recovery": "actual handler with CPU API substitutes, exit 0",
+  "windows_game_and_HD6000": "NOT RUN",
+  "source_commit": "30db778944e7fc0fe88816171fde0d95047926af",
+  "windows_ci": "Windows2022/MSVC x64 Release; application compiled; 19/19 CPU/GDI/HLSL checks; 1.12s; 8 existing warnings; Assimp OFF; runtime assets OFF",
+  "windows_ci_url": "https://github.com/zhangchenrui7891/fiycare/actions/runs/42363181654",
+  "windows_job": 128375625667
+}
