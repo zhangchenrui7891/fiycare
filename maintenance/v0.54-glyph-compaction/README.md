@@ -1,3 +1,6 @@
+# v0.69：保护启动恢复备份
+见 TODAY_REVIEW.md。源码资源包，无 EXE。
+
 # v0.68：退出前保存，失败可取消退出返回航班
 见EXIT_RECOVERY.md与TODAY_REVIEW.md。源码资源包，无EXE。
 
