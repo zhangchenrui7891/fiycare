@@ -10,7 +10,7 @@ import sys
 import tempfile
 
 root = Path(__file__).resolve().parents[1]
-main = (root / 'src/main.cpp').read_text()
+main = Path(sys.argv[1]).read_text() if len(sys.argv)>1 and sys.argv[1]!='--sanitize' else (root / 'src/main.cpp').read_text()
 start = main.index('  auto save=[&](){')
 save = main[start:main.index('  SetProcessDPIAware();', start)]
 start = main.index('  auto saveTracks=[&](){')
@@ -34,7 +34,8 @@ constexpr int FALSE=0, MOVEFILE_REPLACE_EXISTING=1, MOVEFILE_WRITE_THROUGH=2;
 bool CopyFileW(const char* a,const char* b,int){
  std::filesystem::copy_file(a,b,std::filesystem::copy_options::overwrite_existing);return true;
 }
-bool MoveFileExW(const char* a,const char* b,int){std::filesystem::rename(a,b);return true;}
+bool failCommit=false;
+bool MoveFileExW(const char* a,const char* b,int){if(failCommit)return false;std::filesystem::rename(a,b);return true;}
 void require(bool ok,const char* why){if(!ok)throw std::runtime_error(why);}
 std::string read(const std::filesystem::path& p){std::ifstream in(p);return {std::istreambuf_iterator<char>(in),{}};}
 int main(int argc,char** argv){
@@ -66,10 +67,19 @@ int main(int argc,char** argv){
    std::ifstream in(game/"state.txt");sim::Snapshot restored;
    require(restored.read(in)&&restored.flight.x==123.5,"v16 state readback");
    require(!std::filesystem::exists(game/"state.tmp"),"No leftover committed temp");
+   const auto oldTracks=read(game/"tracks.txt");marks.push_back({5,6});
+   failCommit=true;bool threw=false;try{saveTracks();}catch(const std::exception&){threw=true;}failCommit=false;
+   require(threw&&read(game/"tracks.txt")==oldTracks,"Failed track commit must preserve existing file and report failure");
+   std::filesystem::remove(game/"tracks.tmp");std::filesystem::create_directory(game/"tracks.tmp");
+   threw=false;try{saveTracks();}catch(const std::exception&){threw=true;}
+   require(threw&&read(game/"tracks.txt")==oldTracks,"Blocked temporary output must preserve existing tracks");
+   std::filesystem::remove(game/"tracks.tmp");saveTracks();
+   require(read(game/"tracks.txt")=="1 2\n3 4\n5 6\n"&&!std::filesystem::exists(game/"tracks.tmp"),"Retry commits full new track data");
+   marks.clear();saveTracks();require(read(game/"tracks.txt").empty(),"Empty trail replaces old content intentionally");
    require(read(game/"career.txt")=="PLAYER-UNCHANGED","Unrelated legacy file unchanged");
   }
  }
- std::cout<<"PASS rebuilt storage: four modes, actual save/track lambdas, repeated commits, state readback. CPU API substitutes only.\n";
+ std::cout<<"PASS rebuilt storage: four modes, actual save/track lambdas, repeated commits, state readback, failed track commit/write preservation and retry. CPU API substitutes only.\n";
 }
 '''
 with tempfile.TemporaryDirectory() as directory:
