@@ -32,12 +32,14 @@ code = r'''
 #include <sstream>
 #include <stdexcept>
 constexpr int FALSE=0, MOVEFILE_REPLACE_EXISTING=1, MOVEFILE_WRITE_THROUGH=2;
+bool failBackupCopy=false,failBackupCommit=false;
 bool CopyFileW(const char* a,const char* b,int){
+ if(failBackupCopy){std::ofstream(b)<<"INCOMPLETE";return false;}
  std::filesystem::copy_file(a,b,std::filesystem::copy_options::overwrite_existing);return true;
 }
 bool failCommit=false,failTrackCommit=false;
 void logLine(const std::string&){}
-bool MoveFileExW(const char* a,const char* b,int){if(failCommit||(failTrackCommit&&std::filesystem::path(b).filename()=="tracks.txt"))return false;std::filesystem::rename(a,b);return true;}
+bool MoveFileExW(const char* a,const char* b,int){if((failBackupCommit&&std::filesystem::path(b).filename()=="state.bak")||failCommit||(failTrackCommit&&std::filesystem::path(b).filename()=="tracks.txt"))return false;std::filesystem::rename(a,b);return true;}
 void require(bool ok,const char* why){if(!ok)throw std::runtime_error(why);}
 std::string read(const std::filesystem::path& p){std::ifstream in(p);return {std::istreambuf_iterator<char>(in),{}};}
 int main(int argc,char** argv){
@@ -83,6 +85,17 @@ int main(int argc,char** argv){
     std::ifstream retry(game/"state.txt");sim::Snapshot recovered;
     require(recovered.read(retry)&&recovered.flight.x==memory,"Retry persists retained in-memory flight");
    }
+   for(bool copyFailure:{true,false}){
+    const auto oldState=read(game/"state.txt"),oldBackup=read(game/"state.bak");
+    state.flight.x+=1;failBackupCopy=copyFailure;failBackupCommit=!copyFailure;
+    require(!trySave()&&paused&&!saveError.empty(),"Backup failure pauses and reports");
+    require(read(game/"state.txt")==oldState&&read(game/"state.bak")==oldBackup,"Backup copy/commit failure must preserve primary and previous backup");
+    failBackupCopy=failBackupCommit=false;
+    require(trySave()&&read(game/"state.bak")==oldState,"Retry backs up previous primary before committing new state");
+    std::ifstream in(game/"state.txt");sim::Snapshot restored;
+    require(restored.read(in)&&restored.flight.x==state.flight.x,"Retry commits retained in-memory state");
+    require(!std::filesystem::exists(game/"state.bak.tmp"),"Successful backup commit consumes temporary file");
+   }
    const auto oldTracks=read(game/"tracks.txt");marks.push_back({5,6});
    failCommit=true;bool threw=false;try{saveTracks();}catch(const std::exception&){threw=true;}failCommit=false;
    require(threw&&read(game/"tracks.txt")==oldTracks,"Failed track commit must preserve existing file and report failure");
@@ -95,7 +108,7 @@ int main(int argc,char** argv){
    require(read(game/"career.txt")=="PLAYER-UNCHANGED","Unrelated legacy file unchanged");
   }
  }
- std::cout<<"PASS rebuilt storage: four modes, actual save/track lambdas, repeated commits, state readback, recoverable state/track failure and retry, failed track commit/write preservation and retry. CPU API substitutes only.\n";
+ std::cout<<"PASS rebuilt storage: four modes, actual save/track lambdas, repeated commits, state readback, recoverable state/track failure and retry, failed track commit/write preservation and retry. backup copy/commit failure preserves old files and retry succeeds. CPU API substitutes only.\n";
 }
 '''
 with tempfile.TemporaryDirectory() as directory:
