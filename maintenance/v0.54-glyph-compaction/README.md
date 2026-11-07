@@ -1,3 +1,6 @@
+# v0.65：重开/换机时清理旧自动驾驶状态
+见GUIDANCE_RESET.md及TODAY_REVIEW.md。源码资源包，无EXE。
+
 # v0.64：benchmark配置改变后拒绝性能判定
 见BENCHMARK_CONFIGURATION.md与TODAY_REVIEW.md。源码资源包，无EXE。
 

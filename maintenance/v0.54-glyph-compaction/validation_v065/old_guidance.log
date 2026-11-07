@@ -1,0 +1,2 @@
+New flight must disengage all autopilot modes
+Expected old-code failure exit=1
