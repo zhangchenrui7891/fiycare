@@ -114,7 +114,7 @@ void help(HWND window){
   L"存档/照片/日志：%LOCALAPPDATA%\\FlightCareerAir\n"
   L"诊断输出另存：diagnostics\\benchmark 或 diagnostics\\smoke；不保存游戏生涯。\n"
   L"DX12初始化失败会自动尝试DX11；可用--dx11强制兼容模式。",
-  L"飞行生涯 v0.66 · 中文操作说明",MB_OK);
+  L"飞行生涯 v0.67 · 中文操作说明",MB_OK);
 }
 int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
  std::filesystem::path folder;
@@ -122,7 +122,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   const auto args=launch::currentOptions();const bool benchmark=args.has(L"--benchmark");const bool low=args.has(L"--low")||benchmark;const bool smoke=args.has(L"--smoke-test");int smokeFrames=0;
   const runfiles::RunFiles runFiles(dataFolder(),benchmark,smoke);
   folder=runFiles.folder();std::filesystem::create_directories(folder);
-  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.66 startup");
+  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.67 startup");
   if(!runFiles.gameSavesEnabled())logLine("Diagnostic output isolated; live game saves disabled");
   sim::Snapshot state;bool loaded=false,primaryValid=false;
   {std::ifstream saved(folder/L"state.txt");if(saved){if(!state.read(saved))logLine("Invalid state.txt ignored; attempting legacy career");else {loaded=primaryValid=true;logLine("Loaded compatible full flight state");}}}
@@ -152,7 +152,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   const DWORD style=WS_OVERLAPPEDWINDOW;
   WNDCLASSW wc{};wc.lpfnWndProc=windowProc;wc.hInstance=instance;wc.lpszClassName=L"FlightCareerAir";wc.hCursor=LoadCursor(nullptr,IDC_ARROW);if(!RegisterClassW(&wc))throw std::runtime_error("Window registration failed");
   RECT bounds{0,0,low?640:1600,low?360:900};HMENU nativeMenu=createChineseMenu();AdjustWindowRect(&bounds,style,TRUE);
-  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.66 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
+  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.67 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
   if(!window)throw std::runtime_error("Window creation failed");ShowWindow(window,SW_SHOW);
   if(args.has(L"--fullscreen"))toggleFullscreen(window);
   renderScale=launch::initialRenderScale(args);
@@ -179,6 +179,19 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   presentation::FrameGeometry<Vertex> frameGeometry;frameGeometry.scene.reserve(140000);
   auto& mesh=frameGeometry.scene;auto& cabin=frameGeometry.cabin;auto& hud=frameGeometry.hud;
   std::filesystem::path pendingPhoto;std::wstring notice=L"欢迎：在主菜单选择飞机，再开始飞行。";
+  // Save recovery: disk failures must not destroy the in-memory flight.
+  std::wstring saveError;
+  auto trySave=[&](){
+   try{save();saveTracks();
+    if(!saveError.empty())notice=L"保存已恢复，可继续飞行。";
+    saveError.clear();return true;
+   }catch(const std::exception& error){
+    logLine(std::string("Save failed: ")+error.what());
+    saveError=L"保存失败，飞行已暂停。检查磁盘空间或权限后按F5重试；退出会丢失未保存进度。";
+    notice=saveError;paused=true;return false;
+   }
+  };
+  // End save recovery.
   std::wstring lastOverlayNotice;double overlayNoticeUntil=0;
   std::ofstream perf(folder/L"performance.csv",std::ios::trunc);
   perf<<"elapsed_s,backend,aircraft,camera,terrain,fxaa,low_mode,active,samples,fps,p95_ms,max_ms,render_width,render_height,software_frame_cap\n";
@@ -260,8 +273,8 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
     }
     if(!walking){
      for(int k=0;k<5;k++)if(pressed['1'+k])menuCommands.push_back(ui::License+k);
-     if(pressed['B']){notice=career.buy(flight)?L"已购买出租飞机。":L"购买需要：执照、停稳和6000积分。";save();}
-     if(pressed['H']){notice=career.service(flight)?L"已加油并完成维修。":L"请在跑道停稳，并准备300积分。";save();}
+     if(pressed['B']){notice=career.buy(flight)?L"已购买出租飞机。":L"购买需要：执照、停稳和6000积分。";trySave();}
+     if(pressed['H']){notice=career.service(flight)?L"已加油并完成维修。":L"请在跑道停稳，并准备300积分。";trySave();}
      if(pressed['K']){
       if(career.canPhotograph(flight))pendingPhoto=folder/("photo_"+std::to_string(career.photos+1)+".bmp");
       else notice=L"摄影条件：距当前航点350米内，高度80～650米。";
@@ -285,23 +298,23 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
      case ui::AircraftPage:menuPage=ui::Page::Aircraft;break;
      case ui::Missions:menuPage=ui::Page::Missions;break;
      case ui::LightingPage:menuPage=ui::Page::Lighting;break;
-     case ui::ExposureLess:case ui::ExposureMore:state.exposureEV=std::clamp(state.exposureEV+(cmd==ui::ExposureMore?.25:-.25),-2.0,2.0);notice=L"曝光 EV："+std::to_wstring(state.exposureEV);save();break;
-     case ui::HazeToggle:state.haze=state.haze>.0002?.00016:.00032;save();break;
-     case ui::ShadowsToggle:state.shadows=!state.shadows;save();break;
-     case ui::LightReset:state.exposureEV=0;state.haze=.00016;state.shadows=true;save();break;
-     case ui::Noon:state.clock=12;save();break;
-     case ui::AntiAlias:state.antiAlias=!state.antiAlias;save();break;
-     case ui::Sunset:state.clock=17.4;save();break;
+     case ui::ExposureLess:case ui::ExposureMore:state.exposureEV=std::clamp(state.exposureEV+(cmd==ui::ExposureMore?.25:-.25),-2.0,2.0);notice=L"曝光 EV："+std::to_wstring(state.exposureEV);trySave();break;
+     case ui::HazeToggle:state.haze=state.haze>.0002?.00016:.00032;trySave();break;
+     case ui::ShadowsToggle:state.shadows=!state.shadows;trySave();break;
+     case ui::LightReset:state.exposureEV=0;state.haze=.00016;state.shadows=true;trySave();break;
+     case ui::Noon:state.clock=12;trySave();break;
+     case ui::AntiAlias:state.antiAlias=!state.antiAlias;trySave();break;
+     case ui::Sunset:state.clock=17.4;trySave();break;
      case ui::Settings:menuPage=ui::Page::Settings;break;
-     case ui::Save:save();saveTracks();notice=runFiles.gameSavesEnabled()?L"已保存飞行状态与生涯。":L"诊断运行不保存飞行状态与生涯。";break;
+     case ui::Save:if(trySave())notice=runFiles.gameSavesEnabled()?L"已保存飞行状态与生涯。":L"诊断运行不保存飞行状态与生涯。";break;
      case ui::Load:{
       sim::Snapshot loadedState;std::ifstream in(folder/L"state.txt");
       if(in&&loadedState.read(in)){state=loadedState;sim::worldMode.store(state.terrainMode);backupEligible=true;walking=false;physicsTime.reset();menuPage=ui::Page::Pause;notice=L"已读取飞行，可选择继续。";}else notice=L"读取失败：没有有效存档，当前飞行保持不变。";break;
      }
-     case ui::Restart:ui::restart(state);walking=false;physicsTime.reset();notice=L"已重新出发，保留燃油；事故恢复会扣费。";save();break;
+     case ui::Restart:ui::restart(state);walking=false;physicsTime.reset();notice=L"已重新出发，保留燃油；事故恢复会扣费。";trySave();break;
      case ui::Exit:DestroyWindow(window);break;
      case ui::Trainer:case ui::Airliner:case ui::A330:case ui::A350:case ui::A320:case ui::B737:case ui::B787:case ui::A319:case ui::A321:case ui::B7879:
-      if(ui::switchAircraft(state,ui::aircraftIdForCommand(cmd))){walking=false;physicsTime.reset();notice=L"已切换飞机，并重置本次任务。";save();}else notice=L"换机需要在跑道停稳；空中请先返场。";break;
+      if(ui::switchAircraft(state,ui::aircraftIdForCommand(cmd))){walking=false;physicsTime.reset();notice=L"已切换飞机，并重置本次任务。";trySave();}else notice=L"换机需要在跑道停稳；空中请先返场。";break;
      case ui::ImportModel:{
       if(!career.parked(flight)){notice=L"请先在跑道停稳后导入机模。";break;}
 #ifdef FCAIR_WITH_ASSIMP
@@ -350,17 +363,17 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
      }
      case ui::PassengersLess:case ui::PassengersMore:case ui::PassengersFull:case ui::PassengersEmpty:{
       int pax=cmd==ui::PassengersFull?flight.spec().seats:cmd==ui::PassengersEmpty?0:flight.passengers+(cmd==ui::PassengersMore?10:-10);
-      if(ui::setPassengers(state,pax)){notice=L"客舱载荷已更新，乘客重量会影响起降。";save();}else notice=L"请驾驶客机并在跑道停稳后调整乘客。";break;
+      if(ui::setPassengers(state,pax)){notice=L"客舱载荷已更新，乘客重量会影响起降。";trySave();}else notice=L"请驾驶客机并在跑道停稳后调整乘客。";break;
      }
      case ui::TerrainSatellite:case ui::TerrainMountains:
-      if(career.parked(flight)){state.terrainMode=cmd==ui::TerrainSatellite?1:0;sim::worldMode.store(state.terrainMode);marks.clear();notice=state.terrainMode?L"已切换浦东离线卫星图，周边建筑与道路为示意地景。":L"已切换虚构山海地形。";save();}else notice=L"切换地形需要先在跑道停稳。";break;
+      if(career.parked(flight)){state.terrainMode=cmd==ui::TerrainSatellite?1:0;sim::worldMode.store(state.terrainMode);marks.clear();notice=state.terrainMode?L"已切换浦东离线卫星图，周边建筑与道路为示意地景。":L"已切换虚构山海地形。";trySave();}else notice=L"切换地形需要先在跑道停稳。";break;
      case ui::PowerSaver:powerSaver=!powerSaver;break;
      case ui::Assist:flight.assist=!flight.assist;break;
      case ui::CameraChase:camera=0;break;
      case ui::CameraCockpit:camera=1;break;
      case ui::CameraTop:camera=2;break;
      case ui::Help:help(window);keyboardInput.suspend();last=std::chrono::steady_clock::now();dt=0;break;
-     default:if(cmd>=ui::License&&cmd<=ui::Photo){bool selected=career.select(cmd-ui::License,flight);notice=selected?L"已选择任务，点击继续飞行即可开始。":L"请在跑道停稳；高级任务需要先取得执照。";if(selected&&career.mission==2&&flight.aircraftId>0&&flight.passengers==0)flight.passengers=50;if(selected)save();}break;
+     default:if(cmd>=ui::License&&cmd<=ui::Photo){bool selected=career.select(cmd-ui::License,flight);notice=selected?L"已选择任务，点击继续飞行即可开始。":L"请在跑道停稳；高级任务需要先取得执照。";if(selected&&career.mission==2&&flight.aircraftId>0&&flight.passengers==0)flight.passengers=50;if(selected)trySave();}break;
     }
    }
    if(!IsWindow(window))continue;
@@ -416,12 +429,12 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
        career.writeFlightReport(report,flight,career.credits-beforeCredits);
        if(!report)logLine("Flight report write failed; settlement remains valid");
       }
-      if(career.completed>before){notice=career.mission==2?L"航班完成：综合评分 "+std::to_wstring(career.lastFlightScore)+L"，票价与奖励已到账。":L"任务完成：奖励与出租收入已到账。";save();}
+      if(career.completed>before){notice=career.mission==2?L"航班完成：综合评分 "+std::to_wstring(career.lastFlightScore)+L"，票价与奖励已到账。":L"任务完成：奖励与出租收入已到账。";trySave();}
      }
      markTimer+=dt;
      if(flight.grounded()&&flight.speed()>2&&markTimer>.25){marks.push_back({(float)flight.x,(float)flight.z});if(marks.size()>400)marks.pop_front();markTimer=0;}
     }
-    autoSave+=dt;if(autoSave>=30){save();saveTracks();autoSave=0;}
+    autoSave+=dt;if(autoSave>=30){trySave();autoSave=0;}
    }else{physicsTime.reset();renderHistory.reset(flight);wasActive=false;}
    if(walking)renderHistory.reset(flight);
    const auto renderFlight=renderHistory.sample(flight,physicsTime.fraction());
@@ -469,6 +482,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
    const timing::FrameContext frameContext{flight.aircraftId,camera,state.terrainMode,static_cast<int>(menuPage),state.antiAlias,low,wasActive,walking,powerSaver,frameExtent.width,frameExtent.height};
    if(benchmark)benchmarkSamples.observeContext(frameContext);
    if(frameContextGate.changed(frameContext)){frameWindow.reset();reportTime=0;previousMeasured=false;}
+   if(!saveError.empty())notice=saveError;
    const auto frameStats=frameWindow.summary();
    if(reportTime>=5&&perf){
     const auto loggedExtent=launch::renderExtent(UINT(std::max(1L,clientWidth)),UINT(std::max(1L,clientHeight)),appliedScale,low);
@@ -489,7 +503,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
     if(!flight.crashed&&!notice.empty()){
      // Show each changed notification once for five seconds; do not cover the glass.
      if(notice!=lastOverlayNotice){lastOverlayNotice=notice;overlayNoticeUntil=wallElapsed+5;}
-     if(wallElapsed<overlayNoticeUntil){screenQuad(hud,12,425,936,26,{.018f,.028f,.038f});chineseFont().draw(hud,notice.substr(0,52),20,429,{.84f,.91f,.97f},920);}
+     if(wallElapsed<overlayNoticeUntil||!saveError.empty()){screenQuad(hud,12,425,936,26,{.018f,.028f,.038f});chineseFont().draw(hud,notice.substr(0,52),20,429,{.84f,.91f,.97f},920);}
     }
     if(state.debugPanel){
      std::wostringstream label;label<<std::fixed<<std::setprecision(1)<<wideUtf8(renderer->name())<<L"  "<<frameStats.fps<<L" FPS  P95 "<<frameStats.p95Ms<<L" ms";
@@ -512,11 +526,11 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
    const auto dimensions=sim::airframeDimensions(flight.aircraftId);lightingFrame.shape=LightVec{float(std::max(.65,dimensions.span*.045)),float(dimensions.length*.5),float(dimensions.span*.5),float(flight.spec().gearHeight)};
    antiAliasEnabled=state.antiAlias;
    renderer->draw(mesh,hud,XMMatrixLookToLH(XMVectorZero(),viewDirection,up)*reversedPerspective(activeFov,cockpit::viewportAspect,presentation::worldNear,presentation::worldFar),daylight,pendingPhoto,cabin,cabinView);
-   if(!pendingPhoto.empty()){if(!smoke){career.photograph(flight);notice=L"照片已保存，摄影航点已确认。";save();}pendingPhoto.clear();}
+   if(!pendingPhoto.empty()){if(!smoke){career.photograph(flight);notice=L"照片已保存，摄影航点已确认。";trySave();}pendingPhoto.clear();}
    if(smoke&&++smokeFrames>=3){logLine("Smoke test: three rendered frames and BMP capture succeeded");DestroyWindow(window);}
    if(benchmark&&timing::benchmarkFinished(benchmarkStarted,benchmarkSamples)){
     std::ofstream summary(folder/L"performance_summary.txt",std::ios::trunc);
-    const auto result=timing::writeBenchmarkSummary(summary,"v0.66",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples);
+    const auto result=timing::writeBenchmarkSummary(summary,"v0.67",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples);
     summary.flush();if(!summary)logLine("Benchmark summary write failed; no report file success claimed");
     pendingPhoto=folder/L"benchmark_final.bmp";renderer->draw(mesh,hud,XMMatrixLookToLH(XMVectorZero(),viewDirection,up)*reversedPerspective(activeFov,cockpit::viewportAspect,presentation::worldNear,presentation::worldFar),daylight,pendingPhoto,cabin,cabinView);pendingPhoto.clear();
     logLine(result.complete?"Benchmark completed with valid full-run statistics":"Benchmark ended without a valid performance verdict; inspect summary status/counts");DestroyWindow(window);
@@ -526,7 +540,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
    if(targetFps>0&&spent<1/targetFps)std::this_thread::sleep_for(std::chrono::duration<double>(1/targetFps-spent));
   }
   logLine("Reusable CPU geometry capacity bytes (not total RAM/GPU memory): "+std::to_string(frameGeometry.retainedBytes()));
-  if(!smoke&&!benchmark){save();saveTracks();}logLine("Normal shutdown");
+  if(!smoke&&!benchmark&&!trySave()){MessageBoxW(nullptr,saveError.c_str(),L"退出前保存失败",MB_OK|MB_ICONWARNING);logLine("Shutdown with unsaved progress");}else logLine("Normal shutdown");
  }catch(const std::exception& e){
   logLine(e.what());std::wstring message=L"启动或运行失败：\n"+wideUtf8(e.what())+L"\n\n日志："+(folder.empty()?std::wstring(L"%LOCALAPPDATA%\\FlightCareerAir"):folder.wstring())+L"\\startup.log\n可尝试兼容启动脚本 run_compat.bat。";
   MessageBoxW(nullptr,message.c_str(),L"飞行生涯 · 错误",MB_OK|MB_ICONERROR);return 1;
