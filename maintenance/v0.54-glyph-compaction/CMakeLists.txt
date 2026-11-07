@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 include("${CMAKE_CURRENT_LIST_DIR}/tools/repair_build_timestamps.cmake")
 fcair_check_build_timestamps("${CMAKE_CURRENT_LIST_DIR}" FALSE)
-project(FlightCareerAir VERSION 0.67.0 LANGUAGES C CXX)
+project(FlightCareerAir VERSION 0.68.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -109,6 +109,7 @@ if(Python3_Interpreter_FOUND AND NOT WIN32)
  add_test(NAME scenery_landscape_integration COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tools/check_scenery_integration.py")
  add_test(NAME launch_renderer_integration COMMAND "${Python3_EXECUTABLE}"
    "${CMAKE_CURRENT_SOURCE_DIR}/tools/check_launch_integration.py")
+ add_test(NAME exit_save_recovery COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tools/check_exit_recovery.py")
  add_test(NAME rebuilt_diagnostic_storage COMMAND "${Python3_EXECUTABLE}"
    "${CMAKE_CURRENT_SOURCE_DIR}/tools/check_rebuilt_storage.py")
  add_test(NAME rebuilt_cockpit_text COMMAND "${Python3_EXECUTABLE}"

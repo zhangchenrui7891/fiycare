@@ -18,7 +18,7 @@ tracks = main[start:main.index('\n', start)]
 for wiring in ('const runfiles::RunFiles runFiles(dataFolder(),benchmark,smoke);',
                'folder=runFiles.folder();', 'autoSave>=30',
                'case ui::Save:if(trySave())notice=',
-               'if(!smoke&&!benchmark&&!trySave())'):
+               'if(!smoke&&!benchmark&&!exitApproved&&!trySave())'):
     if wiring not in main:
         raise RuntimeError('Actual save routing changed; review recovery test: ' + wiring)
 

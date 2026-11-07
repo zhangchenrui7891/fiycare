@@ -54,6 +54,7 @@ bool key(int k){return (GetAsyncKeyState(k)&0x8000)!=0;}
 LRESULT CALLBACK windowProc(HWND h,UINT msg,WPARAM w,LPARAM l){
  if(msg==WM_KEYDOWN&&w==VK_F11&&!(l&(1LL<<30))){menuCommands.push_back(ui::Fullscreen);return 0;}
  if(msg==WM_SYSKEYDOWN&&w==VK_RETURN&&!(l&(1LL<<30))){menuCommands.push_back(ui::Fullscreen);return 0;}
+ if(msg==WM_CLOSE){menuCommands.push_back(ui::Exit);return 0;}
  if(msg==WM_DESTROY){PostQuitMessage(0);return 0;}
  if(msg==WM_COMMAND){menuCommands.push_back(LOWORD(w));return 0;}
  if(msg==WM_ENTERMENULOOP){keyboardInput.suspend();cockpitInput.cancel();cockpitMouseDown=false;if(GetCapture()==h)ReleaseCapture();inNativeMenu=true;return 0;}
@@ -114,7 +115,7 @@ void help(HWND window){
   L"存档/照片/日志：%LOCALAPPDATA%\\FlightCareerAir\n"
   L"诊断输出另存：diagnostics\\benchmark 或 diagnostics\\smoke；不保存游戏生涯。\n"
   L"DX12初始化失败会自动尝试DX11；可用--dx11强制兼容模式。",
-  L"飞行生涯 v0.67 · 中文操作说明",MB_OK);
+  L"飞行生涯 v0.68 · 中文操作说明",MB_OK);
 }
 int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
  std::filesystem::path folder;
@@ -122,7 +123,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   const auto args=launch::currentOptions();const bool benchmark=args.has(L"--benchmark");const bool low=args.has(L"--low")||benchmark;const bool smoke=args.has(L"--smoke-test");int smokeFrames=0;
   const runfiles::RunFiles runFiles(dataFolder(),benchmark,smoke);
   folder=runFiles.folder();std::filesystem::create_directories(folder);
-  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.67 startup");
+  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.68 startup");
   if(!runFiles.gameSavesEnabled())logLine("Diagnostic output isolated; live game saves disabled");
   sim::Snapshot state;bool loaded=false,primaryValid=false;
   {std::ifstream saved(folder/L"state.txt");if(saved){if(!state.read(saved))logLine("Invalid state.txt ignored; attempting legacy career");else {loaded=primaryValid=true;logLine("Loaded compatible full flight state");}}}
@@ -152,7 +153,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   const DWORD style=WS_OVERLAPPEDWINDOW;
   WNDCLASSW wc{};wc.lpfnWndProc=windowProc;wc.hInstance=instance;wc.lpszClassName=L"FlightCareerAir";wc.hCursor=LoadCursor(nullptr,IDC_ARROW);if(!RegisterClassW(&wc))throw std::runtime_error("Window registration failed");
   RECT bounds{0,0,low?640:1600,low?360:900};HMENU nativeMenu=createChineseMenu();AdjustWindowRect(&bounds,style,TRUE);
-  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.67 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
+  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.68 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
   if(!window)throw std::runtime_error("Window creation failed");ShowWindow(window,SW_SHOW);
   if(args.has(L"--fullscreen"))toggleFullscreen(window);
   renderScale=launch::initialRenderScale(args);
@@ -205,9 +206,29 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   sim::LandingResult lastLanding;
   double markTimer=0,autoSave=0;
   auto last=std::chrono::steady_clock::now();timing::FixedSteps physicsTime;presentation::FlightHistory renderHistory;renderHistory.reset(flight);bool wasActive=false;MSG msg{};
+  bool exitApproved=false,exitWithoutSave=false;
+  // Exit recovery: save while the flight window still exists.
+  auto requestExit=[&](){
+   paused=true;keyboardInput.suspend();cockpitInput.cancel();
+   if(GetCapture()==window)ReleaseCapture();
+   const bool saved=smoke||benchmark||trySave();
+   const bool leave=saved||MessageBoxW(window,
+    L"保存失败，当前航班仍保留在内存中。\n选择“否”返回，修复磁盘空间或权限后按 F5 重试。\n\n仍要退出并放弃未保存的进度吗？",
+    L"保存失败 · 是否仍然退出",MB_YESNO|MB_ICONWARNING|MB_DEFBUTTON2)==IDYES;
+   keyboardInput.suspend();cockpitInput.cancel();menuCommands.clear();
+   physicsTime.reset();wasActive=false;previousMeasured=false;last=std::chrono::steady_clock::now();
+   if(!leave){logLine("Exit cancelled after save failure");return false;}
+   if(!DestroyWindow(window)){notice=L"无法关闭窗口，请重试。";logLine("DestroyWindow failed");return false;}
+   exitWithoutSave=!saved;return true;
+  };
+  // End exit recovery.
   while(msg.message!=WM_QUIT){
    while(PeekMessageW(&msg,nullptr,0,0,PM_REMOVE)){TranslateMessage(&msg);DispatchMessageW(&msg);}
    if(msg.message==WM_QUIT)break;
+   // Handle close before resize, keyboard polling and the minimized-window wait.
+   if(std::find(menuCommands.begin(),menuCommands.end(),ui::Exit)!=menuCommands.end()){
+    exitApproved=requestExit();if(exitApproved)break;continue;
+   }
    const auto autopilotBeforeInput=sim::autopilotModes(state);
    RECT currentClient{};GetClientRect(window,&currentClient);
    if(!IsIconic(window)&&currentClient.right>0&&currentClient.bottom>0&&(currentClient.right!=clientWidth||currentClient.bottom!=clientHeight||appliedScale!=renderScale)){
@@ -312,7 +333,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
       if(in&&loadedState.read(in)){state=loadedState;sim::worldMode.store(state.terrainMode);backupEligible=true;walking=false;physicsTime.reset();menuPage=ui::Page::Pause;notice=L"已读取飞行，可选择继续。";}else notice=L"读取失败：没有有效存档，当前飞行保持不变。";break;
      }
      case ui::Restart:ui::restart(state);walking=false;physicsTime.reset();notice=L"已重新出发，保留燃油；事故恢复会扣费。";trySave();break;
-     case ui::Exit:DestroyWindow(window);break;
+     case ui::Exit:exitApproved=requestExit();break;
      case ui::Trainer:case ui::Airliner:case ui::A330:case ui::A350:case ui::A320:case ui::B737:case ui::B787:case ui::A319:case ui::A321:case ui::B7879:
       if(ui::switchAircraft(state,ui::aircraftIdForCommand(cmd))){walking=false;physicsTime.reset();notice=L"已切换飞机，并重置本次任务。";trySave();}else notice=L"换机需要在跑道停稳；空中请先返场。";break;
      case ui::ImportModel:{
@@ -376,6 +397,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
      default:if(cmd>=ui::License&&cmd<=ui::Photo){bool selected=career.select(cmd-ui::License,flight);notice=selected?L"已选择任务，点击继续飞行即可开始。":L"请在跑道停稳；高级任务需要先取得执照。";if(selected&&career.mission==2&&flight.aircraftId>0&&flight.passengers==0)flight.passengers=50;if(selected)trySave();}break;
     }
    }
+   if(exitApproved)break;
    if(!IsWindow(window))continue;
    bool cockpitEnabled=camera==1&&!walking&&!paused&&menuPage==ui::Page::None&&!inNativeMenu&&focus&&!flight.crashed&&pendingPhoto.empty();
    if(cockpitEnabled){for(const auto& event:cockpitInput.pending)cockpit::apply(state,event.action,event.value);cockpitInput.pending.clear();cockpitInput.enabled=true;}
@@ -530,7 +552,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
    if(smoke&&++smokeFrames>=3){logLine("Smoke test: three rendered frames and BMP capture succeeded");DestroyWindow(window);}
    if(benchmark&&timing::benchmarkFinished(benchmarkStarted,benchmarkSamples)){
     std::ofstream summary(folder/L"performance_summary.txt",std::ios::trunc);
-    const auto result=timing::writeBenchmarkSummary(summary,"v0.67",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples);
+    const auto result=timing::writeBenchmarkSummary(summary,"v0.68",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples);
     summary.flush();if(!summary)logLine("Benchmark summary write failed; no report file success claimed");
     pendingPhoto=folder/L"benchmark_final.bmp";renderer->draw(mesh,hud,XMMatrixLookToLH(XMVectorZero(),viewDirection,up)*reversedPerspective(activeFov,cockpit::viewportAspect,presentation::worldNear,presentation::worldFar),daylight,pendingPhoto,cabin,cabinView);pendingPhoto.clear();
     logLine(result.complete?"Benchmark completed with valid full-run statistics":"Benchmark ended without a valid performance verdict; inspect summary status/counts");DestroyWindow(window);
@@ -540,7 +562,9 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
    if(targetFps>0&&spent<1/targetFps)std::this_thread::sleep_for(std::chrono::duration<double>(1/targetFps-spent));
   }
   logLine("Reusable CPU geometry capacity bytes (not total RAM/GPU memory): "+std::to_string(frameGeometry.retainedBytes()));
-  if(!smoke&&!benchmark&&!trySave()){MessageBoxW(nullptr,saveError.c_str(),L"退出前保存失败",MB_OK|MB_ICONWARNING);logLine("Shutdown with unsaved progress");}else logLine("Normal shutdown");
+  // Only abnormal WM_QUIT/WM_DESTROY reaches this fallback without an exit decision.
+  if(!smoke&&!benchmark&&!exitApproved&&!trySave())exitWithoutSave=true;
+  logLine(exitWithoutSave?"Shutdown with unsaved progress":"Normal shutdown");
  }catch(const std::exception& e){
   logLine(e.what());std::wstring message=L"启动或运行失败：\n"+wideUtf8(e.what())+L"\n\n日志："+(folder.empty()?std::wstring(L"%LOCALAPPDATA%\\FlightCareerAir"):folder.wstring())+L"\\startup.log\n可尝试兼容启动脚本 run_compat.bat。";
   MessageBoxW(nullptr,message.c_str(),L"飞行生涯 · 错误",MB_OK|MB_ICONERROR);return 1;
