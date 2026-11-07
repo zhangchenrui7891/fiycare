@@ -1,0 +1,1 @@
+PASS rebuilt storage: four modes, actual save/track lambdas, repeated commits, state readback, recoverable state/track failure and retry, failed track commit/write preservation and retry. CPU API substitutes only.

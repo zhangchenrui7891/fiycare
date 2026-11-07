@@ -34,7 +34,7 @@ sim::Snapshot state;auto& flight=state.flight;
 struct Renderer{const char* name(){return "DX12";}} rendererValue,*renderer=&rendererValue;
 struct Stats{double fps=23,p95Ms=43.2;}frameStats;
 std::vector<Vertex> hud;int camera=1;bool walking=false,paused=false,powerSaver=false;
-ui::Page menuPage=ui::Page::None;sim::AlertManager flightAlerts;std::wstring notice,lastOverlayNotice;
+ui::Page menuPage=ui::Page::None;sim::AlertManager flightAlerts;std::wstring notice,lastOverlayNotice,saveError;
 double overlayNoticeUntil=0,wallElapsed=0;std::map<int,int> customModels;
 void drawMenu(std::vector<Vertex>&,ui::Page,const sim::Snapshot&,bool,const std::wstring&){}
 
@@ -49,6 +49,8 @@ int main(){
  camera=1;notice=L"AP DISC";wallElapsed=1;frame();require(has(notice),"Changed event is visible");
  wallElapsed=7;frame();require(!has(notice),"Event expires after five seconds");
  notice=L"SAVED";frame();require(has(notice),"New notification restarts timer");
+ saveError=notice=L"SAVE FAILED";wallElapsed=100;frame();wallElapsed=200;frame();require(has(saveError),"Save error persists beyond normal notification timeout");
+ saveError.clear();frame();require(!has(L"SAVE FAILED"),"Cleared save error stops persistent overlay");
  state.avionics.master=false;frame();require(has(L"航电断电"),"Power loss warning survives minimal HUD");
  state.avionics.master=true;state.flight.stallWarning=true;frame();require(has(L"失速警告"),"Stall warning survives minimal HUD");
  state.flight.crashed=true;state.flight.crashReason="CRASH";frame();require(has(L"CRASH"),"Crash reason survives minimal HUD");

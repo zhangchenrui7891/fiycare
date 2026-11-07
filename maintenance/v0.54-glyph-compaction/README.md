@@ -1,3 +1,6 @@
+# v0.67：保存失败暂停航班，支持F5重试
+见SAVE_RECOVERY.md与TODAY_REVIEW.md。源码资源包，无EXE。
+
 # v0.66：地面痕迹完整写入后再替换旧存档
 见TRACK_SAVE.md及TODAY_REVIEW.md。源码资源包，无EXE。
 
