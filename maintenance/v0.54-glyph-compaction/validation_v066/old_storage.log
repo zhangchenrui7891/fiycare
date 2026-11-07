@@ -1,0 +1,9 @@
+terminate called after throwing an instance of 'std::runtime_error'
+  what():  Failed track commit must preserve existing file and report failure
+Traceback (most recent call last):
+  File "/workspace/scratch/f28b7c9ab582/run_v066/source/tools/check_rebuilt_storage.py", line 92, in <module>
+    subprocess.run([str(executable), str(Path(directory) / 'data')], check=True,
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/tmp/tmp8b9mkl4r/storage', '/tmp/tmp8b9mkl4r/data']' died with <Signals.SIGABRT: 6>.
+Expected old-code failure exit=1

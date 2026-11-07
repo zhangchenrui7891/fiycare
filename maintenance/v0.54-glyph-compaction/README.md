@@ -1,3 +1,6 @@
+# v0.66：地面痕迹完整写入后再替换旧存档
+见TRACK_SAVE.md及TODAY_REVIEW.md。源码资源包，无EXE。
+
 # v0.65：重开/换机时清理旧自动驾驶状态
 见GUIDANCE_RESET.md及TODAY_REVIEW.md。源码资源包，无EXE。
 
