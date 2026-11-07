@@ -15,6 +15,8 @@ sim::Snapshot pending(int id,int airport,int mission){
  s.career.licensed=true;s.career.credits=12345;s.career.completed=7;
  s.career.fleet=3;s.career.photos=12;s.career.best=96;s.career.maintenance=.9;
  require(s.career.select(mission,s.flight),"Initial mission selected");
+ s.headingHold=s.altitudeHold=s.navigationHold=true;s.navigationWaypoint=3;s.targetHeading=1.7;s.targetAltitude=9000;
+ s.avionics.qnh=1023;s.panelBrightness=.5;
  s.career.stage=2;s.career.gate=4;s.career.elapsed=123;s.career.raceLap=90;
  s.career.lastFlightScore=87;s.career.arrivalLandingScore=95;
  return s;
@@ -32,6 +34,13 @@ void clean(const sim::Snapshot& s,int mission,int departure){
  require(restored.career.departureRunway==departure&&restored.career.arrivalRunway==1-departure&&
          restored.career.arrivalLandingScore==-1&&restored.career.lastFlightScore==0,
          "Save/load preserves clean flight airports and evidence");
+}
+void cleanGuidance(const sim::Snapshot& s){
+ require(!s.headingHold&&!s.altitudeHold&&!s.navigationHold,"New flight must disengage all autopilot modes");
+ require(s.navigationWaypoint==0&&s.targetHeading==s.flight.yaw&&s.targetAltitude==1000,"New flight must discard old navigation leg and targets");
+ require(s.avionics.qnh==1023&&s.panelBrightness==.5,"Restart retains avionics preferences");
+ std::stringstream saved;s.write(saved);sim::Snapshot restored;
+ require(restored.read(saved)&&!restored.headingHold&&!restored.altitudeHold&&!restored.navigationHold&&restored.navigationWaypoint==0&&restored.targetHeading==s.flight.yaw&&restored.targetAltitude==1000,"Save immediately after restart contains clean guidance");
 }
 void lifecycle(sim::Snapshot s){
  const int credits=s.career.credits,completed=s.career.completed;
@@ -61,19 +70,20 @@ int main(){
   for(int id=0;id<sim::aircraftCount;++id)for(int airport=0;airport<2;++airport)for(int mission=0;mission<5;++mission){
    auto restart=pending(id,airport,mission);restart.flight.fuel=45;
    const int pax=restart.flight.passengers;restart.flight.y=300;
-   ui::restart(restart);clean(restart,mission,0);
+   ui::restart(restart);cleanGuidance(restart);clean(restart,mission,0);
    require(restart.flight.aircraftId==id&&restart.flight.passengers==pax&&restart.flight.fuel==45&&
            restart.career.credits==12345&&restart.career.maintenance==.9,"Normal restart preserves payload, fuel and money");
    if(mission==2)lifecycle(restart);
-   auto crashed=pending(id,airport,mission);crashed.flight.crashed=true;ui::restart(crashed);clean(crashed,mission,0);
+   auto crashed=pending(id,airport,mission);crashed.flight.crashed=true;ui::restart(crashed);cleanGuidance(crashed);clean(crashed,mission,0);
    require(crashed.career.credits==11845&&std::abs(crashed.career.maintenance-.8)<1e-12,"Crash penalties unchanged");
    auto switched=pending(id,airport,mission);
    const int next=(id+1)%sim::aircraftCount;
-   require(ui::switchAircraft(switched,next),"Parked aircraft switch allowed");clean(switched,mission,0);
+   require(ui::switchAircraft(switched,next),"Parked aircraft switch allowed");cleanGuidance(switched);clean(switched,mission,0);
    require(switched.flight.aircraftId==next&&switched.career.credits==12345,"Switch preserves career balance");
    if(mission==2)lifecycle(switched);
    auto selected=pending(id,airport,mission);
    require(selected.career.select(mission,selected.flight),"Reselect mission allowed");clean(selected,mission,airport);
+   require(selected.navigationWaypoint==3&&selected.headingHold&&selected.altitudeHold&&selected.navigationHold,"Mission selection alone preserves guidance");
    checks+=4;
   }
   auto rejected=pending(2,1,2);rejected.flight.y=300;

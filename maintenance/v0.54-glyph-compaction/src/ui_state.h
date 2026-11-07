@@ -11,10 +11,17 @@ enum class Page{None,Home,Pause,Aircraft,Missions,Settings,Lighting};
 inline int aircraftIdForCommand(int command){
  switch(command){case Trainer:return 0;case Airliner:return 1;case A330:return 2;case A350:return 3;case A320:return 4;case B737:return 5;case B787:return 6;case A319:return 7;case A321:return 8;case B7879:return 9;default:return -1;}
 }
+inline void resetFlightGuidance(sim::Snapshot& state){
+ state.headingHold=state.altitudeHold=state.navigationHold=false;
+ state.navigationWaypoint=0;
+ state.targetHeading=state.flight.yaw;
+ state.targetAltitude=1000;
+}
 inline bool switchAircraft(sim::Snapshot& state,int id){
  if(id<0||id>=sim::aircraftCount||!state.career.parked(state.flight))return false;
  state.parkingBrake=false;state.flight=sim::Flight{};state.flight.configure(id);
  state.career.resetFlight(state.flight);
+ resetFlightGuidance(state);
  return true;
 }
 inline bool setPassengers(sim::Snapshot& state,int count){
@@ -26,5 +33,6 @@ inline void restart(sim::Snapshot& state){
  if(state.flight.crashed){state.career.credits=std::max(0,state.career.credits-500);state.career.maintenance=std::max(.3,state.career.maintenance-.10);}
  state.parkingBrake=false;state.flight=sim::Flight{};state.flight.configure(aircraft);state.flight.passengers=pax;state.flight.fuel=fuel;
  state.career.resetFlight(state.flight);
+ resetFlightGuidance(state);
 }
 }
