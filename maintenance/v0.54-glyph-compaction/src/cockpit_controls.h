@@ -35,7 +35,7 @@ inline void apply(sim::Snapshot& state,Action action,double value=0){
    state.navigationHold=false;
    if(state.headingHold)state.targetHeading=f.yaw;
    break;
-  case Action::AltitudeHold:state.altitudeHold=!state.altitudeHold;if(state.altitudeHold)state.targetAltitude=std::clamp(std::round(sim::airData(f,state.avionics.qnh).altitude/100)*100.,0.,12000.);break;
+  case Action::AltitudeHold:state.altitudeHold=!state.altitudeHold;if(state.altitudeHold)state.targetAltitude=std::clamp(sim::airData(f,state.avionics.qnh).altitude,0.,12000.);break;
   case Action::HeadingMinus:state.targetHeading=sim::wrapAngle(state.targetHeading-10*sim::pi/180);break;
   case Action::HeadingPlus:state.targetHeading=sim::wrapAngle(state.targetHeading+10*sim::pi/180);break;
   case Action::AltitudeMinus:state.targetAltitude=std::max(0.,state.targetAltitude-100);break;

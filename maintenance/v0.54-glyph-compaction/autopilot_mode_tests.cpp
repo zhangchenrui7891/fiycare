@@ -35,5 +35,24 @@ int main(){try{
   check(!s.headingHold&&!s.navigationHold&&!s.altitudeHold,"Unpowered avionics cannot keep AP modes");
   ++cases;
  }
+ int altitudeCases=0;
+ for(int id=0;id<sim::aircraftCount;++id)for(double qnh:{980.,1013.25,1040.})for(double y:{1049.,1051.,2345.67}){
+  sim::Snapshot s;s.flight.configure(id);s.flight.y=y;s.flight.vz=120;s.avionics.qnh=qnh;
+  s.headingHold=true;s.targetHeading=.4;
+  const double indicated=sim::airData(s.flight,qnh).altitude;
+  cockpit::apply(s,cockpit::Action::AltitudeHold);
+  check(s.altitudeHold&&std::abs(s.targetAltitude-indicated)<1e-9,"ALT must capture indicated altitude without hundred-metre rounding");
+  check(s.headingHold&&s.targetHeading==.4,"ALT capture preserves lateral mode");
+  cockpit::apply(s,cockpit::Action::AltitudePlus);
+  check(std::abs(s.targetAltitude-indicated-100)<1e-9,"Altitude selector retains 100 metre step");
+  cockpit::apply(s,cockpit::Action::AltitudeHold);
+  check(!s.altitudeHold,"Second ALT press disconnects");
+  s.flight.y+=23.5;cockpit::apply(s,cockpit::Action::AltitudeHold);
+  check(std::abs(s.targetAltitude-sim::airData(s.flight,qnh).altitude)<1e-9,"Re-engage captures new current indication");
+  std::stringstream out;s.write(out);sim::Snapshot restored;
+  check(restored.read(out)&&restored.targetAltitude==s.targetAltitude,"Fractional target survives save roundtrip");
+  ++altitudeCases;
+ }
+ std::cout<<"ALT capture cases: "<<altitudeCases<<" including QNH, selector, toggle, recapture and save roundtrip.\n";
  std::cout<<"PASS: "<<cases<<" aircraft/model mode sequences; 2000 subsequent guidance updates. CPU state tests, not a flight or hardware test.\n";
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}
