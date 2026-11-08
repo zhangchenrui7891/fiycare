@@ -1,0 +1,7 @@
+Resize entry clears gestures and queued cockpit commands
+Traceback (most recent call last):
+  File "/workspace/scratch/f28b7c9ab582/run74/source/tools/check_pointer_integration.py", line 100, in <module>
+    subprocess.run([str(exe)],check=True)
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/tmp/tmpm9edae8t/pointer']' returned non-zero exit status 1.

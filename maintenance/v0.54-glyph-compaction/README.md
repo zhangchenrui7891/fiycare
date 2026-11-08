@@ -1,3 +1,6 @@
+# v0.74：窗口缩放时取消旧鼠标拖动
+见RESIZE_INPUT.md及TODAY_REVIEW.md。源码资源包，无EXE。
+
 # v0.73：驾驶舱油门拖动与右键环视互斥
 见POINTER_OWNERSHIP.md和TODAY_REVIEW.md。源码资源包，无EXE。
 
