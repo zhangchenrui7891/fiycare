@@ -49,7 +49,7 @@ inline void toggleFullscreen(HWND h){
   SetWindowPos(h,nullptr,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER|SWP_FRAMECHANGED);fullscreen=false;
  }
 }
-inline bool cockpitMouseDown=false,lookDragging=false;inline int lookX=0,lookY=0;
+inline bool cockpitMouseDown=false;inline int lookX=0,lookY=0;
 bool key(int k){return (GetAsyncKeyState(k)&0x8000)!=0;}
 LRESULT CALLBACK windowProc(HWND h,UINT msg,WPARAM w,LPARAM l){
  if(msg==WM_KEYDOWN&&w==VK_F11&&!(l&(1LL<<30))){menuCommands.push_back(ui::Fullscreen);return 0;}
@@ -70,10 +70,11 @@ LRESULT CALLBACK windowProc(HWND h,UINT msg,WPARAM w,LPARAM l){
   }else keyboardInput.suspend();
  }
  if(msg==WM_KILLFOCUS){keyboardInput.suspend();cockpitInput.cancel();cockpitMouseDown=false;if(GetCapture()==h)ReleaseCapture();}
- if(msg==WM_CAPTURECHANGED){cockpitInput.release();lookDragging=false;}
- if(msg==WM_RBUTTONDOWN&&cockpitInput.enabled){lookDragging=true;lookX=(short)LOWORD(l);lookY=(short)HIWORD(l);SetCapture(h);return 0;}
- if(msg==WM_RBUTTONUP&&lookDragging){lookDragging=false;ReleaseCapture();return 0;}
- if(msg==WM_MOUSEMOVE&&lookDragging){int x=(short)LOWORD(l),y=(short)HIWORD(l);cockpit::lookYaw=std::clamp(cockpit::lookYaw+(x-lookX)*.004f,-.85f,.85f);cockpit::lookPitch=std::clamp(cockpit::lookPitch-(y-lookY)*.004f,-.8f,.55f);lookX=x;lookY=y;return 0;}
+ if(msg==WM_CAPTURECHANGED){cockpitInput.loseCapture();}
+ if(msg==WM_RBUTTONDOWN&&cockpitInput.enabled){if(cockpitInput.beginLook()){lookX=(short)LOWORD(l);lookY=(short)HIWORD(l);SetCapture(h);}return 0;}
+ if(msg==WM_RBUTTONUP&&cockpitInput.enabled){if(cockpitInput.looking){cockpitInput.endLook();if(GetCapture()==h)ReleaseCapture();}return 0;}
+ if((msg==WM_LBUTTONDOWN||msg==WM_LBUTTONUP)&&cockpitInput.looking){cockpitMouseDown=false;return 0;}
+ if(msg==WM_MOUSEMOVE&&cockpitInput.looking){int x=(short)LOWORD(l),y=(short)HIWORD(l);cockpit::lookYaw=std::clamp(cockpit::lookYaw+(x-lookX)*.004f,-.85f,.85f);cockpit::lookPitch=std::clamp(cockpit::lookPitch-(y-lookY)*.004f,-.8f,.55f);lookX=x;lookY=y;return 0;}
  if(msg==WM_LBUTTONDOWN||msg==WM_MOUSEMOVE){
   RECT b{};GetClientRect(h,&b);float x=(short)LOWORD(l)*960.f/std::max(1L,b.right),y=(short)HIWORD(l)*540.f/std::max(1L,b.bottom);
   if(msg==WM_LBUTTONDOWN&&cockpitInput.press(x,y)){cockpitMouseDown=true;if(cockpitInput.dragging)SetCapture(h);return 0;}

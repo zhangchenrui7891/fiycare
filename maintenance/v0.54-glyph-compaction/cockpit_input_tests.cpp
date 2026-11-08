@@ -71,6 +71,31 @@ void mixedEquivalence(){
  }
  std::cout<<"84000 deterministic mixed events in "<<batches<<" batches: 7 profiles x2 models x2 power states, final Snapshot equivalence passed.\n";
 }
-int main(){try{dragBurst();barriers();mixedEquivalence();
+void pointerOwnership(){
+ for(bool leftReleasedFirst:{false,true}){
+  cockpit::SpatialInput input;input.enabled=true;input.throttle=.5;
+  const auto point=project(cockpit::solids(.5)[5].center);
+  require(input.press(point.x,point.y)&&input.dragging,"Left drag acquires throttle");
+  input.move(point.y-16);const double selected=input.throttle;
+  require(!input.beginLook()&&!input.looking&&input.dragging,"Right press cannot steal active throttle drag");
+  if(leftReleasedFirst){input.release();input.endLook();}
+  else{input.endLook();require(input.dragging,"Ignored right release cannot terminate throttle drag");input.release();}
+  require(!input.dragging&&!input.looking,"Both release orders leave pointer idle");
+  sim::Snapshot s;applyAll(s,input.pending);
+  require(std::abs(s.flight.throttle-selected)<1e-12,"Release keeps final pending throttle value");
+  input.pending.clear();require(input.beginLook(),"Idle pointer accepts look");
+  require(!input.press(point.x,point.y)&&input.pending.empty(),"Left press during look cannot queue throttle");
+  const auto gear=project(cockpit::solids(selected)[1].center);
+  require(!input.press(gear.x,gear.y)&&input.pending.empty(),"Left press during look cannot toggle a switch");
+  input.release();require(input.looking,"Left release cannot end right-button look");
+  input.endLook();require(!input.looking,"Right release ends look");
+  require(input.press(point.x,point.y),"New left press works after look ends");
+  input.loseCapture();require(!input.dragging&&!input.looking&&!input.pending.empty(),"Capture loss ends gestures but preserves completed input");
+  require(input.beginLook(),"Look works after capture loss");input.cancel();
+  require(!input.looking&&!input.dragging&&input.pending.empty()&&!input.beginLook(),"Focus/menu cancellation clears gestures and pending input");
+ }
+ std::cout<<"Pointer ownership: both release orders, switch suppression, capture loss, cancellation and recovery passed. CPU event-state tests only.\n";
+}
+int main(){try{pointerOwnership();dragBurst();barriers();mixedEquivalence();
  std::cout<<"Cockpit input coalescing CPU checks passed; no real Windows mouse/capture/rendering verification.\n";
  }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}

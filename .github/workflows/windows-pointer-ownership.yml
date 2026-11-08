@@ -1,0 +1,20 @@
+name: Windows pointer ownership source checks
+on:
+  push:
+    branches: ['codex/v0.73-pointer-ownership']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v6
+      - shell: pwsh
+        run: ./maintenance/v0.54-glyph-compaction/tools/check_windows_source.ps1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-pointer-ownership-evidence
+          path: maintenance/v0.54-glyph-compaction/out/build/windows-source-check/**/*.log
+

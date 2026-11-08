@@ -46,7 +46,7 @@ inline void apply(sim::Snapshot& state,Action action,double value=0){
 }
 struct Event{Action action;double value=0;};
 struct Input {
- bool enabled=false,dragging=false;std::vector<Event> pending;
+ bool enabled=false,dragging=false,looking=false;std::vector<Event> pending;
  void enqueue(Action action,double value=0){
   // Absolute positions may replace only the immediately preceding finite
   // throttle position. Never cross a switch, invalid value or other action.
@@ -56,8 +56,12 @@ struct Input {
   }
   pending.push_back({action,value});
  }
+ // The first held drag owns the pointer until its button is released.
+ bool beginLook(){if(!enabled||dragging)return false;looking=true;return true;}
+ void endLook(){looking=false;}
  void release(){dragging=false;}
- void cancel(){enabled=false;dragging=false;pending.clear();}
+ void loseCapture(){dragging=false;looking=false;}
+ void cancel(){enabled=false;loseCapture();pending.clear();}
 };
 }
 
@@ -97,7 +101,7 @@ inline int pick(Point d,double throttle){
 }
 struct SpatialInput:Input {
  double throttle=0;float lastY=0;
- bool press(float x,float y){if(!enabled)return false;int hit=pick(ray(x,y),throttle);if(hit<0)return false;auto action=solids(throttle)[hit].action;dragging=action==Action::Throttle;lastY=y;enqueue(action,throttle);return true;}
+ bool press(float x,float y){if(!enabled||looking)return false;int hit=pick(ray(x,y),throttle);if(hit<0)return false;auto action=solids(throttle)[hit].action;dragging=action==Action::Throttle;lastY=y;enqueue(action,throttle);return true;}
  void move(float y){if(enabled&&dragging){throttle=std::clamp(throttle+(lastY-y)/160.,0.,1.);lastY=y;enqueue(Action::Throttle,throttle);}}
 };
 }
