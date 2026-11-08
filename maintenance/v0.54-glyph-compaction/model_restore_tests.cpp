@@ -22,6 +22,22 @@ int main(){
   {std::ofstream out(path,std::ios::binary);out.write("FCMESH07",8);uint32_t dims[]={3,12,1};out.write(reinterpret_cast<char*>(dims),12);Vertex v[3]{};for(auto& x:v)x.ny=1;v[0].x=7;out.write(reinterpret_cast<char*>(v),sizeof(v));out.put(0);}
   restoreDefaultModel(models,2,path);check(models.at(2).vertices[0].x==7&&models.at(2).gear[0]==0,"Valid default replaces custom model");
   restoreDefaultModel(models,3,path);check(models.size()==2&&models.at(3).vertices[0].x==7,"Absent model can be restored");
-  std::filesystem::remove_all(dir);std::cout<<"PASS: missing, corrupt and truncated defaults preserve current model; valid replace/insert succeed. CPU filesystem test.\n";
+  const auto missing=dir/"missing.fcmesh",bad=dir/"bad.fcmesh";
+  std::ofstream(bad)<<"broken";
+  auto preferred=loadStartupModel(missing,path);
+  check(preferred.custom&&preferred.model&&preferred.model->vertices[0].x==7&&preferred.warning.empty(),"Valid custom bypasses unavailable default");
+  preferred=loadStartupModel(path,bad);
+  check(!preferred.custom&&preferred.model&&!preferred.warning.empty(),"Damaged custom falls back to valid default with warning");
+  preferred=loadStartupModel(path,missing);
+  check(!preferred.custom&&preferred.model&&preferred.warning.empty(),"Absent custom loads default");
+  preferred=loadStartupModel({},missing);
+  check(!preferred.custom&&!preferred.model&&preferred.warning.empty(),"Procedural aircraft needs no mesh");
+  preferred=loadStartupModel({},bad);
+  check(!preferred.model&&!preferred.warning.empty(),"Damaged custom on procedural aircraft leaves procedural fallback");
+  preferred=loadStartupModel({},path);
+  check(preferred.custom&&preferred.model,"Procedural aircraft accepts valid custom");
+  bool failed=false;try{loadStartupModel(missing,bad);}catch(const std::runtime_error&){failed=true;}
+  check(failed,"No valid custom or required default must still report startup failure");
+  std::filesystem::remove_all(dir);std::cout<<"PASS: missing, corrupt and truncated defaults preserve current model; valid replace/insert succeed. Custom-first startup, default/procedural fallbacks and unrecoverable failure passed. CPU filesystem test.\n";
  }catch(const std::exception& e){std::filesystem::remove_all(dir);std::cerr<<e.what()<<'\n';return 1;}
 }
