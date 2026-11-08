@@ -17,6 +17,6 @@ g++ -std=c++17 -O2 -pthread -Wall -Wextra -Werror -pedantic \
 "$task_build/flight_lab" sweep "$task_build/lab/sweep"
 "$task_build/flight_lab" scenario --surface --aircraft 3 --seconds 90 \
     --fail-left 15 --output "$task_build/lab/engine_out"
-for task_script in check_glass check_clean_overlay check_scenery_integration check_launch_integration check_rebuilt_text check_rebuilt_storage check_exit_recovery check_frame_upload check_shader_cache_integration check_keyboard_integration check_approach_integration check_menus; do
+for task_script in check_pointer_integration check_glass check_clean_overlay check_scenery_integration check_launch_integration check_rebuilt_text check_rebuilt_storage check_exit_recovery check_frame_upload check_shader_cache_integration check_keyboard_integration check_approach_integration check_menus; do
     python3 "$task_root/tools/$task_script.py"
 done

@@ -69,7 +69,7 @@ void mixedEquivalence(){
    }
   }
  }
- std::cout<<"84000 deterministic mixed events in "<<batches<<" batches: 7 profiles x2 models x2 power states, final Snapshot equivalence passed.\n";
+ std::cout<<sim::aircraftCount*12000<<" deterministic mixed events in "<<batches<<" batches: "<<sim::aircraftCount<<" profiles x2 models x2 power states, final Snapshot equivalence passed.\n";
 }
 void pointerOwnership(){
  for(bool leftReleasedFirst:{false,true}){
