@@ -1,3 +1,6 @@
+# v0.72：新航班重新提示现有故障
+见TODAY_REVIEW.md。源码资源包，无EXE。
+
 # v0.71：ALT捕获当前指示高度
 见TODAY_REVIEW.md。源码资源包，无EXE。
 

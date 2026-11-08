@@ -1,0 +1,1 @@
+PASS source assertions: alert reset only in successful load, restart and successful aircraft switch branches. This is a wiring check, not Windows menu execution.

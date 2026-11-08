@@ -1,0 +1,2 @@
+9 saved/reloaded flight acknowledgement resets passed; faults preserved.
+63 actual fault transitions and 36 severity/ack combinations passed; stable ordering and no mutation. CPU only.
