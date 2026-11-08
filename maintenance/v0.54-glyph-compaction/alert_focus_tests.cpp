@@ -24,6 +24,24 @@ int main(){
   check(alerts.headline()->id=="engine2_fail");
   transitions+=7;
  }
+ // Reloading an identical fault must require acknowledgement again.
+ int reloads=0;
+ for(int id=1;id<sim::aircraftCount;++id){
+  sim::Snapshot state;state.flight.configure(id);
+  state.flight.engines.units[0].fault=sim::EngineFault::Flameout;
+  alerts.beginFlight(state);alerts.acknowledge();alerts.update(state);
+  check(!alerts.attention());
+  std::stringstream saved;state.write(saved);sim::Snapshot loaded;check(loaded.read(saved));
+  alerts.beginFlight(loaded);
+  check(alerts.attention()&&alerts.headline()->id=="engine1_fail"&&!alerts.headline()->acknowledged);
+  check(loaded.flight.engines.units[0].fault==sim::EngineFault::Flameout);
+  alerts.acknowledge();alerts.update(loaded);check(!alerts.attention());
+  loaded.flight.engines.units[0].fault=sim::EngineFault::None;
+  alerts.beginFlight(loaded);
+  for(const auto& a:alerts.active)check(a.id!="engine1_fail");
+  ++reloads;
+ }
+ std::cout<<reloads<<" saved/reloaded flight acknowledgement resets passed; faults preserved.\n";
  // Exhaust severity/ack combinations, independent of list ordering.
  int combinations=0;
  for(int a=0;a<3;++a)for(int b=0;b<3;++b)for(bool aa:{false,true})for(bool ab:{false,true}){

@@ -66,6 +66,9 @@ inline std::vector<FlightAlert> collectFlightAlerts(const Snapshot& state) {
 struct AlertManager {
     std::vector<FlightAlert> active;
 
+    // A different loaded/restarted flight must not inherit old acknowledgements.
+    void beginFlight(const Snapshot& state) { active = collectFlightAlerts(state); }
+
     void update(const Snapshot& state) {
         auto next = collectFlightAlerts(state);
         for (auto& alert : next) {
