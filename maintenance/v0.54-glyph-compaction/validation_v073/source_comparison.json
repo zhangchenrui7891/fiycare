@@ -1,0 +1,13 @@
+{
+  "baseline": "FlightCareerAir_v0.72.zip",
+  "baseline_manifest_entries": 2392,
+  "unchanged_assets_and_third_party": 1661,
+  "changed_existing_files": [
+    "CMakeLists.txt",
+    "cockpit_input_tests.cpp",
+    "src/cockpit_controls.h",
+    "src/main.cpp",
+    "tools/check_portable.sh",
+    "tools/check_windows_source.ps1"
+  ]
+}

@@ -1,0 +1,4 @@
+Pointer ownership: both release orders, switch suppression, capture loss, cancellation and recovery passed. CPU event-state tests only.
+CPU burst: 100001 legacy pending events -> 1; absolute position and final Snapshot identical. Not Windows/RAM/FPS measurement.
+120000 deterministic mixed events in 3280 batches: 10 profiles x2 models x2 power states, final Snapshot equivalence passed.
+Cockpit input coalescing CPU checks passed; no real Windows mouse/capture/rendering verification.

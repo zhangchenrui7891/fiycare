@@ -1,3 +1,6 @@
+# v0.73：驾驶舱油门拖动与右键环视互斥
+见POINTER_OWNERSHIP.md和TODAY_REVIEW.md。源码资源包，无EXE。
+
 # v0.72：新航班重新提示现有故障
 见TODAY_REVIEW.md。源码资源包，无EXE。
 

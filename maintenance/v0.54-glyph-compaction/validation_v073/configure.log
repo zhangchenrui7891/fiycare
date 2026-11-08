@@ -1,0 +1,11 @@
+-- Shared libraries disabled
+-- GCC13 detected disabling "-Wdangling-reference" in Cpp files as it appears to be a false positive
+-- compiling zlib from sources
+-- Build an import-only version of Assimp.
+-- GCC13 detected disabling "-Warray-bounds and -Wstringop-overflow" for AssetLib/MDL/MDLLoader.cpp as it appears to be a false positive
+-- tinyusdz disabled
+-- Enabled importer formats: AMF 3DS AC ASE ASSBIN B3D BVH COLLADA DXF CSM HMP IRRMESH IQM IRR LWO LWS M3D MD2 MD3 MD5 MDC MDL NFF NDO OFF OBJ OGRE OPENGEX PLY MS3D COB BLEND XGL FBX Q3D Q3BSP RAW SIB SMD STL TERRAGEN 3D X X3D GLTF 3MF MMD
+-- Disabled importer formats: IFC USD
+-- Configuring done (0.3s)
+-- Generating done (0.1s)
+-- Build files have been written to: /workspace/scratch/f28b7c9ab582/run_v073/build
