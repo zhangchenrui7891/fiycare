@@ -1,0 +1,2 @@
+ALT capture cases: 90 including QNH, selector, toggle, recapture and save roundtrip.
+PASS: 20 aircraft/model mode sequences; 2000 subsequent guidance updates. CPU state tests, not a flight or hardware test.

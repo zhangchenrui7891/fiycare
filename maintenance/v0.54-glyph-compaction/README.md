@@ -1,3 +1,6 @@
+# v0.71：ALT捕获当前指示高度
+见TODAY_REVIEW.md。源码资源包，无EXE。
+
 # v0.70：启动优先加载有效自定义机模
 见TODAY_REVIEW.md。源码资源包，无EXE。
 

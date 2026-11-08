@@ -227,9 +227,9 @@ void spatialChecks(){
 void autopilotCheck(){
  sim::Snapshot s;s.flight.configure(3);s.flight.y=1500;s.flight.vz=90;s.flight.yaw=.4;
  cockpit::apply(s,cockpit::Action::HeadingHold);cockpit::apply(s,cockpit::Action::AltitudeHold);
- require(s.headingHold&&s.altitudeHold&&std::abs(s.targetHeading-.4)<1e-9&&s.targetAltitude==1500,"Autopilot captures present heading and altitude");
+ require(s.headingHold&&s.altitudeHold&&std::abs(s.targetHeading-.4)<1e-9&&std::abs(s.targetAltitude-sim::airData(s.flight,s.avionics.qnh).altitude)<1e-9,"Autopilot captures present heading and indicated altitude");
  cockpit::apply(s,cockpit::Action::HeadingPlus);cockpit::apply(s,cockpit::Action::AltitudePlus);
- require(std::abs(s.targetHeading-(.4+10*sim::pi/180))<1e-9&&s.targetAltitude==1600,"Autopilot selectors change targets");
+ require(std::abs(s.targetHeading-(.4+10*sim::pi/180))<1e-9&&std::abs(s.targetAltitude-sim::airData(s.flight,s.avionics.qnh).altitude-100)<1e-9,"Autopilot selectors change targets");
  sim::Controls c;sim::updateAutopilot(s,c);require(c.roll>0&&c.pitch>0,"Autopilot commands bank and climb toward selected targets");
  c={};c.roll=-1;sim::updateAutopilot(s,c);require(!s.headingHold&&s.altitudeHold,"Manual roll disconnects heading hold only");
  c={};c.pitch=1;sim::updateAutopilot(s,c);require(!s.altitudeHold,"Manual pitch disconnects altitude hold");

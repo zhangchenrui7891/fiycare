@@ -1,0 +1,11 @@
+PASS 11 independent configuration transitions and 6600 stable-frame checks. CPU only.
+PASS: missing, corrupt and truncated defaults preserve current model; valid replace/insert succeed. Custom-first startup, default/procedural fallbacks and unrecoverable failure passed. CPU filesystem test.
+ALT capture cases: 90 including QNH, selector, toggle, recapture and save roundtrip.
+PASS: 20 aircraft/model mode sequences; 2000 subsequent guidance updates. CPU state tests, not a flight or hardware test.
+PASS: 400 reset/select cases, 40 passenger lifecycles, save roundtrips and rejected-action immutability
+63 actual fault transitions and 36 severity/ack combinations passed; stable ordering and no mutation. CPU only.
+14641 segment grid cases: reversal, bounds, collinearity, idempotence, sampled coverage; crossing/parallel/point/invalid cases passed. CPU only.
+120027 old/new integer-format comparisons passed, including rounding, finite bounds, invalid values and non-classic global locale. No FPS claim.
+3000 masks exact coverage, no overlap; idempotence, gaps, width changes, negative bearings passed
+Synthetic rectangles 539602 -> 494983; 13-row stem vertices 78 -> 6. Not GDI/FPS evidence.
+FAIL: Autopilot captures present heading and altitude
