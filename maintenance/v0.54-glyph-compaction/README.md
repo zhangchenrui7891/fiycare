@@ -1,3 +1,6 @@
+# v0.70：启动优先加载有效自定义机模
+见TODAY_REVIEW.md。源码资源包，无EXE。
+
 # v0.69：保护启动恢复备份
 见 TODAY_REVIEW.md。源码资源包，无 EXE。
 
