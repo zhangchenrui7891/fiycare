@@ -7,23 +7,28 @@ root = Path(__file__).resolve().parents[1]
 main = Path(sys.argv[1]).read_text() if len(sys.argv)>1 else (root/'src/main.cpp').read_text()
 start = main.index(' if(msg==WM_CAPTURECHANGED)')
 hook = main[start:main.index(' return DefWindowProc', start)].replace(';}return 0;', ';}\n return 0;')
+resize_start=main.index(' if(msg==WM_ENTERSIZEMOVE)')
+hook=main[resize_start:main.index('\n',resize_start)]+'\n'+hook
 prefix = r'''
 #include "cockpit_controls.h"
+#include "keyboard_state.h"
 #include <iostream>
 #include <stdexcept>
 constexpr int WM_CAPTURECHANGED=1,WM_RBUTTONDOWN=2,WM_RBUTTONUP=3,
- WM_MOUSEMOVE=4,WM_LBUTTONDOWN=5,WM_LBUTTONUP=6;
+ WM_MOUSEMOVE=4,WM_LBUTTONDOWN=5,WM_LBUTTONUP=6,WM_ENTERSIZEMOVE=7;
 struct RECT{long left=0,top=0,right=960,bottom=540;};
 struct Button{float x,y,w,h;int command;};
 std::vector<Button> clickableButtons;
 std::vector<int> menuCommands;
 cockpit::SpatialInput cockpitInput;
+input::KeyboardState keyboardInput;
 bool cockpitMouseDown=false,lookDragging=false;
 int lookX=0,lookY=0,capture=0;
 int message(int h,int msg,unsigned long l);
 unsigned long LOWORD(unsigned long l){return l&65535;}
 unsigned long HIWORD(unsigned long l){return (l>>16)&65535;}
-void GetClientRect(int,RECT*){}
+long clientWidth=960,clientHeight=540;
+void GetClientRect(int,RECT* r){r->right=clientWidth;r->bottom=clientHeight;}
 int GetCapture(){return capture;}
 void SetCapture(int h){capture=h;}
 void ReleaseCapture(){const int previous=capture;capture=0;if(previous)message(previous,WM_CAPTURECHANGED,0);}
@@ -42,6 +47,25 @@ int main(){try{
  const float up=p.y*cp-p.z*sp,forward=p.y*sp+p.z*cp;
  const int x=int(480*(1+p.x/forward/(.57735027f*cockpit::viewportAspect)));
  const int y=int(270*(1-up/forward/.57735027f));
+ for(bool look:{false,true})for(bool owned:{false,true}){
+  cockpitInput={};cockpitInput.enabled=true;cockpitInput.throttle=.5;
+  send(look?WM_RBUTTONDOWN:WM_LBUTTONDOWN,x,y);
+  if(!look)send(WM_MOUSEMOVE,x,y-16);
+  if(!owned)capture=2; // Must not release another window's capture.
+  send(WM_ENTERSIZEMOVE,x,y);
+  require(!cockpitInput.enabled&&!cockpitInput.dragging&&!cockpitInput.looking&&!cockpitMouseDown&&cockpitInput.pending.empty(),"Resize entry clears gestures and queued cockpit commands");
+  require(capture==(owned?0:2),"Resize releases only this window's capture");
+  const float yaw=cockpit::lookYaw,pitch=cockpit::lookPitch;
+  const double throttle=cockpitInput.throttle;
+  clientWidth=1920;clientHeight=1080;send(WM_MOUSEMOVE,x,y-80);
+  require(cockpitInput.throttle==throttle&&cockpitInput.pending.empty()&&cockpit::lookYaw==yaw&&cockpit::lookPitch==pitch,"Resized coordinates cannot move stale throttle or look gesture");
+  cockpitInput.enabled=true;send(WM_MOUSEMOVE,x,y-100);
+  require(cockpitInput.pending.empty(),"Re-enable alone cannot resume old drag");
+  cockpitInput.throttle=.5;send(WM_LBUTTONDOWN,x*2,y*2);send(WM_MOUSEMOVE,x*2,(y-16)*2);
+  require(cockpitInput.dragging&&std::abs(cockpitInput.throttle-.6)<1e-9,"Fresh press works at resized dimensions");
+  cockpitInput.cancel();ReleaseCapture();clientWidth=960;clientHeight=540;
+ }
+ std::cout<<"Resize entry: throttle/look, own/foreign capture, changed dimensions and fresh-press recovery passed.\n";
  for(bool leftFirst:{false,true}){
   cockpitInput={};cockpitInput.enabled=true;cockpitInput.throttle=.5;
   cockpitMouseDown=false;lookDragging=false;capture=0;

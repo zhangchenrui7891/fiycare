@@ -59,7 +59,7 @@ LRESULT CALLBACK windowProc(HWND h,UINT msg,WPARAM w,LPARAM l){
  if(msg==WM_COMMAND){menuCommands.push_back(LOWORD(w));return 0;}
  if(msg==WM_ENTERMENULOOP){keyboardInput.suspend();cockpitInput.cancel();cockpitMouseDown=false;if(GetCapture()==h)ReleaseCapture();inNativeMenu=true;return 0;}
  if(msg==WM_EXITMENULOOP){keyboardInput.suspend();inNativeMenu=false;nativeMenuJustClosed=true;return 0;}
- if(msg==WM_ENTERSIZEMOVE)keyboardInput.suspend();
+ if(msg==WM_ENTERSIZEMOVE){keyboardInput.suspend();cockpitInput.cancel();cockpitMouseDown=false;if(GetCapture()==h)ReleaseCapture();}
  if(msg==WM_KEYDOWN&&w==VK_ESCAPE&&!(l&(1LL<<30))){menuCommands.push_back(ui::ToggleMenu);return 0;}
  if(msg==WM_KEYDOWN||msg==WM_KEYUP){
   if(GetForegroundWindow()==h&&!IsIconic(h)&&!inNativeMenu){

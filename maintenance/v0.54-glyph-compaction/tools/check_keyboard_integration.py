@@ -20,7 +20,7 @@ controls=main[start:main.index('\n',start)]
 for hook in ('WM_ENTERMENULOOP','WM_EXITMENULOOP','WM_KILLFOCUS'):
     if f'if(msg=={hook}){{keyboardInput.suspend();' not in main:
         raise RuntimeError(f'Missing keyboard suspension in {hook}')
-for text in ('if(msg==WM_ENTERSIZEMOVE)keyboardInput.suspend();',
+for text in ('if(msg==WM_ENTERSIZEMOVE){keyboardInput.suspend();cockpitInput.cancel();cockpitMouseDown=false;if(GetCapture()==h)ReleaseCapture();}',
              'keyboardInput.suspend();cockpitInput.cancel();renderer.reset();',
              'case ui::Help:help(window);keyboardInput.suspend();',
              'keyboardInput.suspend();physicsTime.reset();previousMeasured=false;',
