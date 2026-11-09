@@ -1,3 +1,6 @@
+# v0.77：旅客航班进行中锁定人数
+见PASSENGER_FLIGHT_LOCK.md与TODAY_REVIEW.md。源码资源包，无EXE。
+
 # v0.76：可选自定义机模路径异常可回退
 见MODEL_PROBE_RECOVERY.md与TODAY_REVIEW.md。源码资源包，无EXE。
 

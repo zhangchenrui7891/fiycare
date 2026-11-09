@@ -1,0 +1,2 @@
+Passenger boarding: 80 aircraft/airport/stage cases plus save roundtrips passed.
+PASS: 400 reset/select cases, 40 passenger lifecycles, save roundtrips and rejected-action immutability
