@@ -69,7 +69,7 @@ int main(){
  try{
   int boardingCases=0;
   for(int id=0;id<sim::aircraftCount;++id)for(int airport=0;airport<2;++airport)for(int stage=0;stage<4;++stage){
-   auto s=pending(id,airport,2);s.career.stage=stage;
+   auto s=pending(id,airport,2);s.career.stage=stage;s.career.gate=0;
    std::stringstream saved;s.write(saved);sim::Snapshot restored;
    require(restored.read(saved),"Passenger flight state roundtrip");
    for(auto* state:{&s,&restored}){
