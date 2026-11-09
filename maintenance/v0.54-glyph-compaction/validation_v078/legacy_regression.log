@@ -1,0 +1,7 @@
+Modal move/resize return must discard physics time even if client size is unchanged
+Traceback (most recent call last):
+  File "/workspace/scratch/f28b7c9ab582/run78/source/tools/check_window_timing.py", line 95, in <module>
+    subprocess.run([str(exe)], check=True)
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/tmp/fcair-window-timing-l8fgdep5/check']' returned non-zero exit status 1.

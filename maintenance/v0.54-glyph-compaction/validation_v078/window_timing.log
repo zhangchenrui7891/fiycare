@@ -1,0 +1,1 @@
+PASS 12 modal timing cases; ordinary stalls, native menu, benchmark recovery and key gating. Actual main.cpp statements with CPU Win32 stand-ins only.

@@ -1,0 +1,149 @@
+PASS 11 independent configuration transitions and 6600 stable-frame checks. CPU only.
+Real filesystem probe exception: default/procedural fallback, diagnostic, required-default failure and existing data preservation passed.
+PASS: missing, corrupt and truncated defaults preserve current model; valid replace/insert succeed. Custom-first startup, default/procedural fallbacks and unrecoverable failure passed. CPU filesystem test.
+ALT capture cases: 90 including QNH, selector, toggle, recapture and save roundtrip.
+PASS: 20 aircraft/model mode sequences; 2000 subsequent guidance updates. CPU state tests, not a flight or hardware test.
+Passenger boarding: 80 aircraft/airport/stage cases plus save roundtrips passed.
+PASS: 400 reset/select cases, 40 passenger lifecycles, save roundtrips and rejected-action immutability
+9 saved/reloaded flight acknowledgement resets passed; faults preserved.
+63 actual fault transitions and 36 severity/ack combinations passed; stable ordering and no mutation. CPU only.
+14641 segment grid cases: reversal, bounds, collinearity, idempotence, sampled coverage; crossing/parallel/point/invalid cases passed. CPU only.
+120027 old/new integer-format comparisons passed, including rounding, finite bounds, invalid values and non-classic global locale. No FPS claim.
+3000 masks exact coverage, no overlap; idempotence, gaps, width changes, negative bearings passed
+Synthetic rectangles 539602 -> 494983; 13-row stem vertices 78 -> 6. Not GDI/FPS evidence.
+PASS: ground, engine/fuel, impacts, assisted controls, flex, takeoff, landing, missions, saves, fleet, assets, lighting, cockpit, FXAA persistence, fixed timing, performance benchmark, heading, altitude, waypoint navigation, cross-track, dual runway, ILS-style guidance, landing review, isolated material mipmaps and gamma-aware filtering
+aircraft=0 duration_s=300 late_max_altitude_error_m=0.434079 final_tas_mps=86.3376
+aircraft=1 duration_s=300 late_max_altitude_error_m=0.216572 final_tas_mps=165.35
+aircraft=2 duration_s=300 late_max_altitude_error_m=0.224419 final_tas_mps=188.56
+aircraft=3 duration_s=300 late_max_altitude_error_m=0.259354 final_tas_mps=192.429
+PASS: aero/avionics regression and five-minute scenarios
+surface_takeoff aircraft=0 max_altitude_m=342.941
+surface_takeoff aircraft=1 max_altitude_m=1201.8
+surface_takeoff aircraft=2 max_altitude_m=1714.51
+surface_takeoff aircraft=3 max_altitude_m=1821.84
+PASS: rigid-body, panel aerodynamics, independent engines, faults, alerts, v15, CSV, four takeoffs, engine-out
+PASS: smooth 30-1000 FPS presentation, irregular frames, reset/wrap, reverse depth, local cabin; 35 seven-aircraft 120-second surface-flight runs agree across render cadences
+PASS: stale terrain rejection, latest request, single worker, cached return, failure retention/recovery
+a330.fcmesh: 31500 model vertices; 120 warm frames, 0 geometry-buffer reallocations; 4296288 DX12 intermediate bytes removed per frame
+a350.fcmesh: 61641 model vertices; 120 warm frames, 0 geometry-buffer reallocations; 5743056 DX12 intermediate bytes removed per frame
+a320.fcmesh: 15687 model vertices; 120 warm frames, 0 geometry-buffer reallocations; 3537264 DX12 intermediate bytes removed per frame
+b737.fcmesh: 8010 model vertices; 120 warm frames, 0 geometry-buffer reallocations; 3168768 DX12 intermediate bytes removed per frame
+b787.fcmesh: 10134 model vertices; 120 warm frames, 0 geometry-buffer reallocations; 3270720 DX12 intermediate bytes removed per frame
+Frame geometry checks passed. CPU staging evidence only; no GPU/FPS claim.
+100 simulated four-stage renderer requests: 4 compiler calls / 396 cache hits
+Shader cache key, failure/retry, LRU capacity and ownership checks passed. No HLSL/GPU executed.
+Legacy defect reproduced: held G becomes a new edge on foreground return and retracts gear.
+All 256 key slots: focus recovery, hold, release/repress and independent-key gating passed.
+11 actual cockpit bindings x120 held frames: no false state change; fresh presses still act once.
+10,000 deterministic mixed availability/key sequences preserve input invariants.
+Keyboard recovery checks passed. CPU state checks only; no Windows messages executed.
+256 slots: completed taps retained, 1000 same-frame taps coalesced, repeat filtered, no continuous latch.
+Recovery barriers, between-frame rearming, press-time modifier gating and bounds passed.
+Async physical state ahead of message: no duplicate discrete action.
+Actual gear action: 5 deterministic sample intervals x120 completed taps; all 600 delivered once.
+Keyboard event checks passed; CPU schedules only, not Windows input delivery or performance.
+Pointer ownership: both release orders, switch suppression, capture loss, cancellation and recovery passed. CPU event-state tests only.
+CPU burst: 100001 legacy pending events -> 1; absolute position and final Snapshot identical. Not Windows/RAM/FPS measurement.
+120000 deterministic mixed events in 3280 batches: 10 profiles x2 models x2 power states, final Snapshot equivalence passed.
+Cockpit input coalescing CPU checks passed; no real Windows mouse/capture/rendering verification.
+PASS: 27027 exact ordered solids, 89964 equivalent hit rays; fixed array type. Not GPU/Windows/FPS evidence.
+Legacy PVG threshold: centre-distance=1800m, path delta=74.9014m relative to chosen training clearance.
+7 aircraft x2 airports x2 directions x6 distances: 240 threshold, slope and signed-deviation samples passed.
+12,001 one-metre path samples: continuous slope; selection/power/save and invalid envelopes passed.
+Training approach CPU geometry passed; not Windows, radio ILS, certified procedure or autoland validation.
+Legacy reproduced at X=600 Z=2700: distance=632.456m, old point=1 behind; new point=2.
+7 profiles x2 models x4 courses x2 sides x3 overshoots: 480 AP capture cases passed.
+CPU flight aircraft=0 surface=0 wind=-8 seconds=10 first_point=2 final_point=2 max_roll_deg=24.0237
+CPU flight aircraft=0 surface=0 wind=8 seconds=10 first_point=2 final_point=2 max_roll_deg=24.0237
+CPU flight aircraft=0 surface=1 wind=-8 seconds=10 first_point=2 final_point=2 max_roll_deg=23.9818
+CPU flight aircraft=0 surface=1 wind=8 seconds=10 first_point=2 final_point=2 max_roll_deg=23.9898
+CPU flight aircraft=3 surface=0 wind=-8 seconds=10 first_point=2 final_point=2 max_roll_deg=24.0382
+CPU flight aircraft=3 surface=0 wind=8 seconds=10 first_point=2 final_point=2 max_roll_deg=24.0382
+CPU flight aircraft=3 surface=1 wind=-8 seconds=10 first_point=2 final_point=2 max_roll_deg=23.7612
+CPU flight aircraft=3 surface=1 wind=8 seconds=10 first_point=2 final_point=2 max_roll_deg=25.8078
+8 short actual Flight.step scenarios passed; not complete-route, Windows or calibrated-aircraft validation.
+Training navigation CPU checks passed; no certified FMS, turn anticipation or real input/GPU evidence.
+6720 profile/model/course/offset/speed guidance/AP cases passed.
+X=600 Z=-1500 speed=90: legacy bearing=-8.53077 deg; new=-29.0546 deg; lookahead=1080m (CPU geometry only).
+IDEAL_ONLY course=0 side=-600 speed=48 20s old_XTK=457.593 new_XTK=149.469
+IDEAL_ONLY course=0 side=-600 speed=90 20s old_XTK=332.987 new_XTK=121.624
+IDEAL_ONLY course=0 side=-600 speed=120 20s old_XTK=243.983 new_XTK=117.973
+IDEAL_ONLY course=0 side=600 speed=48 20s old_XTK=457.593 new_XTK=149.469
+IDEAL_ONLY course=0 side=600 speed=90 20s old_XTK=332.987 new_XTK=121.624
+IDEAL_ONLY course=0 side=600 speed=120 20s old_XTK=243.983 new_XTK=117.973
+IDEAL_ONLY course=1 side=-600 speed=48 20s old_XTK=398.852 new_XTK=149.469
+IDEAL_ONLY course=1 side=-600 speed=90 20s old_XTK=222.848 new_XTK=121.624
+IDEAL_ONLY course=1 side=-600 speed=120 20s old_XTK=97.1302 new_XTK=75.2446
+IDEAL_ONLY course=1 side=600 speed=48 20s old_XTK=398.852 new_XTK=149.469
+IDEAL_ONLY course=1 side=600 speed=90 20s old_XTK=222.848 new_XTK=121.624
+IDEAL_ONLY course=1 side=600 speed=120 20s old_XTK=97.1302 new_XTK=75.2446
+IDEAL_ONLY course=2 side=-600 speed=48 20s old_XTK=457.593 new_XTK=149.469
+IDEAL_ONLY course=2 side=-600 speed=90 20s old_XTK=332.987 new_XTK=121.624
+IDEAL_ONLY course=2 side=-600 speed=120 20s old_XTK=243.983 new_XTK=117.973
+IDEAL_ONLY course=2 side=600 speed=48 20s old_XTK=457.593 new_XTK=149.469
+IDEAL_ONLY course=2 side=600 speed=90 20s old_XTK=332.987 new_XTK=121.624
+IDEAL_ONLY course=2 side=600 speed=120 20s old_XTK=243.983 new_XTK=117.973
+IDEAL_ONLY course=3 side=-600 speed=48 20s old_XTK=398.852 new_XTK=149.469
+IDEAL_ONLY course=3 side=-600 speed=90 20s old_XTK=222.848 new_XTK=121.624
+IDEAL_ONLY course=3 side=-600 speed=120 20s old_XTK=97.1302 new_XTK=75.2446
+IDEAL_ONLY course=3 side=600 speed=48 20s old_XTK=398.852 new_XTK=149.469
+IDEAL_ONLY course=3 side=600 speed=90 20s old_XTK=222.848 new_XTK=121.624
+IDEAL_ONLY course=3 side=600 speed=120 20s old_XTK=97.1302 new_XTK=75.2446
+24 ideal-track comparisons passed; NOT aircraft dynamics or full route.
+PHYSICS_SMOKE aircraft=0 surface=0 wind=-8 20s XTK=142.398
+PHYSICS_SMOKE aircraft=0 surface=0 wind=8 20s XTK=179.441
+PHYSICS_SMOKE aircraft=0 surface=1 wind=-8 20s XTK=178.014
+PHYSICS_SMOKE aircraft=0 surface=1 wind=8 20s XTK=199.753
+PHYSICS_SMOKE aircraft=3 surface=0 wind=-8 20s XTK=252.665
+PHYSICS_SMOKE aircraft=3 surface=0 wind=8 20s XTK=260.189
+PHYSICS_SMOKE aircraft=3 surface=1 wind=-8 20s XTK=228.908
+PHYSICS_SMOKE aircraft=3 surface=1 wind=8 20s XTK=215.536
+Bounded training leg-guidance CPU checks passed. No FMS/turn anticipation/Windows/GPU/full-route acceptance.
+PASS 11 configuration mutations after valid full runs, sticky invalidation, early change, and report suppression. CPU only.
+Legacy virtual dt=0.0005s x200000: elapsed freezes at 32.768s; new accepted duration=100s, storage=65536. Not hardware FPS.
+Capacity boundary: sample 65537 triggers early NOT_EVALUATED at 32.7685 virtual seconds.
+Normal target tiers/full-run P95 preserved; insufficient 60s evidence has no performance verdict.
+Invalid intervals, accumulation overflow, malformed stats and report NA/NOT_EVALUATED checks passed.
+Benchmark CPU clock/report checks passed; no Windows, GPU FPS or HD6000 measurement performed.
+Background pacing: 2000 simulated budgets, foreground recovery, overruns and invalid times passed; no wall-clock/FPS/power measurement.
+PASS 85002 exact oracle comparisons: all partial window sizes, repeated queries, ring wraps, resets, duplicates, long frames, rejected samples. CPU only.
+PASS launch options: 19 flags, 133 misleading tokens, forcing/copy and backend checks. Tokenized CPU inputs only.
+PASS 40001 heading-range cases plus cardinal/north-boundary, unit conversion, fractional VS, invalid and signed-zero cases. Text/CPU only.
+PASS 2324 transition/controller/manual/protection/NAV/post-battery cases across seven aircraft and both physics modes. No Windows input or GPU test.
+PASS 368 truncated/trailing payload cases; valid atlas/FCMESH06/07 bytes preserved. Old header-only atlas/mesh request at least 67108864/144000000 bytes (allocator padding allowed), intercepted before allocation. New readers reject with zero requests above 1MiB. Not process RAM, Windows startup, GPU or FPS measurement.
+PASS offline scenery: 192 camera keys, 1925526 checked vertices; peak 28644 / 48000 budget; airport mesh 13938. Determinism, LOD footprints, seasons, normals and clear approaches verified. CPU only.
+Wrote /tmp/portable78/lab/sweep/surface_sweep.csv
+samples=901
+duration_s=90
+min_altitude_m=1489.52188
+max_altitude_m=1500
+max_tas_mps=109.2637459
+max_abs_roll_deg=2.264352508
+max_abs_aoa_deg=6.428679148
+max_egt_C=444
+max_thrust_difference_N=112500
+crashed=0
+Output: /tmp/portable78/lab/engine_out
+PASS 12 modal timing cases; ordinary stalls, native menu, benchmark recovery and key gating. Actual main.cpp statements with CPU Win32 stand-ins only.
+Resize entry: throttle/look, own/foreign capture, changed dimensions and fresh-press recovery passed.
+Actual mouse hook: throttle-first both release orders, look-first left suppression, capture callbacks and idle recovery passed.
+CPU Win32 stand-ins only; no Windows message delivery, real mouse or GPU verification.
+PASS production glass: 900 aircraft/pitch/bank/heading/power cases; units, RPM, fuel/flap/throttle bindings, bounds, vertex budget, invalid waypoint and stall warning. CPU adapters only.
+PASS real main overlay statements: cockpit/exterior/menu, timed notifications, power/stall/crash/pause, F2 and required credits. CPU font adapters only.
+PASS actual landscape statements: 24 mode/camera/season cases; v0.49 ground bytes and fictional geometry preserved. Identity CPU math only.
+PASS actual renderer selection: misleading/exact flags, DX11 precedence, fallback/forced failure, benchmark copy and recreation. CPU renderer/API substitutes only.
+PASS rebuilt text: 192 cases, 76896 generated vertices, layout, prefix, rollback/retry. CPU glyph/matrix substitutes only.
+PASS rebuilt storage: four modes, actual save/track lambdas, repeated commits, state readback, recoverable state/track failure and retry, failed track commit/write preservation and retry. backup copy/commit failure preserves old files and retry succeeds. CPU API substitutes only.
+PASS actual exit handler: save-before-destroy, default-No cancellation, explicit unsaved exit, retry, diagnostics bypass, duplicate commands, input/timing reset, destroy/dialog failure. CPU substitutes only.
+Actual DX11/DX12 upload statements: 5 fleet assets x 4 view/empty combinations; bytes match legacy staging.
+CPU stand-ins only: Windows APIs, GPU fences and rendering remain unverified.
+Actual DX11/DX12 shader-call sequences x10 each: 4 compiler calls, 76 hits.
+Production wrappers: source/flags invalidation, failed/empty retry, diagnostics and ownership passed.
+CPU stand-ins only; Windows HLSL compiler and GPU were NOT executed.
+Actual main polling/bindings/Controls: held gear/flaps/engine/power/fault/throttle recovery stays neutral; fresh commands still work.
+No key API calls in background/native-menu/minimized modes; focus/menu/resize/dialog hooks present.
+Actual message hook: completed G/W taps, Shift+F6, Ctrl+F7, repeat filter and suspend barriers passed.
+CPU API stand-ins only: Windows message delivery, keyboard hardware and real interaction NOT verified.
+Actual cockpit approach statements: destination/threshold distance, reciprocal sign/course, power/ground/outbound/bounds passed.
+CPU text formatting only; no Windows message, font rasterization, GPU or screen-layout verification.
+PASS: six menu pages, 19 aircraft-page buttons, ten profiles and model tools fit the viewport

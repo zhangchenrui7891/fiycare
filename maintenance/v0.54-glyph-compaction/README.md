@@ -1,3 +1,6 @@
+# v0.78：窗口移动与缩放后的计时恢复
+见 WINDOW_MODAL_TIMING.md 与 TODAY_REVIEW.md。源码资源包，无 EXE。
+
 # v0.77：旅客航班进行中锁定人数
 见PASSENGER_FLIGHT_LOCK.md与TODAY_REVIEW.md。源码资源包，无EXE。
 
