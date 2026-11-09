@@ -22,10 +22,11 @@ struct StartupModel {
 inline StartupModel loadStartupModel(const std::filesystem::path& defaultPath,
                                      const std::filesystem::path& customPath){
  StartupModel result;
- if(std::filesystem::exists(customPath)){
-  try{result.model=loadModel(customPath);result.custom=true;return result;}
-  catch(const std::runtime_error& error){result.warning=error.what();}
- }
+ // Optional custom-path probing can itself throw (permissions, path limits).
+ // Keep it inside the same recovery boundary as reading the custom mesh.
+ try{
+  if(std::filesystem::exists(customPath)){result.model=loadModel(customPath);result.custom=true;return result;}
+ }catch(const std::runtime_error& error){result.warning=error.what();}
  if(!defaultPath.empty())result.model=loadModel(defaultPath);
  return result;
 }

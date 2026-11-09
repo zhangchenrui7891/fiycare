@@ -36,6 +36,22 @@ int main(){
   check(!preferred.model&&!preferred.warning.empty(),"Damaged custom on procedural aircraft leaves procedural fallback");
   preferred=loadStartupModel({},path);
   check(preferred.custom&&preferred.model,"Procedural aircraft accepts valid custom");
+  const auto oversized=dir/std::string(4096,'x');
+  bool probeFailed=false;
+  try{(void)std::filesystem::exists(oversized);}catch(const std::filesystem::filesystem_error&){probeFailed=true;}
+#ifndef _WIN32
+  check(probeFailed,"Linux oversized component must exercise a real filesystem probe exception");
+#endif
+  if(probeFailed){
+   preferred=loadStartupModel(path,oversized);
+   check(!preferred.custom&&preferred.model&&preferred.model->vertices[0].x==7&&!preferred.warning.empty(),"Probe failure falls back to valid default and retains diagnostic");
+   preferred=loadStartupModel({},oversized);
+   check(!preferred.custom&&!preferred.model&&!preferred.warning.empty(),"Probe failure preserves procedural fallback");
+   bool requiredFailed=false;try{loadStartupModel(missing,oversized);}catch(const std::runtime_error&){requiredFailed=true;}
+   check(requiredFailed,"Missing required default remains fatal after custom probe failure");
+   check(models.at(2).vertices[0].x==7&&std::filesystem::file_size(dir/"custom.fcmesh")==22,"Probe failure does not mutate installed models or persistent custom data");
+   std::cout<<"Real filesystem probe exception: default/procedural fallback, diagnostic, required-default failure and existing data preservation passed.\n";
+  }else std::cout<<"Probe-exception case not exercised on this platform; ordinary fallback cases still run.\n";
   bool failed=false;try{loadStartupModel(missing,bad);}catch(const std::runtime_error&){failed=true;}
   check(failed,"No valid custom or required default must still report startup failure");
   std::filesystem::remove_all(dir);std::cout<<"PASS: missing, corrupt and truncated defaults preserve current model; valid replace/insert succeed. Custom-first startup, default/procedural fallbacks and unrecoverable failure passed. CPU filesystem test.\n";
