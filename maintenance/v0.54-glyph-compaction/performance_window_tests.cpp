@@ -1,4 +1,5 @@
 #include "src/performance.h"
+#include "src/frame_timing.h"
 #include <cstdint>
 #include <iostream>
 #include <limits>
@@ -41,6 +42,21 @@ void sequence(const std::vector<double>& inputs){
 }
 int main(){
  try{
+  for(bool saver:{false,true}){
+   double elapsed=0;
+   for(int i=0;i<1000;++i){
+    const double work=(i%2)?0.005:0.12;
+    const double delay=timing::frameDelay(work,saver,false);
+    if(delay<0||std::abs(work+delay-std::max(.1,work))>1e-12)
+     throw std::runtime_error("Background pacing must subtract work and never add backlog");
+    elapsed+=work+delay;
+   }
+   if(std::abs(elapsed-110)>1e-8)throw std::runtime_error("Background frame budget differs across power settings");
+   if(timing::frameDelay(.01,saver,true)!=(saver?.04:0.))throw std::runtime_error("Focus recovery must immediately restore foreground policy");
+  }
+  for(double bad:{-1.,std::numeric_limits<double>::infinity(),std::numeric_limits<double>::quiet_NaN()})
+   if(timing::frameDelay(bad,false,false)!=0)throw std::runtime_error("Invalid elapsed time cannot produce a sleep request");
+  std::cout<<"Background pacing: 2000 simulated budgets, foreground recovery, overruns and invalid times passed; no wall-clock/FPS/power measurement.\n";
   std::uint32_t rng=48271;
   for(int pattern=0;pattern<7;++pattern){
    std::vector<double> inputs;

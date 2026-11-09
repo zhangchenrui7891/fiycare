@@ -3,6 +3,14 @@
 #include <cmath>
 
 namespace timing {
+// Background windows keep a low-rate preview; foreground retains user policy.
+// Return only the remaining budget, never delay a frame already over budget.
+inline double frameDelay(double spent,bool powerSaver,bool focused){
+ if(!std::isfinite(spent)||spent<0)return 0;
+ const double fps=focused?(powerSaver?20.:0.):10.;
+ return fps>0?std::max(0.,1/fps-spent):0.;
+}
+
 // Retain the fractional 100 Hz step, but discard long stalls instead of
 // creating a backlog that delays the next input/render frame.
 struct FixedSteps {

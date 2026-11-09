@@ -561,14 +561,14 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
    if(smoke&&++smokeFrames>=3){logLine("Smoke test: three rendered frames and BMP capture succeeded");DestroyWindow(window);}
    if(benchmark&&timing::benchmarkFinished(benchmarkStarted,benchmarkSamples)){
     std::ofstream summary(folder/L"performance_summary.txt",std::ios::trunc);
-    const auto result=timing::writeBenchmarkSummary(summary,"v0.72",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples);
+    const auto result=timing::writeBenchmarkSummary(summary,"v0.75",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples);
     summary.flush();if(!summary)logLine("Benchmark summary write failed; no report file success claimed");
     pendingPhoto=folder/L"benchmark_final.bmp";renderer->draw(mesh,hud,XMMatrixLookToLH(XMVectorZero(),viewDirection,up)*reversedPerspective(activeFov,cockpit::viewportAspect,presentation::worldNear,presentation::worldFar),daylight,pendingPhoto,cabin,cabinView);pendingPhoto.clear();
     logLine(result.complete?"Benchmark completed with valid full-run statistics":"Benchmark ended without a valid performance verdict; inspect summary status/counts");DestroyWindow(window);
    }
-   const double targetFps=powerSaver?20:0;
    double spent=std::chrono::duration<double>(std::chrono::steady_clock::now()-now).count();
-   if(targetFps>0&&spent<1/targetFps)std::this_thread::sleep_for(std::chrono::duration<double>(1/targetFps-spent));
+   const double delay=timing::frameDelay(spent,powerSaver,GetForegroundWindow()==window);
+   if(delay>0)std::this_thread::sleep_for(std::chrono::duration<double>(delay));
   }
   logLine("Reusable CPU geometry capacity bytes (not total RAM/GPU memory): "+std::to_string(frameGeometry.retainedBytes()));
   // Only abnormal WM_QUIT/WM_DESTROY reaches this fallback without an exit decision.
