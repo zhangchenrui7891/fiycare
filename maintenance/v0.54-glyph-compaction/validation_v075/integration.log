@@ -1,0 +1,1 @@
+Actual pacing statements: background wait invalidates measurement; focus recovery skips interval; foreground saver preserved. CPU stand-in only.

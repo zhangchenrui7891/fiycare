@@ -1,17 +1,17 @@
-## v0.74 · 2026-11-09（窗口缩放取消旧鼠标拖动）
+## v0.75 · 2026-11-09（后台预览限速）
 
-基线：读取最新v0.73完整工程、TODAY_REVIEW与连续记录，ZIP CRC及2407项SHA256通过。沿用连续版本编号；提示中的v0.8不是本次确认的工程版本。上轮已实现油门/环视互斥；历史Linux47/47、Windows CI20/20通过，实机验收仍空缺。
+基线：读取最新v0.74完整工程及TODAY_REVIEW、连续记录；ZIP CRC和2417项SHA256通过。上轮窗口缩放取消旧鼠标拖动已完成，历史Linux47/47与Windows20/20通过；提示的v0.8不是本次确认的工程版本，沿用连续版本编号。
 
-当前特点：C++17、DX12/DX11、中文菜单、十机型含A330/A350、共用27控件三维驾驶舱及PFD/NAV/ENGINE、训练导航/进近、双机场生涯、浦东离线影像、FXAA。气动/机型系统仍属原型，周边建筑道路为示意，网站账号尚未绑定本地生涯。
+当前特点：C++17、DX12/DX11、中文菜单、十机型含A330/A350、27控件共用三维驾驶舱及PFD/NAV/ENGINE、训练导航/进近、双机场生涯、浦东离线影像、FXAA。机型系统及气动仍是原型，周边地景为示意，网站账号未绑定本地生涯。
 
-本轮代码：WM_ENTERSIZEMOVE此前只暂停键盘，未取消油门/环视拖动；缩放后归一化鼠标坐标变化可能让旧拖动延续并跳变。现在同时cancel驾驶舱输入、清空待处理命令和左键标记，并只释放本窗口持有的捕获。已应用的飞行状态保持不变，恢复后必须重新按下鼠标。本轮只改输入事件路径，无新增贴图/地景或每帧分配。
+本轮修复：失去前台焦点但未最小化时，旧版暂停物理却仍可能不限速绘制。现在按100毫秒预算补足后台等待（最多约10帧/秒），已超预算不补等、不积累欠帧；前台普通模式不限帧、节能20帧/秒保留，最小化仍走既有跳过渲染路径。等待前重新检查焦点；若将执行后台策略，清除previousMeasured，避免等待期间焦点返回后将后台间隔混入前台统计。同步修正benchmark版本字符串v0.72为v0.75。没有新增资源或每帧分配，未声称实测功耗/FPS改善。
 
-回归：扩展实际main鼠标语句抽取检查，模拟Win32 API及捕获回调；覆盖油门/环视×本窗口/其他窗口捕获四组合、960×540到1920×1080坐标变化、重启输入后的新按键恢复。v0.73语句在取消断言处失败；新版通过。既有两种松键顺序等检查保留。更新键盘源码布线检查以匹配新取消路径。CPU模拟并非Windows消息/硬件验收。
+验证：2000组模拟帧预算覆盖两种节能设置、短帧/超预算帧；检查前台恢复和负数/NaN/无穷耗时。实际main末尾限速语句抽取后编译，验证后台清除采样连续标记、恢复不错误标记后台间隔、前台节能等待保留。保留85002次滚动统计对照。上述都是CPU逻辑测试，不是操作系统Sleep精度、GPU或HD6000验证。
 
-本轮验证：Linux Assimp ON Release完整282步构建成功，47/47 CTest通过（17.86秒）；严格C++17便携检查退出0。Windows2022/MSVC x64 Release主程序编译成功，20/20 CPU/GDI/HLSL检查通过（1.37秒），8条既有警告。Assimp OFF、资源复制OFF，未运行游戏/GPU。CI：https://github.com/zhangchenrui7891/fiycare/actions/runs/42523521225 。详见validation_v074。
+本轮验证：Linux Assimp ON Release完整282步构建成功，47/47 CTest通过（25.36秒），严格C++17便携检查退出0；实际限速语句ASan/UBSan检查退出0（detect_leaks=0）。Windows2022/MSVC x64 Release主程序编译成功，21/21 CPU/GDI/HLSL检查通过（1.35秒），8条既有警告。Assimp OFF、资源复制OFF，未运行游戏/GPU。最终受检CI：https://github.com/zhangchenrui7891/fiycare/actions/runs/42549024574 。
 
-GitHub分支codex/v0.74-resize-input；受检代码b05d2de2ff4da5b64e754cb747aaeb8e46bfa3bd，目录maintenance/v0.54-glyph-compaction，默认main未改。最终提交仅补记录。源码资源ZIP不含EXE，1661项资源/第三方文件未改。
+GitHub分支codex/v0.75-background-pacing，受检代码f87863fec7fdff86e294278f3be3a805212b1b44；目录maintenance/v0.54-glyph-compaction，默认main未改。源码资源ZIP无EXE，1661项资源/第三方文件未改。日志和抽取检查代码见validation_v075。
 
-差距：微软官方指南 https://www.flightsimulator.com/guide/new-flight-simmer-guide/ 所述全球世界、航电、气动、天气、生涯体验仍是长期目标。本项目缺真实机型系统/FMS、气动标定、精细机场/DEM、复杂天气和完整航班实机证据。未运行Windows游戏或HD6000，没有FPS/RAM/截图验收；不承诺5350U/HD6000/8GB达到MSFS2024同等画质功能。尚非成品，继续迭代。
+差距：对照微软官方指南 https://www.flightsimulator.com/guide/new-flight-simmer-guide/ 描述的世界、航电、飞行建模、天气与生涯，本项目仍缺真实机型系统/FMS、气动标定、精细机场/DEM、复杂天气及完整航班实机证据。未运行Windows游戏或HD6000，尚无FPS/RAM/真实截图验收。目标5350U/HD6000/8GB/256GB不承诺同等画质和功能；尚非成品，继续迭代。
 
-下一步：见RESIZE_INPUT.md，优先带资源Windows启动及窗口缩放前后油门/环视恢复验收，再收集Boot Camp 60秒帧时/RAM和完整航班记录。当前无目标机连接，未执行这些人工步骤。
+下一步：带资源Windows构建分别采集前台普通/节能、后台可见、最小化四种状态60秒CPU/GPU/帧时/RAM，检查切回后的输入与飞行恢复及benchmark样本。清单见BACKGROUND_PACING.md。无目标机连接，这些实机步骤未执行。

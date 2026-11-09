@@ -1,0 +1,2 @@
+Background pacing: 2000 simulated budgets, foreground recovery, overruns and invalid times passed; no wall-clock/FPS/power measurement.
+PASS 85002 exact oracle comparisons: all partial window sizes, repeated queries, ring wraps, resets, duplicates, long frames, rejected samples. CPU only.
