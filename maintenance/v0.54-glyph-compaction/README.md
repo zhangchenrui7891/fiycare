@@ -1,3 +1,6 @@
+# v0.76：可选自定义机模路径异常可回退
+见MODEL_PROBE_RECOVERY.md与TODAY_REVIEW.md。源码资源包，无EXE。
+
 # v0.75：后台窗口预览限速
 见BACKGROUND_PACING.md与TODAY_REVIEW.md。源码资源包，无EXE。
 
