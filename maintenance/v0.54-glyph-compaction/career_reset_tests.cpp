@@ -56,6 +56,7 @@ void lifecycle(sim::Snapshot s){
  require(guidance.valid&&guidance.runwayIndex==s.career.arrivalRunway,"Approach targets new destination");
  park(s.flight,s.career.arrivalRunway);
  s.career.recordTouchdown(s.flight,sim::assessLanding(s.flight,-1,0,0));
+ require(!ui::setPassengers(s,s.flight.spec().seats),"Cannot inflate passenger count immediately before arrival settlement");
  s.career.update(s.flight,.01);
  require(s.career.stage==3&&s.career.completed==completed+1&&s.career.credits>credits,
          "New destination touchdown and stop settle flight");
@@ -66,6 +67,22 @@ void lifecycle(sim::Snapshot s){
 }
 int main(){
  try{
+  int boardingCases=0;
+  for(int id=0;id<sim::aircraftCount;++id)for(int airport=0;airport<2;++airport)for(int stage=0;stage<4;++stage){
+   auto s=pending(id,airport,2);s.career.stage=stage;
+   std::stringstream saved;s.write(saved);sim::Snapshot restored;
+   require(restored.read(saved),"Passenger flight state roundtrip");
+   for(auto* state:{&s,&restored}){
+    std::stringstream before;state->write(before);
+    const bool allowed=id>0&&(stage==0||stage==3);
+    require(ui::setPassengers(*state,state->flight.spec().seats)==allowed,"Only preflight/completed passenger flights may adjust payload");
+    if(!allowed){std::stringstream after;state->write(after);require(before.str()==after.str(),"Rejected boarding must leave entire snapshot unchanged");}
+    else require(state->flight.passengers==state->flight.spec().seats,"Allowed boarding still clamps to seats");
+   }
+   s.career.mission=1;require(ui::setPassengers(s,0)==(id>0),"Other mission boarding rules preserved");
+   ++boardingCases;
+  }
+  std::cout<<"Passenger boarding: "<<boardingCases<<" aircraft/airport/stage cases plus save roundtrips passed.\n";
   int checks=0;
   for(int id=0;id<sim::aircraftCount;++id)for(int airport=0;airport<2;++airport)for(int mission=0;mission<5;++mission){
    auto restart=pending(id,airport,mission);restart.flight.fuel=45;

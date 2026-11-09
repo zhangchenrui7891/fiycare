@@ -393,7 +393,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
      }
      case ui::PassengersLess:case ui::PassengersMore:case ui::PassengersFull:case ui::PassengersEmpty:{
       int pax=cmd==ui::PassengersFull?flight.spec().seats:cmd==ui::PassengersEmpty?0:flight.passengers+(cmd==ui::PassengersMore?10:-10);
-      if(ui::setPassengers(state,pax)){notice=L"客舱载荷已更新，乘客重量会影响起降。";trySave();}else notice=L"请驾驶客机并在跑道停稳后调整乘客。";break;
+      if(ui::setPassengers(state,pax)){notice=L"客舱载荷已更新，乘客重量会影响起降。";trySave();}else notice=ui::passengerFlightActive(state)?L"旅客航班进行中，完成或重新出发后才能调整乘客。":L"请驾驶客机并在跑道停稳后调整乘客。";break;
      }
      case ui::TerrainSatellite:case ui::TerrainMountains:
       if(career.parked(flight)){state.terrainMode=cmd==ui::TerrainSatellite?1:0;sim::worldMode.store(state.terrainMode);marks.clear();notice=state.terrainMode?L"已切换浦东离线卫星图，周边建筑与道路为示意地景。":L"已切换虚构山海地形。";trySave();}else notice=L"切换地形需要先在跑道停稳。";break;
@@ -561,7 +561,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
    if(smoke&&++smokeFrames>=3){logLine("Smoke test: three rendered frames and BMP capture succeeded");DestroyWindow(window);}
    if(benchmark&&timing::benchmarkFinished(benchmarkStarted,benchmarkSamples)){
     std::ofstream summary(folder/L"performance_summary.txt",std::ios::trunc);
-    const auto result=timing::writeBenchmarkSummary(summary,"v0.76",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples);
+    const auto result=timing::writeBenchmarkSummary(summary,"v0.77",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples);
     summary.flush();if(!summary)logLine("Benchmark summary write failed; no report file success claimed");
     pendingPhoto=folder/L"benchmark_final.bmp";renderer->draw(mesh,hud,XMMatrixLookToLH(XMVectorZero(),viewDirection,up)*reversedPerspective(activeFov,cockpit::viewportAspect,presentation::worldNear,presentation::worldFar),daylight,pendingPhoto,cabin,cabinView);pendingPhoto.clear();
     logLine(result.complete?"Benchmark completed with valid full-run statistics":"Benchmark ended without a valid performance verdict; inspect summary status/counts");DestroyWindow(window);

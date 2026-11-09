@@ -24,8 +24,11 @@ inline bool switchAircraft(sim::Snapshot& state,int id){
  resetFlightGuidance(state);
  return true;
 }
+inline bool passengerFlightActive(const sim::Snapshot& state){
+ return state.career.mission==2&&state.career.stage>0&&state.career.stage<3;
+}
 inline bool setPassengers(sim::Snapshot& state,int count){
- if(state.flight.aircraftId==0||!state.career.parked(state.flight))return false;
+ if(state.flight.aircraftId==0||!state.career.parked(state.flight)||passengerFlightActive(state))return false;
  state.flight.passengers=std::clamp(count,0,state.flight.spec().seats);return true;
 }
 inline void restart(sim::Snapshot& state){

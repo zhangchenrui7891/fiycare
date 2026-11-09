@@ -60,6 +60,6 @@ inline void drawMenu(std::vector<Vertex>& out,ui::Page page,const sim::Snapshot&
  }
  for(const auto& b:clickableButtons){screenQuad(out,b.x,b.y,b.w,b.h,{.08f,.16f,.23f});font.draw(out,b.label,b.x+12,b.y+11,{.95f,.97f,1},int(b.w-24));}
  font.draw(out,notice.substr(0,33),210,474,{.95f,.85f,.5f},550);
- std::wstring foot=page==ui::Page::Aircraft?L"换机与登机需要在跑道停稳。乘客重量影响起降。":L"鼠标点击选择 · Tab / Esc关闭菜单 · 飞行已冻结";
+ std::wstring foot=page==ui::Page::Aircraft?(ui::passengerFlightActive(state)?L"旅客航班进行中，完成或重新出发后才能调整乘客。":L"换机与登机需要在跑道停稳。乘客重量影响起降。"):L"鼠标点击选择 · Tab / Esc关闭菜单 · 飞行已冻结";
  font.draw(out,foot,210,499,{.65f,.75f,.82f},550);
 }
