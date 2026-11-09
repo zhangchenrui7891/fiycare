@@ -567,7 +567,9 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
     logLine(result.complete?"Benchmark completed with valid full-run statistics":"Benchmark ended without a valid performance verdict; inspect summary status/counts");DestroyWindow(window);
    }
    double spent=std::chrono::duration<double>(std::chrono::steady_clock::now()-now).count();
-   const double delay=timing::frameDelay(spent,powerSaver,GetForegroundWindow()==window);
+   const bool pacingFocused=GetForegroundWindow()==window;
+   if(!pacingFocused)previousMeasured=false; // Exclude a background wait even if focus returns before the next frame.
+   const double delay=timing::frameDelay(spent,powerSaver,pacingFocused);
    if(delay>0)std::this_thread::sleep_for(std::chrono::duration<double>(delay));
   }
   logLine("Reusable CPU geometry capacity bytes (not total RAM/GPU memory): "+std::to_string(frameGeometry.retainedBytes()));
