@@ -1,0 +1,377 @@
+﻿2026-11-13T21:06:43.7754876Z Current runner version: '2.338.2'
+2026-11-13T21:06:43.7782936Z ##[group]Runner Image Provisioner
+2026-11-13T21:06:43.7783614Z Hosted Compute Agent
+2026-11-13T21:06:43.7784032Z Version: 20261028.624
+2026-11-13T21:06:43.7784485Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+2026-11-13T21:06:43.7785014Z Build Date: 2026-10-28T21:51:42Z
+2026-11-13T21:06:43.7785502Z Worker ID: {7ca88c4c-013f-43ab-9ff5-15f74371f8da}
+2026-11-13T21:06:43.7786039Z Region: eastus2
+2026-11-13T21:06:43.7786434Z Cloud: Azure
+2026-11-13T21:06:43.7786816Z ##[endgroup]
+2026-11-13T21:06:43.7787871Z ##[group]Operating System
+2026-11-13T21:06:43.7788326Z Microsoft Windows Server 2022
+2026-11-13T21:06:43.7788799Z 10.0.20348
+2026-11-13T21:06:43.7789188Z Datacenter
+2026-11-13T21:06:43.7789564Z ##[endgroup]
+2026-11-13T21:06:43.7789968Z ##[group]Runner Image
+2026-11-13T21:06:43.7790381Z Image: windows-2022
+2026-11-13T21:06:43.7790800Z Version: 20261101.353.1
+2026-11-13T21:06:43.7791906Z Included Software: https://github.com/actions/runner-images/blob/win22/20261101.353/images/windows/Windows2022-Readme.md
+2026-11-13T21:06:43.7793108Z Image Release: https://github.com/actions/runner-images/releases/tag/win22%2F20261101.353
+2026-11-13T21:06:43.7793821Z ##[endgroup]
+2026-11-13T21:06:43.7794671Z ##[group]GITHUB_TOKEN Permissions
+2026-11-13T21:06:43.7796450Z Contents: read
+2026-11-13T21:06:43.7796891Z Metadata: read
+2026-11-13T21:06:43.7797324Z ##[endgroup]
+2026-11-13T21:06:43.7799055Z Secret source: Actions
+2026-11-13T21:06:43.7799752Z Cache mode: write
+2026-11-13T21:06:43.7800254Z Prepare workflow directory
+2026-11-13T21:06:43.8072594Z Prepare all required actions
+2026-11-13T21:06:43.8113051Z Getting action download info
+2026-11-13T21:06:44.0123558Z Download action repository 'actions/checkout@v6' (SHA:d23441a48e516b6c34aea4fa41551a30e30af803)
+2026-11-13T21:06:44.1137868Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-11-13T21:06:44.3886647Z Complete job name: build
+2026-11-13T21:06:44.5396565Z ##[group]Run actions/checkout@v6
+2026-11-13T21:06:44.5397429Z with:
+2026-11-13T21:06:44.5397767Z   repository: zhangchenrui7891/fiycare
+2026-11-13T21:06:44.5400846Z   token: ***
+2026-11-13T21:06:44.5401156Z   ssh-strict: true
+2026-11-13T21:06:44.5401475Z   ssh-user: git
+2026-11-13T21:06:44.5401804Z   persist-credentials: true
+2026-11-13T21:06:44.5402155Z   clean: true
+2026-11-13T21:06:44.5402469Z   sparse-checkout-cone-mode: true
+2026-11-13T21:06:44.5402846Z   fetch-depth: 1
+2026-11-13T21:06:44.5403151Z   fetch-tags: false
+2026-11-13T21:06:44.5403469Z   show-progress: true
+2026-11-13T21:06:44.5403780Z   lfs: false
+2026-11-13T21:06:44.5404067Z   submodules: false
+2026-11-13T21:06:44.5404389Z   set-safe-directory: true
+2026-11-13T21:06:44.5404749Z   allow-unsafe-pr-checkout: false
+2026-11-13T21:06:44.5405286Z ##[endgroup]
+2026-11-13T21:06:44.8312048Z Syncing repository: zhangchenrui7891/fiycare
+2026-11-13T21:06:44.8314442Z ##[group]Getting Git version info
+2026-11-13T21:06:44.8315304Z Working directory is 'D:\a\fiycare\fiycare'
+2026-11-13T21:06:44.9080206Z [command]"C:\Program Files\Git\bin\git.exe" version
+2026-11-13T21:06:45.4136332Z git version 2.56.0.windows.4
+2026-11-13T21:06:45.4179646Z ##[endgroup]
+2026-11-13T21:06:45.4194481Z Temporarily overriding HOME='D:\a\_temp\b4b1735d-8bf0-4d4c-9926-03ab9243a0c3' before making global git config changes
+2026-11-13T21:06:45.4195573Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-13T21:06:45.4204141Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\fiycare\fiycare
+2026-11-13T21:06:45.4724719Z Deleting the contents of 'D:\a\fiycare\fiycare'
+2026-11-13T21:06:45.4728679Z ##[group]Determining repository object format
+2026-11-13T21:06:45.4730537Z ##[endgroup]
+2026-11-13T21:06:45.4738757Z ##[group]Initializing the repository
+2026-11-13T21:06:45.4739579Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\fiycare\fiycare
+2026-11-13T21:06:45.5553691Z Initialized empty Git repository in D:/a/fiycare/fiycare/.git/
+2026-11-13T21:06:45.5591185Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/zhangchenrui7891/fiycare
+2026-11-13T21:06:45.6182268Z ##[endgroup]
+2026-11-13T21:06:45.6183140Z ##[group]Disabling automatic garbage collection
+2026-11-13T21:06:45.6189040Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+2026-11-13T21:06:45.6437047Z ##[endgroup]
+2026-11-13T21:06:45.6438099Z ##[group]Setting up auth
+2026-11-13T21:06:45.6438894Z Removing SSH command configuration
+2026-11-13T21:06:45.6448423Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+2026-11-13T21:06:45.6771898Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+2026-11-13T21:06:47.2718502Z Removing HTTP extra header
+2026-11-13T21:06:47.2727412Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-13T21:06:47.2974732Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+2026-11-13T21:06:47.7106366Z Removing includeIf entries pointing to credentials config files
+2026-11-13T21:06:47.7116068Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-13T21:06:47.7374312Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+2026-11-13T21:06:48.1667451Z [command]"C:\Program Files\Git\bin\git.exe" config --file D:\a\_temp\git-credentials-157ccf68-2d38-4d1d-b421-ec331e58fe9e.config http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+2026-11-13T21:06:48.1918291Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:D:/a/fiycare/fiycare/.git.path D:\a\_temp\git-credentials-157ccf68-2d38-4d1d-b421-ec331e58fe9e.config
+2026-11-13T21:06:48.2163431Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:D:/a/fiycare/fiycare/.git/worktrees/*.path D:\a\_temp\git-credentials-157ccf68-2d38-4d1d-b421-ec331e58fe9e.config
+2026-11-13T21:06:48.2463500Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-157ccf68-2d38-4d1d-b421-ec331e58fe9e.config
+2026-11-13T21:06:48.2718530Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-157ccf68-2d38-4d1d-b421-ec331e58fe9e.config
+2026-11-13T21:06:48.2980059Z ##[endgroup]
+2026-11-13T21:06:48.2980534Z ##[group]Fetching the repository
+2026-11-13T21:06:48.2992044Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +6d48774126b970c5c3a2bb5955136a102f250049:refs/remotes/origin/codex/v0.79-ground-service
+2026-11-13T21:06:49.3768406Z From https://github.com/zhangchenrui7891/fiycare
+2026-11-13T21:06:49.3769349Z  * [new ref]         6d48774126b970c5c3a2bb5955136a102f250049 -> origin/codex/v0.79-ground-service
+2026-11-13T21:06:49.3811963Z [command]"C:\Program Files\Git\bin\git.exe" branch --list --remote origin/codex/v0.79-ground-service
+2026-11-13T21:06:49.4159193Z   origin/codex/v0.79-ground-service
+2026-11-13T21:06:49.4194762Z [command]"C:\Program Files\Git\bin\git.exe" rev-parse refs/remotes/origin/codex/v0.79-ground-service
+2026-11-13T21:06:49.4511915Z 6d48774126b970c5c3a2bb5955136a102f250049
+2026-11-13T21:06:49.4537727Z ##[endgroup]
+2026-11-13T21:06:49.4538039Z ##[group]Determining the checkout info
+2026-11-13T21:06:49.4539590Z ##[endgroup]
+2026-11-13T21:06:49.4547225Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+2026-11-13T21:06:49.4897307Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+2026-11-13T21:06:49.5149129Z ##[group]Checking out the ref
+2026-11-13T21:06:49.5156734Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force -B codex/v0.79-ground-service refs/remotes/origin/codex/v0.79-ground-service
+2026-11-13T21:06:49.8104921Z Switched to a new branch 'codex/v0.79-ground-service'
+2026-11-13T21:06:49.8119948Z branch 'codex/v0.79-ground-service' set up to track 'origin/codex/v0.79-ground-service'.
+2026-11-13T21:06:49.8154890Z ##[endgroup]
+2026-11-13T21:06:49.8510168Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+2026-11-13T21:06:49.8736293Z 6d48774126b970c5c3a2bb5955136a102f250049
+2026-11-13T21:06:49.9066815Z ##[group]Run ./maintenance/v0.54-glyph-compaction/tools/check_windows_source.ps1
+2026-11-13T21:06:49.9067415Z [36;1m./maintenance/v0.54-glyph-compaction/tools/check_windows_source.ps1[0m
+2026-11-13T21:06:49.9288917Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+2026-11-13T21:06:49.9289264Z ##[endgroup]
+2026-11-13T21:06:51.6127015Z -- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.20348.
+2026-11-13T21:07:03.5736309Z -- The C compiler identification is MSVC 19.44.35229.0
+2026-11-13T21:07:04.8881043Z -- The CXX compiler identification is MSVC 19.44.35229.0
+2026-11-13T21:07:05.0095248Z -- Detecting C compiler ABI info
+2026-11-13T21:07:06.0131225Z -- Detecting C compiler ABI info - done
+2026-11-13T21:07:06.0248112Z -- Check for working C compiler: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+2026-11-13T21:07:06.0257101Z -- Detecting C compile features
+2026-11-13T21:07:06.0384918Z -- Detecting C compile features - done
+2026-11-13T21:07:06.0674537Z -- Detecting CXX compiler ABI info
+2026-11-13T21:07:06.6372258Z -- Detecting CXX compiler ABI info - done
+2026-11-13T21:07:06.6488419Z -- Check for working CXX compiler: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+2026-11-13T21:07:06.6491666Z -- Detecting CXX compile features
+2026-11-13T21:07:06.6498348Z -- Detecting CXX compile features - done
+2026-11-13T21:07:06.6732656Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+2026-11-13T21:07:08.2654706Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+2026-11-13T21:07:08.2655119Z -- Looking for pthread_create in pthreads
+2026-11-13T21:07:08.7749094Z -- Looking for pthread_create in pthreads - not found
+2026-11-13T21:07:08.7749665Z -- Looking for pthread_create in pthread
+2026-11-13T21:07:09.2654863Z -- Looking for pthread_create in pthread - not found
+2026-11-13T21:07:09.2900640Z -- Found Threads: TRUE
+2026-11-13T21:07:10.5929422Z -- Runtime asset copy disabled: executable requires separately supplied assets before launch
+2026-11-13T21:07:10.5930520Z -- Configuring done (19.5s)
+2026-11-13T21:07:10.7595079Z -- Generating done (0.2s)
+2026-11-13T21:07:10.7601424Z -- Build files have been written to: D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/out/build/windows-source-check
+2026-11-13T21:07:10.8564881Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-11-13T21:07:10.8825244Z 
+2026-11-13T21:07:11.1936478Z   1>Checking Build System
+2026-11-13T21:07:11.2910338Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/CMakeLists.txt
+2026-11-13T21:07:11.4181740Z   performance_window_tests.cpp
+2026-11-13T21:07:13.8682339Z   performance_window_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\performance_window_check.exe
+2026-11-13T21:07:13.9486269Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-11-13T21:07:13.9736746Z 
+2026-11-13T21:07:14.2529390Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/CMakeLists.txt
+2026-11-13T21:07:14.3595792Z   cockpit_input_tests.cpp
+2026-11-13T21:07:15.2558750Z   cockpit_input_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\cockpit_input_check.exe
+2026-11-13T21:07:15.3304680Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-11-13T21:07:15.3558350Z 
+2026-11-13T21:07:15.6348487Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/CMakeLists.txt
+2026-11-13T21:07:15.7420940Z   benchmark_tests.cpp
+2026-11-13T21:07:17.2750583Z   benchmark_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\benchmark_check.exe
+2026-11-13T21:07:17.3491883Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-11-13T21:07:17.3736833Z 
+2026-11-13T21:07:17.6474320Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/CMakeLists.txt
+2026-11-13T21:07:17.7515504Z   performance_segment_tests.cpp
+2026-11-13T21:07:18.4513257Z   performance_segment_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\performance_segment_check.exe
+2026-11-13T21:07:18.5259807Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-11-13T21:07:18.5513283Z 
+2026-11-13T21:07:18.8268417Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/CMakeLists.txt
+2026-11-13T21:07:18.9330850Z   model_restore_tests.cpp
+2026-11-13T21:07:20.4235345Z   model_restore_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\model_restore_check.exe
+2026-11-13T21:07:20.4972047Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-11-13T21:07:20.5235919Z 
+2026-11-13T21:07:20.7957990Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/CMakeLists.txt
+2026-11-13T21:07:20.9042998Z   autopilot_mode_tests.cpp
+2026-11-13T21:07:21.9359407Z   autopilot_mode_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\autopilot_mode_check.exe
+2026-11-13T21:07:22.0092826Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-11-13T21:07:22.0343161Z 
+2026-11-13T21:07:22.3079629Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/CMakeLists.txt
+2026-11-13T21:07:22.4129154Z   career_reset_tests.cpp
+2026-11-13T21:07:23.5962748Z   career_reset_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\career_reset_check.exe
+2026-11-13T21:07:23.6689743Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-11-13T21:07:23.6939605Z 
+2026-11-13T21:07:23.9703713Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/CMakeLists.txt
+2026-11-13T21:07:24.0744470Z   alert_focus_tests.cpp
+2026-11-13T21:07:25.2711985Z   alert_focus_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\alert_focus_check.exe
+2026-11-13T21:07:25.3452787Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-11-13T21:07:25.3704972Z 
+2026-11-13T21:07:25.6469770Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/CMakeLists.txt
+2026-11-13T21:07:25.7537755Z   map_clip_tests.cpp
+2026-11-13T21:07:26.3451914Z   map_clip_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\map_clip_check.exe
+2026-11-13T21:07:26.4188954Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-11-13T21:07:26.4440351Z 
+2026-11-13T21:07:26.7194966Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/CMakeLists.txt
+2026-11-13T21:07:26.8261893Z   instrument_format_tests.cpp
+2026-11-13T21:07:27.6753206Z   instrument_format_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\instrument_format_check.exe
+2026-11-13T21:07:27.7481311Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-11-13T21:07:27.7729746Z 
+2026-11-13T21:07:28.0414097Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/CMakeLists.txt
+2026-11-13T21:07:28.1503759Z   windows_glyph_tests.cpp
+2026-11-13T21:07:31.6147801Z   windows_glyph_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\windows_glyph_check.exe
+2026-11-13T21:07:31.6886249Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-11-13T21:07:31.7141985Z 
+2026-11-13T21:07:31.9880626Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/CMakeLists.txt
+2026-11-13T21:07:32.0954767Z   glyph_runs_tests.cpp
+2026-11-13T21:07:32.8805215Z   glyph_runs_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\glyph_runs_check.exe
+2026-11-13T21:07:32.9553210Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-11-13T21:07:32.9800129Z 
+2026-11-13T21:07:33.2616088Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/CMakeLists.txt
+2026-11-13T21:07:33.3666148Z   scenery_tests.cpp
+2026-11-13T21:07:34.5859843Z   scenery_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\scenery_check.exe
+2026-11-13T21:07:34.6602379Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-11-13T21:07:34.6850012Z 
+2026-11-13T21:07:34.9576400Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/CMakeLists.txt
+2026-11-13T21:07:35.0664208Z   main.cpp
+2026-11-13T21:07:36.2408591Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\renderer12.h(64,95): warning C4458: declaration of 'footprint' hides class member [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-13T21:07:36.2429987Z   (compiling source file '../../../src/main.cpp')
+2026-11-13T21:07:36.2430554Z       D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\renderer12.h(10,37):
+2026-11-13T21:07:36.2435753Z       see declaration of 'Renderer12::footprint'
+2026-11-13T21:07:36.2436022Z   
+2026-11-13T21:07:36.5488627Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\menus.h(61,140): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-13T21:07:36.5489528Z   (compiling source file '../../../src/main.cpp')
+2026-11-13T21:07:36.5489750Z   
+2026-11-13T21:07:36.9922648Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(512,76): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-13T21:07:36.9924166Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(513,57): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-13T21:07:36.9925508Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(513,136): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-13T21:07:36.9926766Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(513,265): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-13T21:07:36.9928033Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\main.cpp(513,310): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-13T21:07:37.1079863Z D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\cockpit_avionics.h(129,21): warning C4244: 'argument': conversion from 'size_t' to 'double', possible loss of data [D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\FlightCareerAir.vcxproj]
+2026-11-13T21:07:37.1080801Z   (compiling source file '../../../src/main.cpp')
+2026-11-13T21:07:37.1081160Z       D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\cockpit_avionics.h(129,21):
+2026-11-13T21:07:37.1081548Z       the template instantiation context (the oldest one first) is
+2026-11-13T21:07:37.1081900Z           D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\src\cockpit.h(31,9):
+2026-11-13T21:07:37.1083345Z           see reference to function template instantiation 'void glass::draw<cockpitMesh::<lambda_0b6b2bdc8a61219827d489c4e2578ad3>>(std::vector<Vertex,std::allocator<Vertex>> &,const sim::Snapshot &,const DirectX::XMMATRIX &,Text)' being compiled
+2026-11-13T21:07:37.1084403Z           with
+2026-11-13T21:07:37.1084602Z           [
+2026-11-13T21:07:37.1084898Z               Text=cockpitMesh::<lambda_0b6b2bdc8a61219827d489c4e2578ad3>
+2026-11-13T21:07:37.1085263Z           ]
+2026-11-13T21:07:37.1085440Z   
+2026-11-13T21:07:42.4004760Z   FlightCareerAir.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\FlightCareerAir.exe
+2026-11-13T21:07:42.4751103Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-11-13T21:07:42.5003360Z 
+2026-11-13T21:07:42.7726322Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/CMakeLists.txt
+2026-11-13T21:07:42.8815210Z   shader_tests.cpp
+2026-11-13T21:07:44.4108660Z   shader_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\shader_check.exe
+2026-11-13T21:07:44.4865196Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-11-13T21:07:44.5118852Z 
+2026-11-13T21:07:44.7846078Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/CMakeLists.txt
+2026-11-13T21:07:44.8879445Z   windows_launch_tests.cpp
+2026-11-13T21:07:45.8721176Z   windows_launch_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\windows_launch_check.exe
+2026-11-13T21:07:45.9462442Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-11-13T21:07:45.9710650Z 
+2026-11-13T21:07:46.2418593Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/CMakeLists.txt
+2026-11-13T21:07:46.3452709Z   launch_options_tests.cpp
+2026-11-13T21:07:47.3911236Z   launch_options_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\launch_options_check.exe
+2026-11-13T21:07:47.4645014Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-11-13T21:07:47.4895258Z 
+2026-11-13T21:07:47.7609052Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/CMakeLists.txt
+2026-11-13T21:07:47.8685963Z   windows_text_tests.cpp
+2026-11-13T21:07:48.7452708Z   windows_text_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\windows_text_check.exe
+2026-11-13T21:07:48.8215881Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-11-13T21:07:48.8464270Z 
+2026-11-13T21:07:49.1180734Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/CMakeLists.txt
+2026-11-13T21:07:49.2218689Z   flight_instrument_tests.cpp
+2026-11-13T21:07:50.0476071Z   flight_instrument_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\flight_instrument_check.exe
+2026-11-13T21:07:50.1214111Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-11-13T21:07:50.1464436Z 
+2026-11-13T21:07:50.4198906Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/CMakeLists.txt
+2026-11-13T21:07:50.5306805Z   flight_instrument_layout_tests.cpp
+2026-11-13T21:07:52.2861012Z   flight_instrument_layout_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\flight_instrument_layout_check.exe
+2026-11-13T21:07:52.3663136Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-11-13T21:07:52.4056621Z 
+2026-11-13T21:07:52.6832947Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/CMakeLists.txt
+2026-11-13T21:07:52.7865504Z   autopilot_feedback_tests.cpp
+2026-11-13T21:07:53.6909220Z   autopilot_feedback_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\autopilot_feedback_check.exe
+2026-11-13T21:07:53.7653427Z MSBuild version 17.14.60+43b635718 for .NET Framework
+2026-11-13T21:07:53.7901288Z 
+2026-11-13T21:07:54.0639460Z   Building Custom Rule D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/CMakeLists.txt
+2026-11-13T21:07:54.1718271Z   autopilot_feedback_layout_tests.cpp
+2026-11-13T21:07:55.8879729Z   autopilot_feedback_layout_check.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\autopilot_feedback_layout_check.exe
+2026-11-13T21:07:56.4279136Z Internal ctest changing into directory: D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/out/build/windows-source-check
+2026-11-13T21:07:56.5324113Z Test project D:/a/fiycare/fiycare/maintenance/v0.54-glyph-compaction/out/build/windows-source-check
+2026-11-13T21:07:56.5783412Z       Start  1: default_model_restore_transaction
+2026-11-13T21:07:56.5980441Z  1/21 Test  #1: default_model_restore_transaction ........   Passed    0.02 sec
+2026-11-13T21:07:56.5986846Z       Start  2: cockpit_lateral_mode_transfer
+2026-11-13T21:07:56.6098835Z  2/21 Test  #2: cockpit_lateral_mode_transfer ............   Passed    0.01 sec
+2026-11-13T21:07:56.6100911Z       Start  3: career_flight_reset
+2026-11-13T21:07:56.6615947Z  3/21 Test  #3: career_flight_reset ......................   Passed    0.05 sec
+2026-11-13T21:07:56.6618519Z       Start  4: alert_headline_priority
+2026-11-13T21:07:56.6689647Z  4/21 Test  #4: alert_headline_priority ..................   Passed    0.01 sec
+2026-11-13T21:07:56.6692172Z       Start  5: navigation_map_clipping
+2026-11-13T21:07:56.6772392Z  5/21 Test  #5: navigation_map_clipping ..................   Passed    0.01 sec
+2026-11-13T21:07:56.6774550Z       Start  6: instrument_integer_format
+2026-11-13T21:07:56.7896918Z  6/21 Test  #6: instrument_integer_format ................   Passed    0.11 sec
+2026-11-13T21:07:56.7899429Z       Start  7: compact_glyph_coverage
+2026-11-13T21:07:56.9112204Z  7/21 Test  #7: compact_glyph_coverage ...................   Passed    0.12 sec
+2026-11-13T21:07:56.9114713Z       Start  9: offline_scenery_geometry
+2026-11-13T21:07:57.0435277Z  8/21 Test  #9: offline_scenery_geometry .................   Passed    0.13 sec
+2026-11-13T21:07:57.0437691Z       Start 11: autopilot_disconnect_feedback
+2026-11-13T21:07:57.0524390Z  9/21 Test #11: autopilot_disconnect_feedback ............   Passed    0.01 sec
+2026-11-13T21:07:57.0526511Z       Start 12: primary_instrument_text
+2026-11-13T21:07:57.0622726Z 10/21 Test #12: primary_instrument_text ..................   Passed    0.01 sec
+2026-11-13T21:07:57.0625240Z       Start 13: exact_launch_options
+2026-11-13T21:07:57.0689174Z 11/21 Test #13: exact_launch_options .....................   Passed    0.01 sec
+2026-11-13T21:07:57.0691434Z       Start 26: cockpit_throttle_event_coalescing
+2026-11-13T21:07:57.2562765Z 12/21 Test #26: cockpit_throttle_event_coalescing ........   Passed    0.19 sec
+2026-11-13T21:07:57.2565501Z       Start 31: benchmark_evidence_integrity
+2026-11-13T21:07:57.2672048Z 13/21 Test #31: benchmark_evidence_integrity .............   Passed    0.01 sec
+2026-11-13T21:07:57.2675016Z       Start 32: rolling_frame_statistics
+2026-11-13T21:07:57.4415259Z 14/21 Test #32: rolling_frame_statistics .................   Passed    0.17 sec
+2026-11-13T21:07:57.4417916Z       Start 33: rolling_frame_configuration_boundaries
+2026-11-13T21:07:57.4482684Z 15/21 Test #33: rolling_frame_configuration_boundaries ...   Passed    0.01 sec
+2026-11-13T21:07:57.4484978Z       Start 37: windows_compact_glyph_coverage
+2026-11-13T21:07:57.7728464Z 16/21 Test #37: windows_compact_glyph_coverage ...........   Passed    0.32 sec
+2026-11-13T21:07:57.7731035Z       Start 38: windows_autopilot_notice_glyph_bounds
+2026-11-13T21:07:57.8357738Z 17/21 Test #38: windows_autopilot_notice_glyph_bounds ....   Passed    0.06 sec
+2026-11-13T21:07:57.8359982Z       Start 39: windows_instrument_glyph_bounds
+2026-11-13T21:07:57.8520737Z 18/21 Test #39: windows_instrument_glyph_bounds ..........   Passed    0.02 sec
+2026-11-13T21:07:57.8524023Z       Start 40: windows_utf8_device_log
+2026-11-13T21:07:57.8587815Z 19/21 Test #40: windows_utf8_device_log ..................   Passed    0.01 sec
+2026-11-13T21:07:57.8590129Z       Start 41: windows_command_line_parsing
+2026-11-13T21:07:57.8678035Z 20/21 Test #41: windows_command_line_parsing .............   Passed    0.01 sec
+2026-11-13T21:07:57.8680553Z       Start 42: hlsl_shader_compilation
+2026-11-13T21:07:57.9870040Z 21/21 Test #42: hlsl_shader_compilation ..................   Passed    0.12 sec
+2026-11-13T21:07:57.9876617Z 
+2026-11-13T21:07:57.9876848Z 100% tests passed, 0 tests failed out of 21
+2026-11-13T21:07:57.9877035Z 
+2026-11-13T21:07:57.9877116Z Total Test time (real) =   1.45 sec
+2026-11-13T21:07:58.0287946Z Application compiled with Assimp OFF. Native fcmesh loading remains compiled. Runtime assets are NOT copied. No application/GPU/HD6000 execution was performed.
+2026-11-13T21:07:58.1632312Z ##[group]Run actions/upload-artifact@v4
+2026-11-13T21:07:58.1632586Z with:
+2026-11-13T21:07:58.1632768Z   name: windows-ground-service-evidence
+2026-11-13T21:07:58.1633098Z   path: maintenance/v0.54-glyph-compaction/out/build/windows-source-check/**/*.log
+2026-11-13T21:07:58.1633435Z   if-no-files-found: warn
+2026-11-13T21:07:58.1633613Z   compression-level: 6
+2026-11-13T21:07:58.1633782Z   overwrite: false
+2026-11-13T21:07:58.1633942Z   include-hidden-files: false
+2026-11-13T21:07:58.1634135Z ##[endgroup]
+2026-11-13T21:07:58.3067647Z (node:840) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-13T21:07:58.3068191Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-13T21:07:58.3864360Z With the provided path, there will be 2 files uploaded
+2026-11-13T21:07:58.3869527Z Artifact name is valid!
+2026-11-13T21:07:58.3870913Z Root directory input is valid!
+2026-11-13T21:07:58.6009007Z Beginning upload of artifact content to blob storage
+2026-11-13T21:07:58.6183795Z (node:840) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-11-13T21:07:58.6685359Z Uploaded bytes 4239
+2026-11-13T21:07:58.6882930Z Finished uploading artifact content to blob storage!
+2026-11-13T21:07:58.6883709Z SHA256 digest of uploaded artifact zip is fb979ad10f3ff20bf2ad0221486280818e40dada3ce00333b0c36c3b61390b41
+2026-11-13T21:07:58.6885228Z Finalizing artifact upload
+2026-11-13T21:07:59.0512044Z Artifact windows-ground-service-evidence.zip successfully finalized. Artifact ID 14076917357
+2026-11-13T21:07:59.0512846Z Artifact windows-ground-service-evidence has been successfully uploaded! Final size is 4239 bytes. Artifact ID is 14076917357
+2026-11-13T21:07:59.0521215Z Artifact download URL: https://github.com/zhangchenrui7891/fiycare/actions/runs/43507696254/artifacts/14076917357
+2026-11-13T21:07:59.0806284Z Post job cleanup.
+2026-11-13T21:07:59.2100918Z [command]"C:\Program Files\Git\bin\git.exe" version
+2026-11-13T21:07:59.2323415Z git version 2.56.0.windows.4
+2026-11-13T21:07:59.2375638Z Temporarily overriding HOME='D:\a\_temp\ebeadbfb-2d0e-4e33-957e-f2399a81279a' before making global git config changes
+2026-11-13T21:07:59.2376830Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-13T21:07:59.2384810Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\fiycare\fiycare
+2026-11-13T21:07:59.2626539Z Removing SSH command configuration
+2026-11-13T21:07:59.2635941Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+2026-11-13T21:07:59.2884807Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+2026-11-13T21:07:59.7046627Z Removing HTTP extra header
+2026-11-13T21:07:59.7057942Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-13T21:07:59.7338597Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+2026-11-13T21:08:00.1512537Z Removing includeIf entries pointing to credentials config files
+2026-11-13T21:08:00.1526187Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-13T21:08:00.1774356Z includeif.gitdir:D:/a/fiycare/fiycare/.git.path
+2026-11-13T21:08:00.1774941Z includeif.gitdir:D:/a/fiycare/fiycare/.git/worktrees/*.path
+2026-11-13T21:08:00.1775418Z includeif.gitdir:/github/workspace/.git.path
+2026-11-13T21:08:00.1775915Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-13T21:08:00.1811368Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:D:/a/fiycare/fiycare/.git.path
+2026-11-13T21:08:00.2036658Z D:\a\_temp\git-credentials-157ccf68-2d38-4d1d-b421-ec331e58fe9e.config
+2026-11-13T21:08:00.2072022Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:D:/a/fiycare/fiycare/.git.path D:\a\_temp\git-credentials-157ccf68-2d38-4d1d-b421-ec331e58fe9e.config
+2026-11-13T21:08:00.2336465Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:D:/a/fiycare/fiycare/.git/worktrees/*.path
+2026-11-13T21:08:00.2562072Z D:\a\_temp\git-credentials-157ccf68-2d38-4d1d-b421-ec331e58fe9e.config
+2026-11-13T21:08:00.2593159Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:D:/a/fiycare/fiycare/.git/worktrees/*.path D:\a\_temp\git-credentials-157ccf68-2d38-4d1d-b421-ec331e58fe9e.config
+2026-11-13T21:08:00.2850252Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-11-13T21:08:00.3074494Z /github/runner_temp/git-credentials-157ccf68-2d38-4d1d-b421-ec331e58fe9e.config
+2026-11-13T21:08:00.3107598Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-157ccf68-2d38-4d1d-b421-ec331e58fe9e.config
+2026-11-13T21:08:00.3361509Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-13T21:08:00.3583339Z /github/runner_temp/git-credentials-157ccf68-2d38-4d1d-b421-ec331e58fe9e.config
+2026-11-13T21:08:00.3615257Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-157ccf68-2d38-4d1d-b421-ec331e58fe9e.config
+2026-11-13T21:08:00.3872617Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+2026-11-13T21:08:00.8121486Z Removing credentials config 'D:\a\_temp\git-credentials-157ccf68-2d38-4d1d-b421-ec331e58fe9e.config'
+2026-11-13T21:08:00.8297385Z Cleaning up orphan processes
+2026-11-13T21:08:00.8498434Z Terminate orphan process: pid (7940) (vctip)
+2026-11-13T21:08:00.8580988Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+

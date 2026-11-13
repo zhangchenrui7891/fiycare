@@ -1,17 +1,17 @@
-## v0.78 · 2026-11-10 Asia/Shanghai（窗口移动/缩放后的计时恢复）
+## v0.79 · 2026-11-14（地面维修清除发动机故障）
 
-基线：读取最新可用 v0.77 完整工程、TODAY_REVIEW、PROGRESS 和上轮改进结果，ZIP CRC 与 2452 项 SHA256 通过。上轮旅客航班人数锁定保留，历史 Linux 47/47 与 Windows CI 21/21 检查通过；没有目标机运行证据。沿用实际连续版本，提示的 v0.8 不是本轮确认的工程版本。
+基线：读取最新可用 v0.78 完整工程、TODAY_REVIEW、PROGRESS 和交付恢复记录；ZIP CRC 及 2467 项 SHA256 一致。上轮窗口移动/取消缩放计时修复保留；此前同一代码 Linux48/48、Windows21/21通过，未有目标机游戏运行证据。沿用工程连续版本，提示中的 v0.8 不是本轮确认的工程版本。
 
-当前特点：C++17、DX12/DX11、中文菜单、十机型含 A330/A350、共用 27 控件三维驾驶舱及 PFD/NAV/ENGINE、训练导航/进近、双机场生涯、浦东离线影像和 FXAA。机型系统和气动仍属原型，机场/周边地景简化，网站账号未绑定本地生涯。
+当前特点：C++17、DX12/DX11、中文菜单、十机型含A330/A350、共用27控件三维驾驶舱、PFD/NAV/ENGINE、训练导航与进近、双机场生涯、浦东离线影像、FXAA。机型系统与气动仍为原型，周边地景为示意，网站账号未绑定本地生涯。
 
-本轮实际修复：拖动窗口标题栏、取消缩放或拖回相同尺寸时，旧版未走渲染器重建路径，消息循环的等待时间会混入帧时/benchmark 并触发最多 80ms 物理补算。现在处理 WM_EXITSIZEMOVE，用一次性标志在性能采样前排除该间隔，清空物理余量并恢复输入边界；保留真实 wallElapsed 与普通慢帧。窗口标题、帮助、startup.log、CMake、benchmark 标识同步 v0.78。未增加资源、存档字段或渲染质量开销。
+本轮改动：H键地面维修原先扣费并提示完成，但只恢复燃油/维护值。本版成功维修增加既有resetFaults调用，清除熄火、火警和发电机模拟故障；保留开关、转速、温度、油门偏置，不伪造瞬间冷却。仍须跑道停稳、未坠毁、至少300积分；失败不扣费、不修复。运行阶段和推力等在后续仿真步更新。版本与成功提示同步v0.79，存档结构不变；1661项资源/第三方文件未变。
 
-验证：新增实际 main.cpp 语句提取检查，覆盖 12 组 benchmark 开/关、是否重建渲染器、0.001/1/30 秒模拟等待，以及普通慢帧、原生菜单、恢复采样、按键释放重按。v0.77 main.cpp 配新检查可编译但断言失败；新版及 ASan/UBSan 通过。初版检查误用了不存在的 BenchmarkSamples::values，改用公开 storedSamples() 后才完成有效对照；该测试编译错误不作为旧版缺陷证据。Win32 API 为 CPU 替身，不是 Windows 消息/鼠标实测。
+新增验证：60组（10机型×2机场×3故障）成功维修与存档往返，四类拒绝操作全状态不变。旧career.h配新检查可编译但断言失败，新版通过。保留80组登机、400组重开/换机/任务选择和40组构造旅客生命周期检查。严格C++17及ASan/UBSan通过（detect_leaks=0）。这些是CPU/存档检查，不是实际飞行或Windows按键验收。
 
-本轮测试结果：Linux Assimp ON Release 全量 282 步构建成功，48/48 CTest 通过（16.57 秒），增量构建无待处理任务。严格 C++17 便携检查退出 0；相关 ASan/UBSan 检查退出 0（detect_leaks=0）。Windows 2022/MSVC x64 Release 主程序编译成功，21/21 CPU/GDI/HLSL 检查通过（1.39 秒），8 条既有警告；Assimp OFF、资源复制 OFF，没有游戏/GPU执行。CI：https://github.com/zhangchenrui7891/fiycare/actions/runs/42661704767 。日志见 validation_v078。
+Linux Assimp ON Release全量282步构建成功，48/48 CTest通过（16.21秒），增量无待构建内容。Windows2022/MSVC x64 Release主程序编译成功，21/21 CPU/GDI/HLSL检查通过，仍有8条既有警告；Assimp OFF、资源复制OFF，未运行游戏/GPU。CI：https://github.com/zhangchenrui7891/fiycare/actions/runs/43507696254 。完整日志见validation_v079。
 
-GitHub：分支 codex/v0.78-window-timing；受检代码 c0d2d101dcd1db95706918325584b16cf66fcb84；目录 maintenance/v0.54-glyph-compaction。最终记录提交只增加文档/证据，默认 main 未改。完整源码资源 ZIP 无 EXE；1661 项资源及第三方文件逐项比对未改。
+GitHub分支codex/v0.79-ground-service；受检代码6d48774126b970c5c3a2bb5955136a102f250049，目录maintenance/v0.54-glyph-compaction，默认main未改。完整源码资源包无EXE，连续记录与日志随包保存。
 
-与目标差距：微软官方指南 https://www.flightsimulator.com/guide/new-flight-simmer-guide/ 描述全球世界、进阶物理/航电/天气及动态生涯。本项目仍缺真实机型系统/FMS、经标定的气动、精细机场/DEM、复杂天气和完整航班实机证据。没有可核查的实机画面对比、HD6000 FPS/RAM/温度数据，不能判断接近成品。不会承诺 i5-5350U/HD6000/8GB/256GB 达到 MSFS2024 同等画质或功能。
+差距与限制：与MSFS2024的成品体验相比，仍缺真实机型系统/FMS、气动标定、精细机场/DEM、复杂天气、完整航班实机证据。没有Windows游戏/HD6000启动、画面对比、FPS/RAM/温度验收，不能判断接近成品；不承诺5350U/HD6000/8GB/256GB达到同等画质或功能。继续迭代，不停止任务。
 
-下一步：按 WINDOW_MODAL_TIMING.md 验收带资源 Windows 构建，检查标题栏移动、取消缩放、DX11/可用 DX12、后台恢复及 benchmark 数据；同时完成上轮登机锁定到落地结算的完整航班验收。仍无目标 Boot Camp 设备连接，所有上述实机步骤未执行。继续迭代，不认定成品、不停止每日任务。
+下一步：按GROUND_SERVICE.md在独立测试存档验收“注入故障—停稳—维修—关闭发动机保持关闭—保存重启”，检查热状态逐步恢复；同时补齐带资源Windows启动、窗口恢复及完整航班证据。上述目标机步骤尚未执行。

@@ -1,3 +1,6 @@
+# v0.79：地面维修清除发动机故障
+见GROUND_SERVICE.md与TODAY_REVIEW.md。源码资源包，无EXE。
+
 # v0.78：窗口移动与缩放后的计时恢复
 见 WINDOW_MODAL_TIMING.md 与 TODAY_REVIEW.md。源码资源包，无 EXE。
 

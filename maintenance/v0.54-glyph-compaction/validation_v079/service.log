@@ -1,0 +1,3 @@
+PASS 60 ground repair and save-roundtrip cases; four refusal cases preserve full state. CPU only.
+Passenger boarding: 80 aircraft/airport/stage cases plus save roundtrips passed.
+PASS: 400 reset/select cases, 40 passenger lifecycles, save roundtrips and rejected-action immutability
