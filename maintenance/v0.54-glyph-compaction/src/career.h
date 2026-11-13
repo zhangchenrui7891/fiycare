@@ -78,7 +78,7 @@ struct Progress {
   photos++;if(++gate>=4)stage=2;return true;
  }
  bool buy(const Flight& f){if(!licensed||!parked(f)||credits<6000||fleet>=6)return false;credits-=6000;fleet++;return true;}
- bool service(Flight& f){if(!parked(f)||credits<300)return false;credits-=300;maintenance=1;f.fuel=100;return true;}
+ bool service(Flight& f){if(!parked(f)||credits<300)return false;credits-=300;maintenance=1;f.fuel=100;f.engines.resetFaults();return true;}
  void load(std::istream& in){
   Progress p;std::string magic;int version;
   if(!(in>>magic>>version)||magic!="FCAIR"||version!=2)return;

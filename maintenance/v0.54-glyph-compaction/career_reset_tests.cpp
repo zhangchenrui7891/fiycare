@@ -65,8 +65,35 @@ void lifecycle(sim::Snapshot s){
  require(s.career.credits==settled&&s.career.completed==completed+1,"Settlement happens once");
 }
 }
+void serviceChecks(){
+ int cases=0;
+ for(int id=0;id<sim::aircraftCount;++id)for(int airport=0;airport<2;++airport)for(int fault=1;fault<=3;++fault){
+  sim::Snapshot s;s.flight.configure(id);park(s.flight,airport);s.career.credits=600;s.career.maintenance=.4;s.flight.fuel=4;
+  s.flight.engine=false;s.flight.engines.initialize(1234);
+  for(auto& unit:s.flight.engines.units){unit.fault=static_cast<sim::EngineFault>(fault);unit.enabled=false;unit.egt=800;unit.oilTemperature=90;unit.throttleOffset=.1;}
+  auto expected=s;expected.career.credits-=300;expected.career.maintenance=1;expected.flight.fuel=100;expected.flight.engines.resetFaults();
+  require(s.career.service(s.flight),"Parked funded maintenance succeeds");
+  std::ostringstream actualText,expectedText;s.write(actualText);expected.write(expectedText);
+  require(actualText.str()==expectedText.str(),"Service clears faults and refuels without altering engine controls, RPM, temperatures or career progress");
+  std::istringstream saved(actualText.str());sim::Snapshot loaded;require(loaded.read(saved),"Serviced state loads");
+  for(const auto& unit:loaded.flight.engines.units)require(unit.fault==sim::EngineFault::None&&!unit.enabled&&unit.rpm==1234&&unit.egt==800,"Repair persists without starting disabled engines");
+  ++cases;
+ }
+ for(int reason=0;reason<4;++reason){
+  sim::Snapshot s;s.flight.configure(3);park(s.flight,0);s.career.credits=600;s.flight.fuel=5;
+  s.flight.engines.inject(0,sim::EngineFault::Fire,3);
+  if(reason==0)s.career.credits=299;
+  if(reason==1)s.flight.y=100;
+  if(reason==2)s.flight.vz=2;
+  if(reason==3)s.flight.crashed=true;
+  std::ostringstream before,after;s.write(before);require(!s.career.service(s.flight),"Invalid maintenance denied");s.write(after);
+  require(before.str()==after.str(),"Rejected maintenance cannot debit, refuel or repair");
+ }
+ std::cout<<"PASS "<<cases<<" ground repair and save-roundtrip cases; four refusal cases preserve full state. CPU only.\n";
+}
 int main(){
  try{
+  serviceChecks();
   int boardingCases=0;
   for(int id=0;id<sim::aircraftCount;++id)for(int airport=0;airport<2;++airport)for(int stage=0;stage<4;++stage){
    auto s=pending(id,airport,2);s.career.stage=stage;s.career.gate=0;
