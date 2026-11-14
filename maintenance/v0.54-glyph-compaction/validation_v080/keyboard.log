@@ -1,0 +1,4 @@
+Actual main polling/bindings/Controls: held gear/flaps/engine/power/fault/throttle recovery stays neutral; fresh commands still work.
+No key API calls in background/native-menu/minimized modes; focus/menu/resize/dialog hooks present.
+Actual message hook: completed G/W taps, Shift+F6, Ctrl+F7, repeat filter and suspend barriers passed.
+CPU API stand-ins only: Windows message delivery, keyboard hardware and real interaction NOT verified.

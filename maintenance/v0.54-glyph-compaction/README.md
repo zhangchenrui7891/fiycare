@@ -1,3 +1,6 @@
+# v0.80：游戏内菜单完整点击判定
+见MENU_CLICK_GUARD.md与TODAY_REVIEW.md。源码资源包，无EXE。
+
 # v0.79：地面维修清除发动机故障
 见GROUND_SERVICE.md与TODAY_REVIEW.md。源码资源包，无EXE。
 

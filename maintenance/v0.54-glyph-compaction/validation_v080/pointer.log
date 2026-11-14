@@ -1,0 +1,4 @@
+Menu clicks: unmatched/outside/other-button releases, capture loss, resize and normal click passed.
+Resize entry: throttle/look, own/foreign capture, changed dimensions and fresh-press recovery passed.
+Actual mouse hook: throttle-first both release orders, look-first left suppression, capture callbacks and idle recovery passed.
+CPU Win32 stand-ins only; no Windows message delivery, real mouse or GPU verification.
