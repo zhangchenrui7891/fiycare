@@ -34,6 +34,7 @@
 #include <iomanip>
 
 inline input::KeyboardState keyboardInput;
+inline int menuPressedCommand=-1;
 inline bool fullscreen=false;inline WINDOWPLACEMENT windowedPlacement{sizeof(WINDOWPLACEMENT)};
 inline HMENU windowedMenu=nullptr;
 inline void toggleFullscreen(HWND h){
@@ -58,9 +59,9 @@ LRESULT CALLBACK windowProc(HWND h,UINT msg,WPARAM w,LPARAM l){
  if(msg==WM_CLOSE){menuCommands.push_back(ui::Exit);return 0;}
  if(msg==WM_DESTROY){PostQuitMessage(0);return 0;}
  if(msg==WM_COMMAND){menuCommands.push_back(LOWORD(w));return 0;}
- if(msg==WM_ENTERMENULOOP){keyboardInput.suspend();cockpitInput.cancel();cockpitMouseDown=false;if(GetCapture()==h)ReleaseCapture();inNativeMenu=true;return 0;}
+ if(msg==WM_ENTERMENULOOP){menuPressedCommand=-1;keyboardInput.suspend();cockpitInput.cancel();cockpitMouseDown=false;if(GetCapture()==h)ReleaseCapture();inNativeMenu=true;return 0;}
  if(msg==WM_EXITMENULOOP){keyboardInput.suspend();inNativeMenu=false;nativeMenuJustClosed=true;return 0;}
- if(msg==WM_ENTERSIZEMOVE){keyboardInput.suspend();cockpitInput.cancel();cockpitMouseDown=false;if(GetCapture()==h)ReleaseCapture();}
+ if(msg==WM_ENTERSIZEMOVE){menuPressedCommand=-1;keyboardInput.suspend();cockpitInput.cancel();cockpitMouseDown=false;if(GetCapture()==h)ReleaseCapture();}
  if(msg==WM_EXITSIZEMOVE){keyboardInput.suspend();sizeMoveJustClosed=true;}
  if(msg==WM_KEYDOWN&&w==VK_ESCAPE&&!(l&(1LL<<30))){menuCommands.push_back(ui::ToggleMenu);return 0;}
  if(msg==WM_KEYDOWN||msg==WM_KEYUP){
@@ -71,8 +72,9 @@ LRESULT CALLBACK windowProc(HWND h,UINT msg,WPARAM w,LPARAM l){
     keyboardInput.keyUp(static_cast<std::size_t>(w));
   }else keyboardInput.suspend();
  }
- if(msg==WM_KILLFOCUS){keyboardInput.suspend();cockpitInput.cancel();cockpitMouseDown=false;if(GetCapture()==h)ReleaseCapture();}
- if(msg==WM_CAPTURECHANGED){cockpitInput.loseCapture();}
+ if(msg==WM_KILLFOCUS){menuPressedCommand=-1;keyboardInput.suspend();cockpitInput.cancel();cockpitMouseDown=false;if(GetCapture()==h)ReleaseCapture();}
+ if(msg==WM_CAPTURECHANGED){cockpitInput.loseCapture();menuPressedCommand=-1;}
+ if(msg==WM_LBUTTONDOWN)menuPressedCommand=-1;
  if(msg==WM_RBUTTONDOWN&&cockpitInput.enabled){if(cockpitInput.beginLook()){lookX=(short)LOWORD(l);lookY=(short)HIWORD(l);SetCapture(h);}return 0;}
  if(msg==WM_RBUTTONUP&&cockpitInput.enabled){if(cockpitInput.looking){cockpitInput.endLook();if(GetCapture()==h)ReleaseCapture();}return 0;}
  if((msg==WM_LBUTTONDOWN||msg==WM_LBUTTONUP)&&cockpitInput.looking){cockpitMouseDown=false;return 0;}
@@ -80,12 +82,15 @@ LRESULT CALLBACK windowProc(HWND h,UINT msg,WPARAM w,LPARAM l){
  if(msg==WM_LBUTTONDOWN||msg==WM_MOUSEMOVE){
   RECT b{};GetClientRect(h,&b);float x=(short)LOWORD(l)*960.f/std::max(1L,b.right),y=(short)HIWORD(l)*540.f/std::max(1L,b.bottom);
   if(msg==WM_LBUTTONDOWN&&cockpitInput.press(x,y)){cockpitMouseDown=true;if(cockpitInput.dragging)SetCapture(h);return 0;}
+  if(msg==WM_LBUTTONDOWN){for(const auto& button:clickableButtons)if(x>=button.x&&x<=button.x+button.w&&y>=button.y&&y<=button.y+button.h){menuPressedCommand=button.command;SetCapture(h);return 0;}}
   if(msg==WM_MOUSEMOVE&&cockpitInput.dragging){cockpitInput.move(y);return 0;}
  }
  if(msg==WM_LBUTTONUP&&cockpitMouseDown){RECT b{};GetClientRect(h,&b);cockpitInput.move((short)HIWORD(l)*540.f/std::max(1L,b.bottom));cockpitInput.release();cockpitMouseDown=false;if(GetCapture()==h)ReleaseCapture();return 0;}
  if(msg==WM_LBUTTONUP){
+  const int pressedCommand=menuPressedCommand;menuPressedCommand=-1;
+  if(GetCapture()==h)ReleaseCapture();
   RECT bounds{};GetClientRect(h,&bounds);float x=(short)LOWORD(l)*960.f/std::max(1L,bounds.right),y=(short)HIWORD(l)*540.f/std::max(1L,bounds.bottom);
-  for(const auto& b:clickableButtons)if(x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h){menuCommands.push_back(b.command);break;}return 0;
+  for(const auto& b:clickableButtons)if(b.command==pressedCommand&&x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h){menuCommands.push_back(b.command);break;}return 0;
  }
  return DefWindowProc(h,msg,w,l);
 }
@@ -118,7 +123,7 @@ void help(HWND window){
   L"存档/照片/日志：%LOCALAPPDATA%\\FlightCareerAir\n"
   L"诊断输出另存：diagnostics\\benchmark 或 diagnostics\\smoke；不保存游戏生涯。\n"
   L"DX12初始化失败会自动尝试DX11；可用--dx11强制兼容模式。",
-  L"飞行生涯 v0.79 · 中文操作说明",MB_OK);
+  L"飞行生涯 v0.80 · 中文操作说明",MB_OK);
 }
 int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
  std::filesystem::path folder;
@@ -126,7 +131,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   const auto args=launch::currentOptions();const bool benchmark=args.has(L"--benchmark");const bool low=args.has(L"--low")||benchmark;const bool smoke=args.has(L"--smoke-test");int smokeFrames=0;
   const runfiles::RunFiles runFiles(dataFolder(),benchmark,smoke);
   folder=runFiles.folder();std::filesystem::create_directories(folder);
-  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.79 startup");
+  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.80 startup");
   if(!runFiles.gameSavesEnabled())logLine("Diagnostic output isolated; live game saves disabled");
   sim::Snapshot state;bool loaded=false,primaryValid=false;
   {std::ifstream saved(folder/L"state.txt");if(saved){if(!state.read(saved))logLine("Invalid state.txt ignored; attempting legacy career");else {loaded=primaryValid=true;logLine("Loaded compatible full flight state");}}}
@@ -160,7 +165,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   const DWORD style=WS_OVERLAPPEDWINDOW;
   WNDCLASSW wc{};wc.lpfnWndProc=windowProc;wc.hInstance=instance;wc.lpszClassName=L"FlightCareerAir";wc.hCursor=LoadCursor(nullptr,IDC_ARROW);if(!RegisterClassW(&wc))throw std::runtime_error("Window registration failed");
   RECT bounds{0,0,low?640:1600,low?360:900};HMENU nativeMenu=createChineseMenu();AdjustWindowRect(&bounds,style,TRUE);
-  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.79 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
+  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.80 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
   if(!window)throw std::runtime_error("Window creation failed");ShowWindow(window,SW_SHOW);
   if(args.has(L"--fullscreen"))toggleFullscreen(window);
   renderScale=launch::initialRenderScale(args);
@@ -317,6 +322,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
    }
    if(pressed[VK_F5])menuCommands.push_back(ui::Save);
    while(!menuCommands.empty()){
+    menuPressedCommand=-1;if(GetCapture()==window)ReleaseCapture();
     int cmd=menuCommands.front();menuCommands.pop_front();dt=0;physicsTime.reset();wasActive=false;
     switch(cmd){
      case ui::SuperSample:renderScale=renderScale==1?2:1;notice=renderScale==2?L"2×超采样：宽高各两倍，四倍像素。":L"按窗口原生分辨率渲染。";break;
@@ -565,7 +571,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
    if(smoke&&++smokeFrames>=3){logLine("Smoke test: three rendered frames and BMP capture succeeded");DestroyWindow(window);}
    if(benchmark&&timing::benchmarkFinished(benchmarkStarted,benchmarkSamples)){
     std::ofstream summary(folder/L"performance_summary.txt",std::ios::trunc);
-    const auto result=timing::writeBenchmarkSummary(summary,"v0.79",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples);
+    const auto result=timing::writeBenchmarkSummary(summary,"v0.80",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples);
     summary.flush();if(!summary)logLine("Benchmark summary write failed; no report file success claimed");
     pendingPhoto=folder/L"benchmark_final.bmp";renderer->draw(mesh,hud,XMMatrixLookToLH(XMVectorZero(),viewDirection,up)*reversedPerspective(activeFov,cockpit::viewportAspect,presentation::worldNear,presentation::worldFar),daylight,pendingPhoto,cabin,cabinView);pendingPhoto.clear();
     logLine(result.complete?"Benchmark completed with valid full-run statistics":"Benchmark ended without a valid performance verdict; inspect summary status/counts");DestroyWindow(window);

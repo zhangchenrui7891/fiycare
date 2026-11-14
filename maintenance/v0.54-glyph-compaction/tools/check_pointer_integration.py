@@ -1,5 +1,6 @@
 """Exercise actual main.cpp mouse hook with CPU-only Win32 API stand-ins."""
 from pathlib import Path
+import os
 import subprocess
 import sys
 import tempfile
@@ -9,21 +10,23 @@ start = main.index(' if(msg==WM_CAPTURECHANGED)')
 hook = main[start:main.index(' return DefWindowProc', start)].replace(';}return 0;', ';}\n return 0;')
 resize_start=main.index(' if(msg==WM_ENTERSIZEMOVE)')
 hook=main[resize_start:main.index('\n',resize_start)]+'\n'+hook
+for event in ('WM_KILLFOCUS','WM_ENTERMENULOOP'):
+    i=main.index(' if(msg=='+event+')');hook=main[i:main.index('\n',i)]+'\n'+hook
 prefix = r'''
 #include "cockpit_controls.h"
 #include "keyboard_state.h"
 #include <iostream>
 #include <stdexcept>
 constexpr int WM_CAPTURECHANGED=1,WM_RBUTTONDOWN=2,WM_RBUTTONUP=3,
- WM_MOUSEMOVE=4,WM_LBUTTONDOWN=5,WM_LBUTTONUP=6,WM_ENTERSIZEMOVE=7;
+ WM_MOUSEMOVE=4,WM_LBUTTONDOWN=5,WM_LBUTTONUP=6,WM_ENTERSIZEMOVE=7,WM_KILLFOCUS=8,WM_ENTERMENULOOP=9;
 struct RECT{long left=0,top=0,right=960,bottom=540;};
 struct Button{float x,y,w,h;int command;};
 std::vector<Button> clickableButtons;
 std::vector<int> menuCommands;
 cockpit::SpatialInput cockpitInput;
 input::KeyboardState keyboardInput;
-bool cockpitMouseDown=false,lookDragging=false;
-int lookX=0,lookY=0,capture=0;
+bool cockpitMouseDown=false,lookDragging=false,inNativeMenu=false;
+int lookX=0,lookY=0,capture=0,menuPressedCommand=-1;
 int message(int h,int msg,unsigned long l);
 unsigned long LOWORD(unsigned long l){return l&65535;}
 unsigned long HIWORD(unsigned long l){return (l>>16)&65535;}
@@ -42,6 +45,18 @@ ending=r'''
  return -1;
 }
 int main(){try{
+ cockpitInput.cancel();clickableButtons={{10,10,100,40,101},{200,10,100,40,102}};
+ send(WM_LBUTTONUP,20,20);require(menuCommands.empty(),"Release without matching press must not activate menu");
+ send(WM_LBUTTONDOWN,150,20);send(WM_LBUTTONUP,20,20);require(menuCommands.empty(),"Dragging in from outside must not activate menu");
+ send(WM_LBUTTONDOWN,20,20);require(capture==1,"Menu press captures pointer");send(WM_LBUTTONUP,210,20);require(menuCommands.empty()&&capture==0,"Release on another button cancels");
+ send(WM_LBUTTONDOWN,20,20);send(WM_LBUTTONUP,150,20);send(WM_LBUTTONUP,20,20);require(menuCommands.empty(),"Outside release consumes click");
+ send(WM_LBUTTONDOWN,20,20);ReleaseCapture();send(WM_LBUTTONUP,20,20);require(menuCommands.empty(),"Capture loss cancels menu press");
+ send(WM_LBUTTONDOWN,20,20);send(WM_ENTERSIZEMOVE,20,20);send(WM_LBUTTONUP,20,20);require(menuCommands.empty(),"Resize cancels menu press");
+ for(int event:{WM_KILLFOCUS,WM_ENTERMENULOOP}){send(WM_LBUTTONDOWN,20,20);send(event,20,20);send(WM_LBUTTONUP,20,20);require(menuCommands.empty(),"Focus loss/native menu cancels click");}
+ send(WM_LBUTTONDOWN,20,20);send(WM_LBUTTONUP,20,20);require(menuCommands.size()==1&&menuCommands[0]==101&&capture==0,"Same-button press/release activates once");send(WM_LBUTTONUP,20,20);require(menuCommands.size()==1,"Duplicate release must not repeat command");
+ clickableButtons.clear();menuCommands.clear();
+ std::cout<<"Menu clicks: unmatched/outside/other-button releases, capture loss, resize and normal click passed.\n";
+
  const auto p=cockpit::solids(.5)[5].center;
  const float sp=std::sin(cockpit::lookPitch),cp=std::cos(cockpit::lookPitch);
  const float up=p.y*cp-p.z*sp,forward=p.y*sp+p.z*cp;
@@ -96,5 +111,5 @@ int main(){try{
 with tempfile.TemporaryDirectory() as folder:
     cpp=Path(folder)/'pointer.cpp';cpp.write_text(prefix+hook+ending)
     exe=Path(folder)/'pointer'
-    subprocess.run(['g++','-std=c++17','-O2','-Wall','-Wextra','-Werror','-pedantic','-I',str(root/'src'),str(cpp),'-o',str(exe)],check=True)
+    subprocess.run(['g++','-std=c++17','-O2','-Wall','-Wextra','-Werror','-pedantic',*(['-fsanitize=address,undefined','-fno-omit-frame-pointer'] if os.environ.get('FCAIR_SANITIZE') else []),'-I',str(root/'src'),str(cpp),'-o',str(exe)],check=True)
     subprocess.run([str(exe)],check=True)
