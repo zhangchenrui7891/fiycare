@@ -11,7 +11,8 @@ struct Renderer11 final : IRenderer {
  ComPtr<IDXGISwapChain> swap;
  ComPtr<ID3D11RenderTargetView> target,sceneTarget;ComPtr<ID3D11Texture2D> sceneTexture;ComPtr<ID3D11ShaderResourceView> sceneView;ComPtr<ID3D11VertexShader> postVS;ComPtr<ID3D11PixelShader> postPS;ComPtr<ID3D11Buffer> postConstants;
  ComPtr<ID3D11DepthStencilView> depth;
- ComPtr<ID3D11Buffer> vertices,constants;
+ ComPtr<ID3D11Buffer> vertices,constants,indexBuffer;
+ size_t indexCapacity=0;
  ComPtr<ID3D11VertexShader> vs;
  ComPtr<ID3D11PixelShader> ps;
  ComPtr<ID3D11InputLayout> layout;
@@ -41,14 +42,14 @@ struct Renderer11 final : IRenderer {
   D3D11_RASTERIZER_DESC rd{};rd.FillMode=D3D11_FILL_SOLID;rd.CullMode=D3D11_CULL_NONE;rd.DepthClipEnable=TRUE;check(device->CreateRasterizerState(&rd,&raster));
   D3D11_DEPTH_STENCIL_DESC dd{};dd.DepthEnable=TRUE;dd.DepthWriteMask=D3D11_DEPTH_WRITE_MASK_ALL;dd.DepthFunc=D3D11_COMPARISON_GREATER;
   dd.FrontFace={D3D11_STENCIL_OP_KEEP,D3D11_STENCIL_OP_KEEP,D3D11_STENCIL_OP_KEEP,D3D11_COMPARISON_ALWAYS};dd.BackFace=dd.FrontFace;
-  const auto textures=buildMaterialTextures(loadAtlas(assetFolder()/L"atlas.fctex"));
-  D3D11_TEXTURE2D_DESC at{};at.Width=textures.subresources[0].width;at.Height=textures.subresources[0].height;at.MipLevels=textures.mipCount;at.ArraySize=5;at.Format=DXGI_FORMAT_R8G8B8A8_UNORM;at.SampleDesc.Count=1;at.Usage=D3D11_USAGE_IMMUTABLE;at.BindFlags=D3D11_BIND_SHADER_RESOURCE;
+  const auto textures=buildFleetTextures(loadAtlas(assetFolder()/L"atlas.fctex"),loadAtlas(assetFolder()/L"b777.fctex"));
+  D3D11_TEXTURE2D_DESC at{};at.Width=textures.subresources[0].width;at.Height=textures.subresources[0].height;at.MipLevels=textures.mipCount;at.ArraySize=6;at.Format=DXGI_FORMAT_R8G8B8A8_UNORM;at.SampleDesc.Count=1;at.Usage=D3D11_USAGE_IMMUTABLE;at.BindFlags=D3D11_BIND_SHADER_RESOURCE;
   std::vector<D3D11_SUBRESOURCE_DATA> data(textures.subresources.size());
   for(size_t i=0;i<data.size();i++){data[i].pSysMem=textures.subresources[i].rgba.data();data[i].SysMemPitch=textures.subresources[i].width*4;}
   check(device->CreateTexture2D(&at,data.data(),&atlas));check(device->CreateShaderResourceView(atlas.Get(),nullptr,&atlasView));
   D3D11_SAMPLER_DESC sm{};sm.Filter=D3D11_FILTER_ANISOTROPIC;sm.AddressU=sm.AddressV=sm.AddressW=D3D11_TEXTURE_ADDRESS_CLAMP;sm.MaxAnisotropy=16;sm.ComparisonFunc=D3D11_COMPARISON_NEVER;sm.MaxLOD=D3D11_FLOAT32_MAX;check(device->CreateSamplerState(&sm,&sampler));
   sm.Filter=D3D11_FILTER_MIN_MAG_MIP_LINEAR;sm.MaxAnisotropy=1;check(device->CreateSamplerState(&sm,&postSampler));
-  logLine("Material textures: 5 isolated slices, "+std::to_string(textures.mipCount)+" mip levels, 16x anisotropic filtering");
+  logLine("Material textures: 6 isolated slices, "+std::to_string(textures.mipCount)+" mip levels, 16x anisotropic filtering");
   check(device->CreateDepthStencilState(&dd,&worldDepth));dd.DepthEnable=FALSE;dd.DepthWriteMask=D3D11_DEPTH_WRITE_MASK_ZERO;check(device->CreateDepthStencilState(&dd,&hudDepth));
  }
  void ensureVertexBuffer(size_t required){
@@ -62,7 +63,27 @@ struct Renderer11 final : IRenderer {
   auto c=cameraData(matrix,mode);D3D11_MAPPED_SUBRESOURCE mapped{};check(context->Map(constants.Get(),0,D3D11_MAP_WRITE_DISCARD,0,&mapped));std::memcpy(mapped.pData,&c,sizeof(c));context->Unmap(constants.Get(),0);
   ID3D11Buffer* cb=constants.Get();context->VSSetConstantBuffers(0,1,&cb);context->PSSetConstantBuffers(0,1,&cb);
  }
- void draw(const std::vector<Vertex>& scene,const std::vector<Vertex>& hud,const XMMATRIX& view,float light,const std::filesystem::path& photo={},const std::vector<Vertex>& cabin={},const XMMATRIX& cabinView=XMMatrixIdentity())override{
+ void uploadIndices(const std::vector<std::uint32_t>& indices){
+  if(indices.empty())return;
+  if(indices.size()>indexCapacity){
+   const auto grown=growVertexCapacity(indexCapacity,indices.size(),sizeof(std::uint32_t));
+   D3D11_BUFFER_DESC desc{};
+   desc.ByteWidth=static_cast<UINT>(grown*sizeof(std::uint32_t));
+   desc.Usage=D3D11_USAGE_DYNAMIC;
+   desc.BindFlags=D3D11_BIND_INDEX_BUFFER;
+   desc.CPUAccessFlags=D3D11_CPU_ACCESS_WRITE;
+   ComPtr<ID3D11Buffer> larger;
+   check(device->CreateBuffer(&desc,nullptr,&larger),"Grow DX11 index buffer");
+   indexBuffer=std::move(larger);
+   indexCapacity=grown;
+  }
+  D3D11_MAPPED_SUBRESOURCE mapped{};
+  check(context->Map(indexBuffer.Get(),0,D3D11_MAP_WRITE_DISCARD,0,&mapped));
+  std::memcpy(mapped.pData,indices.data(),indices.size()*sizeof(std::uint32_t));
+  context->Unmap(indexBuffer.Get(),0);
+ }
+ void draw(const std::vector<Vertex>& scene,const std::vector<Vertex>& hud,const XMMATRIX& view,float light,const std::filesystem::path& photo={},const std::vector<Vertex>& cabin={},const XMMATRIX& cabinView=XMMatrixIdentity(),const presentation::IndexedScene& indexedScene={})override{
+  uploadIndices(indexedScene.indices);
   const presentation::VertexBatch<Vertex> batch(skyVertices,scene,cabin,hud);
   ensureVertexBuffer(batch.layout.total);
   D3D11_MAPPED_SUBRESOURCE mapped{};check(context->Map(vertices.Get(),0,D3D11_MAP_WRITE_DISCARD,0,&mapped));
@@ -74,7 +95,21 @@ struct Renderer11 final : IRenderer {
   UINT stride=sizeof(Vertex),offset=0;auto* vb=vertices.Get();context->IASetVertexBuffers(0,1,&vb,&stride,&offset);
   context->VSSetShader(vs.Get(),nullptr,0);context->PSSetShader(ps.Get(),nullptr,0);auto* srv=atlasView.Get();auto* sm=sampler.Get();context->PSSetShaderResources(0,1,&srv);context->PSSetSamplers(0,1,&sm);
   context->OMSetDepthStencilState(hudDepth.Get(),0);camera(XMMatrixIdentity(),2);context->Draw(6,0);
-  context->OMSetDepthStencilState(worldDepth.Get(),0);camera(view,0);context->Draw((UINT)scene.size(),(UINT)batch.layout.scene);
+  context->OMSetDepthStencilState(worldDepth.Get(),0);camera(view,0);
+  if(!indexedScene.vertexCount){
+   context->Draw(static_cast<UINT>(scene.size()),static_cast<UINT>(batch.layout.scene));
+  }else{
+   const auto first=batch.layout.scene+indexedScene.firstVertex;
+   if(indexedScene.firstVertex)
+    context->Draw(static_cast<UINT>(indexedScene.firstVertex),static_cast<UINT>(batch.layout.scene));
+   if(!indexedScene.indices.empty()){
+    context->IASetIndexBuffer(indexBuffer.Get(),DXGI_FORMAT_R32_UINT,0);
+    context->DrawIndexed(static_cast<UINT>(indexedScene.indices.size()),0,static_cast<INT>(first));
+   }
+   const auto end=indexedScene.firstVertex+indexedScene.vertexCount;
+   if(end<scene.size())
+    context->Draw(static_cast<UINT>(scene.size()-end),static_cast<UINT>(batch.layout.scene+end));
+  }
   if(!cabin.empty()){context->ClearDepthStencilView(depth.Get(),D3D11_CLEAR_DEPTH,presentation::depthClear,0);camera(cabinView,3);context->Draw((UINT)cabin.size(),(UINT)batch.layout.cabin);}
   rt=target.Get();context->OMSetRenderTargets(1,&rt,nullptr);context->OMSetDepthStencilState(hudDepth.Get(),0);context->IASetInputLayout(nullptr);context->VSSetShader(postVS.Get(),nullptr,0);context->PSSetShader(postPS.Get(),nullptr,0);srv=sceneView.Get();context->PSSetShaderResources(0,1,&srv);auto* postSm=postSampler.Get();context->PSSetSamplers(0,1,&postSm);
   float post[]={1.f/width,1.f/height,antiAliasEnabled?1.f:0.f,0};check(context->Map(postConstants.Get(),0,D3D11_MAP_WRITE_DISCARD,0,&mapped));std::memcpy(mapped.pData,post,sizeof(post));context->Unmap(postConstants.Get(),0);auto* pcb=postConstants.Get();context->PSSetConstantBuffers(0,1,&pcb);context->Draw(3,0);

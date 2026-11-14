@@ -10,19 +10,45 @@
 
 namespace presentation {
 
+struct IndexedScene {
+    std::vector<std::uint32_t> indices;
+    std::size_t firstVertex=0, vertexCount=0;
+
+    void clear() {
+        indices.clear();
+        firstVertex=vertexCount=0;
+    }
+
+    template<class Vertex, class Model, class Transform>
+    void append(std::vector<Vertex>& scene, const Model& model, bool gearDown, Transform transform) {
+        firstVertex=scene.size();
+        vertexCount=model.uniqueVertices.size();
+        for (const auto& vertex: model.uniqueVertices) scene.push_back(transform(vertex));
+        indices.reserve(model.indices.size());
+        for (std::size_t triangle=0; triangle<model.gear.size(); ++triangle) {
+            if (!gearDown && model.gear[triangle]) continue;
+            const auto first=model.indices.begin()+triangle*3;
+            indices.insert(indices.end(),first,first+3);
+        }
+    }
+};
+
 // The render thread owns these buffers. Clearing a frame retains capacity;
 // the asynchronous terrain mesh remains a separate, immutable source.
 template<class Vertex> struct FrameGeometry {
     std::vector<Vertex> scene, cabin, hud;
+    IndexedScene indexedScene;
 
     void beginFrame(const std::vector<Vertex>& terrain) {
         scene.assign(terrain.begin(), terrain.end());
         cabin.clear();
         hud.clear();
+        indexedScene.clear();
     }
 
     std::size_t retainedBytes() const {
-        return (scene.capacity()+cabin.capacity()+hud.capacity())*sizeof(Vertex);
+        return (scene.capacity()+cabin.capacity()+hud.capacity())*sizeof(Vertex)
+            +indexedScene.indices.capacity()*sizeof(std::uint32_t);
     }
 };
 

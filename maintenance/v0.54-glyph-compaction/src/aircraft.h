@@ -1,7 +1,7 @@
 #pragma once
 #include <algorithm>
 namespace sim {
-inline constexpr int aircraftCount=10;
+inline constexpr int aircraftCount=11;
 struct AircraftSpec {
  const wchar_t* name;double emptyMass,wingArea,maxThrust,baseDrag,flapLift,gearHeight,rotationSpeed,controlScale,brakeRate,spoolRate,fuelRate;
  int seats;double spawnZ;
@@ -17,7 +17,8 @@ inline const AircraftSpec& aircraft(int id){
   {L"波音 B787 · 290座",120000,377,640000,.024,.90,5.3,69,.39,.48,.58,.038,290,-1600},
   {L"空客 A319 · 132座（近似）",40800,122.6,220000,.026,.90,4.0,62,.52,.52,.72,.026,132,-1600},
   {L"空客 A321 · 220座（近似）",48500,122.6,290000,.027,.92,4.0,68,.47,.50,.68,.031,220,-1600},
-  {L"波音 B787-9 · 296座（近似）",128850,377,660000,.024,.90,5.3,70,.38,.48,.58,.039,296,-1600}
+  {L"波音 B787-9 · 296座（近似）",128850,377,660000,.024,.90,5.3,70,.38,.48,.58,.039,296,-1600},
+  {L"波音 777-300ER",167800,436.8,1026000,.026,.90,5.5,75,.34,.46,.52,.05,365,-1600}
  };
  static_assert(sizeof(specs)/sizeof(specs[0])==aircraftCount,"Aircraft table size");
  return specs[std::clamp(id,0,aircraftCount-1)];

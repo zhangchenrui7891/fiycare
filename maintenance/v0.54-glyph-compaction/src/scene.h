@@ -1,4 +1,5 @@
 #pragma once
+#include "frame_geometry.h"
 #include "graphics_common.h"
 #include "simulation.h"
 #include "render_stability.h"
@@ -74,10 +75,21 @@ inline void airlinerMesh(std::vector<Vertex>& out,const XMMATRIX& transform,cons
  if(f.gear){box(out,0,-2.55f,10,.12f,.8f,.12f,grey,transform);box(out,0,-3.35f,10,.25f,.45f,.45f,{.04f,.04f,.04f},transform);}
 }
 
-inline void importedPlaneMesh(std::vector<Vertex>& out,const XMMATRIX& transform,const sim::Flight& f,const ImportedModel& model){
+inline void importedPlaneMesh(std::vector<Vertex>& out,const XMMATRIX& transform,const sim::Flight& f,const ImportedModel& model,presentation::IndexedScene& indexedScene){
+ auto worldVertex=[&](Vertex v){
+  XMFLOAT3 p,n;
+  XMStoreFloat3(&p,XMVector3TransformCoord(XMVectorSet(v.x,v.y,v.z,1),transform));
+  XMStoreFloat3(&n,XMVector3TransformNormal(XMVectorSet(v.nx,v.ny,v.nz,0),transform));
+  v.x=p.x;v.y=p.y;v.z=p.z;v.nx=n.x;v.ny=n.y;v.nz=n.z;
+  return v;
+ };
+ if(!model.indices.empty()){
+  indexedScene.append(out,model,f.gear,worldVertex);
+  return;
+ }
  for(size_t t=0;t<model.gear.size();t++){
   if(!f.gear&&model.gear[t])continue;
-  for(size_t k=0;k<3;k++){Vertex v=model.vertices[t*3+k];XMFLOAT3 p;XMStoreFloat3(&p,XMVector3TransformCoord(XMVectorSet(v.x,v.y,v.z,1),transform));v.x=p.x;v.y=p.y;v.z=p.z;XMFLOAT3 n;XMStoreFloat3(&n,XMVector3TransformNormal(XMVectorSet(v.nx,v.ny,v.nz,0),transform));v.nx=n.x;v.ny=n.y;v.nz=n.z;out.push_back(v);}
+  for(size_t k=0;k<3;k++)out.push_back(worldVertex(model.vertices[t*3+k]));
  }
 }
 inline void a330Gear(std::vector<Vertex>& out,const XMMATRIX& transform){

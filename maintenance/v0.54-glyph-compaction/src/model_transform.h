@@ -21,5 +21,6 @@ inline ImportedModel rotateAircraftQuarterTurn(const ImportedModel& source,
         v.x=float((v.x-(minX+maxX)*.5)*scale);v.z=float((v.z-(minZ+maxZ)*.5)*scale);
         v.y=float((v.y-minY)*scale-groundOffset);
     }
+    if(!source.indices.empty())indexModel(result);
     return result;
 }

@@ -4,12 +4,12 @@ namespace ui {
 enum Command {
  Continue=100,ToggleMenu,Save,Load,Restart,Exit,Trainer,Airliner,PassengersLess,PassengersMore,PassengersFull,PassengersEmpty,
  Missions,Settings,Home,PowerSaver,Assist,CameraChase,CameraCockpit,CameraTop,Help,AircraftPage,A330,A350,TerrainSatellite,TerrainMountains,LightingPage,ExposureLess,ExposureMore,LightReset,HazeToggle,ShadowsToggle,Noon,Sunset,AntiAlias,Fullscreen,SuperSample,A320,B737,B787,ImportModel,ResetModel,RotateModel,
- A319=170,A321,B7879,Account,
+ A319=170,A321,B7879,Account,B777,
  License=200,Cargo,Passenger,Race,Photo
 };
 enum class Page{None,Home,Pause,Aircraft,Missions,Settings,Lighting};
 inline int aircraftIdForCommand(int command){
- switch(command){case Trainer:return 0;case Airliner:return 1;case A330:return 2;case A350:return 3;case A320:return 4;case B737:return 5;case B787:return 6;case A319:return 7;case A321:return 8;case B7879:return 9;default:return -1;}
+ switch(command){case Trainer:return 0;case Airliner:return 1;case A330:return 2;case A350:return 3;case A320:return 4;case B737:return 5;case B787:return 6;case A319:return 7;case A321:return 8;case B7879:return 9;case B777:return 10;default:return -1;}
 }
 inline void resetFlightGuidance(sim::Snapshot& state){
  state.headingHold=state.altitudeHold=state.navigationHold=false;

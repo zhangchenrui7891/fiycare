@@ -55,3 +55,11 @@ inline MaterialTextures buildMaterialTextures(const AtlasImage& atlas){
  }
  return result;
 }
+
+inline MaterialTextures buildFleetTextures(const AtlasImage& atlas,AtlasImage aircraft){
+ auto result=buildMaterialTextures(atlas);
+ const auto side=result.subresources[0].width;
+ if(aircraft.width!=side||aircraft.height!=side)throw std::runtime_error("Aircraft texture resolution mismatch");
+ for(auto& mip:textureMips(std::move(aircraft))) result.subresources.push_back(std::move(mip));
+ return result;
+}

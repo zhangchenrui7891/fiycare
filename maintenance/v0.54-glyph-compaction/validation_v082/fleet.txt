@@ -1,0 +1,4 @@
+Gear down: 4394304 -> 1491648 bytes for model upload.
+Gear up: 3011904 -> 1376448 bytes for model upload.
+Gear down: 4394304 -> 1491648 bytes for model upload.
+PASS: 11 aircraft, 777 scale, orientation, gear, indexed geometry, and texture mip chain.

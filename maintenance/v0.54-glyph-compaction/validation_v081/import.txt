@@ -1,0 +1,1 @@
+triangles=30516 gear=9600 skipped=399 corners=91548 unique=23447

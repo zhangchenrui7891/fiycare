@@ -1,4 +1,5 @@
 #pragma once
+#include "frame_geometry.h"
 #include <windows.h>
 #include "windows_text.h"
 #include <wrl.h>
@@ -82,5 +83,5 @@ struct IRenderer {
  virtual ~IRenderer()=default;
  virtual const char* name()const=0;
  virtual void init(HWND window,bool software)=0;
- virtual void draw(const std::vector<Vertex>& scene,const std::vector<Vertex>& hud,const XMMATRIX& view,float light,const std::filesystem::path& photo={},const std::vector<Vertex>& cabin={},const XMMATRIX& cabinView=XMMatrixIdentity())=0;
+ virtual void draw(const std::vector<Vertex>& scene,const std::vector<Vertex>& hud,const XMMATRIX& view,float light,const std::filesystem::path& photo={},const std::vector<Vertex>& cabin={},const XMMATRIX& cabinView=XMMatrixIdentity(),const presentation::IndexedScene& indexedScene={})=0;
 };

@@ -1,0 +1,1 @@
+PASS: six menu pages, 20 aircraft-page buttons, eleven profiles and model tools fit the viewport

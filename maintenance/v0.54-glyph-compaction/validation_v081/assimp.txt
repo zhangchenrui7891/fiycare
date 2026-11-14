@@ -1,0 +1,13 @@
+aircraft=4 surface=0 full_load_max_altitude=1257.93
+aircraft=4 surface=1 full_load_max_altitude=1361.18
+aircraft=5 surface=0 full_load_max_altitude=1344.81
+aircraft=5 surface=1 full_load_max_altitude=1444.02
+aircraft=6 surface=0 full_load_max_altitude=1476.74
+aircraft=6 surface=1 full_load_max_altitude=1620.21
+aircraft=7 surface=0 full_load_max_altitude=1342.35
+aircraft=7 surface=1 full_load_max_altitude=1448.09
+aircraft=8 surface=0 full_load_max_altitude=1329.76
+aircraft=8 surface=1 full_load_max_altitude=1457.77
+aircraft=9 surface=0 full_load_max_altitude=1385.87
+aircraft=9 surface=1 full_load_max_altitude=1517.63
+PASS: compiled multi-format importer, three downloaded aircraft, texture baking, native assets, seven-profile saves and full-load flights

@@ -17,7 +17,7 @@ struct AirframeDimensions {
 inline AirframeDimensions airframeDimensions(int id) {
     const auto& spec = aircraft(id);
     const double span = std::sqrt(spec.wingArea * aeroTuning(id).aspectRatio);
-    static constexpr double lengths[] = {7.0, 30.0, 63.7, 66.8, 37.57, 39.47, 62.8, 33.84, 44.51, 62.8};
+    static constexpr double lengths[] = {7.0, 30.0, 63.7, 66.8, 37.57, 39.47, 62.8, 33.84, 44.51, 62.8, 73.86};
     static_assert(sizeof(lengths)/sizeof(lengths[0])==aircraftCount,"Dimension table size");
     const double length = lengths[std::clamp(id, 0, aircraftCount-1)];
     return {span, length, length * .32,

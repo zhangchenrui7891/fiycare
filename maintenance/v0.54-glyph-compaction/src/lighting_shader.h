@@ -48,8 +48,8 @@ float4 materialSample(float2 uv){
 float4 ps(O i):SV_TARGET{
  // Cabin markers: 3 = lit interior surface, 4 = dimmable emissive display.
  // sun.w / horizon.w are packed controls, independent of outdoor exposure/fog.
- if(i.textured>3.5)return float4(i.c*lerp(.08,1,saturate(sun.w)),1);
- if(i.textured>2.5){
+ if(i.textured>3.5&&i.textured<4.5)return float4(i.c*lerp(.08,1,saturate(sun.w)),1);
+ if(i.textured>2.5&&i.textured<3.5){
   float3 normal=i.n;if(dot(normal,normal)<.1)normal=cross(ddy(i.world),ddx(i.world));
   normal*=rsqrt(max(dot(normal,normal),.000001));
   if(dot(normal,eye.xyz-i.world)<0)normal=-normal;
@@ -58,17 +58,17 @@ float4 ps(O i):SV_TARGET{
   float3 flood=float3(.75,.52,.29)*horizon.w*(.45+.55*hemisphere);
   return float4(tone(pow(saturate(i.c),2.2)*(ambient+flood)),1);
  }
- if(i.textured>1.5)return float4(i.c,1);
+ if(i.textured>1.5&&i.textured<2.5)return float4(i.c,1);
  if(options.z>.5&&options.z<1.5)return float4(i.c,1);
  if(options.z>1.5){float3 ray=normalize(cameraForward.xyz+i.world.x*cameraRight.xyz+i.world.y*cameraUp.xyz);return float4(tone(sky(ray)),1);}
- float3 tex=materialSample(i.uv).rgb;
+ float3 tex=i.textured>4.5?Atlas.SampleGrad(AtlasSampler,float3(i.uv,5),ddx(i.uv),ddy(i.uv)).rgb:materialSample(i.uv).rgb;
  float3 base=pow(saturate(i.c*lerp(float3(1,1,1),tex,saturate(i.textured))),2.2);
  float3 n=i.n; if(dot(n,n)<.1)n=cross(ddy(i.world),ddx(i.world));n=normalize(n);
  float3 view=normalize(eye.xyz-i.world);if(dot(n,view)<0)n=-n;
  float sunlight=saturate(dot(n,sun.xyz)),hemisphere=saturate(n.y*.5+.5);
  float3 ambient=lerp(float3(.035,.029,.024),float3(.19,.24,.32),hemisphere)*(.12+.88*sunColor.w);
  float shadow=groundShadow(i.world);float3 color=base*(ambient+sunColor.rgb*sunlight*shadow);
- float aircraft=i.textured>.5&&(i.uv.x>.5||i.uv.y>.5)?1:0;
+ float aircraft=(i.textured>4.5||(i.textured>.5&&(i.uv.x>.5||i.uv.y>.5)))?1:0;
  float3 halfVector=sun.xyz+view;float3 halfDir=halfVector*rsqrt(max(dot(halfVector,halfVector),.000001));float fresnel=.035+.12*pow(1-saturate(dot(n,view)),5);
  color+=aircraft*sunColor.rgb*pow(saturate(dot(n,halfDir)),64)*fresnel*shadow;
  float distance=length(i.world-eye.xyz),fog=1-exp(-distance*options.y);

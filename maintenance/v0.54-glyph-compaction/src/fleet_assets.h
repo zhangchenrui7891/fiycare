@@ -27,7 +27,8 @@ inline const FleetAsset* fleetAsset(int id) {
         {6, "b787.fcmesh", "amvlab/B787_nologo.glb", L"amvlab · CC BY 4.0", 62.8, 3.8, -90},
         {7,"a319.fcmesh","amvlab/A320_nologo.glb",L"amvlab CC BY 4.0 · A320缩短近似",33.84,2.5,-90},
         {8,"a321.fcmesh","amvlab/A320_nologo.glb",L"amvlab CC BY 4.0 · A320加长近似",44.51,2.5,-90},
-        {9,"b7879.fcmesh","amvlab/B787_nologo.glb",L"amvlab CC BY 4.0 · B787系列近似",62.8,3.8,-90}
+        {9,"b7879.fcmesh","amvlab/B787_nologo.glb",L"amvlab CC BY 4.0 · B787系列近似",62.8,3.8,-90},
+        {10,"b777.fcmesh","flightgear777/777-300ER.ac",L"FlightGear 777 authors · GPL v2",73.86,5.5,-90}
     };
     for (const auto& asset : assets) if (asset.aircraftId == id) return &asset;
     return nullptr;

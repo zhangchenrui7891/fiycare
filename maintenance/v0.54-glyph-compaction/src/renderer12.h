@@ -12,7 +12,9 @@ struct Renderer12 final : IRenderer {
  ComPtr<ID3D12DescriptorHeap> depthHeap;ComPtr<ID3D12CommandAllocator> allocator;
  ComPtr<ID3D12GraphicsCommandList> list;ComPtr<ID3D12Fence> fence;
  ComPtr<ID3D12RootSignature> root,postRoot;ComPtr<ID3D12Resource> sceneTexture;ComPtr<ID3D12PipelineState> postPipeline;ComPtr<ID3D12PipelineState> pipeline,hudPipeline;UINT stride=0;Vertex* mapped=nullptr;
- size_t capacity=320000;
+ size_t capacity=320000, indexCapacity=0;
+ ComPtr<ID3D12Resource> indexBuffer;
+ void* mappedIndices=nullptr;
  void wait(){check(queue->Signal(fence.Get(),++serial));if(fence->GetCompletedValue()<serial){check(fence->SetEventOnCompletion(serial,event));if(WaitForSingleObject(event,5000)!=WAIT_OBJECT_0)throw std::runtime_error("GPU fence timed out");}}
  const char* name()const override{return "DX12";}
  void init(HWND h,bool software)override{
@@ -54,9 +56,9 @@ struct Renderer12 final : IRenderer {
   check(device->CreateGraphicsPipelineState(&pd,IID_PPV_ARGS(&pipeline)));
   pd.DepthStencilState.DepthEnable=FALSE;pd.DepthStencilState.DepthWriteMask=D3D12_DEPTH_WRITE_MASK_ZERO;check(device->CreateGraphicsPipelineState(&pd,IID_PPV_ARGS(&hudPipeline)));
   sm.Filter=D3D12_FILTER_MIN_MAG_MIP_LINEAR;sm.MaxAnisotropy=1;params[0].Constants.Num32BitValues=4;check(D3D12SerializeRootSignature(&rd,D3D_ROOT_SIGNATURE_VERSION_1,&blob,&error));check(device->CreateRootSignature(0,blob->GetBufferPointer(),blob->GetBufferSize(),IID_PPV_ARGS(&postRoot)));auto pv=compilePost("postVS","vs_5_0"),pp=compilePost("postPS","ps_5_0");pd.pRootSignature=postRoot.Get();pd.VS={pv->GetBufferPointer(),pv->GetBufferSize()};pd.PS={pp->GetBufferPointer(),pp->GetBufferSize()};pd.InputLayout={nullptr,0};pd.DSVFormat=DXGI_FORMAT_UNKNOWN;check(device->CreateGraphicsPipelineState(&pd,IID_PPV_ARGS(&postPipeline)));
-  const auto textures=buildMaterialTextures(loadAtlas(assetFolder()/L"atlas.fctex"));
+  const auto textures=buildFleetTextures(loadAtlas(assetFolder()/L"atlas.fctex"),loadAtlas(assetFolder()/L"b777.fctex"));
   const UINT subresourceCount=static_cast<UINT>(textures.subresources.size());
-  D3D12_RESOURCE_DESC at{};at.Dimension=D3D12_RESOURCE_DIMENSION_TEXTURE2D;at.Width=textures.subresources[0].width;at.Height=textures.subresources[0].height;at.DepthOrArraySize=5;at.MipLevels=static_cast<UINT16>(textures.mipCount);at.Format=DXGI_FORMAT_R8G8B8A8_UNORM;at.SampleDesc.Count=1;
+  D3D12_RESOURCE_DESC at{};at.Dimension=D3D12_RESOURCE_DIMENSION_TEXTURE2D;at.Width=textures.subresources[0].width;at.Height=textures.subresources[0].height;at.DepthOrArraySize=6;at.MipLevels=static_cast<UINT16>(textures.mipCount);at.Format=DXGI_FORMAT_R8G8B8A8_UNORM;at.SampleDesc.Count=1;
   check(device->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_NONE,&at,D3D12_RESOURCE_STATE_COPY_DEST,nullptr,IID_PPV_ARGS(&atlas)));
   std::vector<D3D12_PLACED_SUBRESOURCE_FOOTPRINT> footprints(subresourceCount);UINT64 bytes=0;device->GetCopyableFootprints(&at,0,subresourceCount,0,footprints.data(),nullptr,nullptr,&bytes);
   D3D12_HEAP_PROPERTIES uploadHeap{};uploadHeap.Type=D3D12_HEAP_TYPE_UPLOAD;D3D12_RESOURCE_DESC buf{};buf.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;buf.Width=bytes;buf.Height=1;buf.DepthOrArraySize=1;buf.MipLevels=1;buf.SampleDesc.Count=1;buf.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
@@ -65,9 +67,9 @@ struct Renderer12 final : IRenderer {
   check(allocator->Reset());check(list->Reset(allocator.Get(),nullptr));
   for(UINT i=0;i<subresourceCount;i++){D3D12_TEXTURE_COPY_LOCATION src{},dst{};src.pResource=upload.Get();src.Type=D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;src.PlacedFootprint=footprints[i];dst.pResource=atlas.Get();dst.Type=D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;dst.SubresourceIndex=i;list->CopyTextureRegion(&dst,0,0,0,&src,nullptr);}
   D3D12_RESOURCE_BARRIER ab{};ab.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;ab.Transition.pResource=atlas.Get();ab.Transition.Subresource=D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;ab.Transition.StateBefore=D3D12_RESOURCE_STATE_COPY_DEST;ab.Transition.StateAfter=D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;list->ResourceBarrier(1,&ab);check(list->Close());ID3D12CommandList* cmd[]={list.Get()};queue->ExecuteCommandLists(1,cmd);wait();
-  D3D12_DESCRIPTOR_HEAP_DESC ah{};ah.Type=D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;ah.NumDescriptors=2;ah.Flags=D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;check(device->CreateDescriptorHeap(&ah,IID_PPV_ARGS(&atlasHeap)));D3D12_SHADER_RESOURCE_VIEW_DESC av{};av.Format=at.Format;av.ViewDimension=D3D12_SRV_DIMENSION_TEXTURE2DARRAY;av.Shader4ComponentMapping=D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;av.Texture2DArray.MipLevels=textures.mipCount;av.Texture2DArray.ArraySize=5;device->CreateShaderResourceView(atlas.Get(),&av,atlasHeap->GetCPUDescriptorHandleForHeapStart());
+  D3D12_DESCRIPTOR_HEAP_DESC ah{};ah.Type=D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;ah.NumDescriptors=2;ah.Flags=D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;check(device->CreateDescriptorHeap(&ah,IID_PPV_ARGS(&atlasHeap)));D3D12_SHADER_RESOURCE_VIEW_DESC av{};av.Format=at.Format;av.ViewDimension=D3D12_SRV_DIMENSION_TEXTURE2DARRAY;av.Shader4ComponentMapping=D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;av.Texture2DArray.MipLevels=textures.mipCount;av.Texture2DArray.ArraySize=6;device->CreateShaderResourceView(atlas.Get(),&av,atlasHeap->GetCPUDescriptorHandleForHeapStart());
   auto sceneSRV=atlasHeap->GetCPUDescriptorHandleForHeapStart();sceneSRV.ptr+=device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);D3D12_SHADER_RESOURCE_VIEW_DESC sceneView{};sceneView.Format=at.Format;sceneView.ViewDimension=D3D12_SRV_DIMENSION_TEXTURE2D;sceneView.Shader4ComponentMapping=D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;sceneView.Texture2D.MipLevels=1;device->CreateShaderResourceView(sceneTexture.Get(),&sceneView,sceneSRV);
-  logLine("Material textures: 5 isolated slices, "+std::to_string(textures.mipCount)+" mip levels, 16x anisotropic filtering");
+  logLine("Material textures: 6 isolated slices, "+std::to_string(textures.mipCount)+" mip levels, 16x anisotropic filtering");
   hp.Type=D3D12_HEAP_TYPE_UPLOAD;D3D12_RESOURCE_DESC vd{};vd.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;vd.Width=capacity*sizeof(Vertex);vd.Height=1;vd.DepthOrArraySize=1;vd.MipLevels=1;vd.SampleDesc.Count=1;vd.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
   check(device->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_NONE,&vd,D3D12_RESOURCE_STATE_GENERIC_READ,nullptr,IID_PPV_ARGS(&vertices)));D3D12_RANGE range{0,0};check(vertices->Map(0,&range,reinterpret_cast<void**>(&mapped)));
  }
@@ -80,7 +82,37 @@ struct Renderer12 final : IRenderer {
   Vertex* next=nullptr;D3D12_RANGE range{0,0};check(larger->Map(0,&range,reinterpret_cast<void**>(&next)));
   wait();vertices->Unmap(0,nullptr);vertices=std::move(larger);mapped=next;capacity=grown;logLine("DX12 vertex capacity grew to "+std::to_string(capacity));
  }
- void draw(const std::vector<Vertex>& scene,const std::vector<Vertex>& hud,const XMMATRIX& matrix,float daylight,const std::filesystem::path& photo={},const std::vector<Vertex>& cabin={},const XMMATRIX& cabinView=XMMatrixIdentity())override{
+ // Each draw waits for the GPU fence before returning, so the same upload
+ // allocation can be rewritten on the next frame.
+ void uploadIndices(const std::vector<std::uint32_t>& indices){
+  if(indices.empty())return;
+  if(indices.size()>indexCapacity){
+   const auto grown=growVertexCapacity(indexCapacity,indices.size(),sizeof(std::uint32_t));
+   D3D12_HEAP_PROPERTIES heap{};
+   heap.Type=D3D12_HEAP_TYPE_UPLOAD;
+   D3D12_RESOURCE_DESC desc{};
+   desc.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;
+   desc.Width=grown*sizeof(std::uint32_t);
+   desc.Height=1;
+   desc.DepthOrArraySize=1;
+   desc.MipLevels=1;
+   desc.SampleDesc.Count=1;
+   desc.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+   ComPtr<ID3D12Resource> larger;
+   check(device->CreateCommittedResource(&heap,D3D12_HEAP_FLAG_NONE,&desc,
+    D3D12_RESOURCE_STATE_GENERIC_READ,nullptr,IID_PPV_ARGS(&larger)),"Grow DX12 index buffer");
+   D3D12_RANGE noReads{0,0};
+   void* next=nullptr;
+   check(larger->Map(0,&noReads,&next));
+   if(indexBuffer)indexBuffer->Unmap(0,nullptr);
+   indexBuffer=std::move(larger);
+   mappedIndices=next;
+   indexCapacity=grown;
+  }
+  std::memcpy(mappedIndices,indices.data(),indices.size()*sizeof(std::uint32_t));
+ }
+ void draw(const std::vector<Vertex>& scene,const std::vector<Vertex>& hud,const XMMATRIX& matrix,float daylight,const std::filesystem::path& photo={},const std::vector<Vertex>& cabin={},const XMMATRIX& cabinView=XMMatrixIdentity(),const presentation::IndexedScene& indexedScene={})override{
+  uploadIndices(indexedScene.indices);
   const presentation::VertexBatch<Vertex> batch(skyVertices,scene,cabin,hud);
   ensureVertexBuffer(batch.layout.total);
   batch.copyTo(mapped,capacity);check(allocator->Reset());check(list->Reset(allocator.Get(),pipeline.Get()));frame=swap->GetCurrentBackBufferIndex();
@@ -89,7 +121,23 @@ struct Renderer12 final : IRenderer {
   D3D12_VIEWPORT viewport{0,0,(float)width,(float)height,0,1};D3D12_RECT rect{0,0,(LONG)width,(LONG)height};list->RSSetViewports(1,&viewport);list->RSSetScissorRects(1,&rect);list->SetGraphicsRootSignature(root.Get());ID3D12DescriptorHeap* heaps[]={atlasHeap.Get()};list->SetDescriptorHeaps(1,heaps);list->SetGraphicsRootDescriptorTable(1,atlasHeap->GetGPUDescriptorHandleForHeapStart());auto camera=cameraData(XMMatrixIdentity(),2);list->SetGraphicsRoot32BitConstants(0,60,&camera,0);
   D3D12_VERTEX_BUFFER_VIEW vb{vertices->GetGPUVirtualAddress(),(UINT)batch.bytes(),sizeof(Vertex)};list->IASetVertexBuffers(0,1,&vb);list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
   list->SetPipelineState(hudPipeline.Get());list->DrawInstanced(6,1,0,0);
-  list->SetPipelineState(pipeline.Get());camera=cameraData(matrix,0);list->SetGraphicsRoot32BitConstants(0,60,&camera,0);list->DrawInstanced((UINT)scene.size(),1,(UINT)batch.layout.scene,0);
+  list->SetPipelineState(pipeline.Get());camera=cameraData(matrix,0);list->SetGraphicsRoot32BitConstants(0,60,&camera,0);
+  if(!indexedScene.vertexCount){
+   list->DrawInstanced(static_cast<UINT>(scene.size()),1,static_cast<UINT>(batch.layout.scene),0);
+  }else{
+   const auto first=batch.layout.scene+indexedScene.firstVertex;
+   if(indexedScene.firstVertex)
+    list->DrawInstanced(static_cast<UINT>(indexedScene.firstVertex),1,static_cast<UINT>(batch.layout.scene),0);
+   if(!indexedScene.indices.empty()){
+    D3D12_INDEX_BUFFER_VIEW ib{indexBuffer->GetGPUVirtualAddress(),
+     static_cast<UINT>(indexedScene.indices.size()*sizeof(std::uint32_t)),DXGI_FORMAT_R32_UINT};
+    list->IASetIndexBuffer(&ib);
+    list->DrawIndexedInstanced(static_cast<UINT>(indexedScene.indices.size()),1,0,static_cast<INT>(first),0);
+   }
+   const auto end=indexedScene.firstVertex+indexedScene.vertexCount;
+   if(end<scene.size())
+    list->DrawInstanced(static_cast<UINT>(scene.size()-end),1,static_cast<UINT>(batch.layout.scene+end),0);
+  }
   if(!cabin.empty()){list->ClearDepthStencilView(ds,D3D12_CLEAR_FLAG_DEPTH,presentation::depthClear,0,0,nullptr);camera=cameraData(cabinView,3);list->SetGraphicsRoot32BitConstants(0,60,&camera,0);list->DrawInstanced((UINT)cabin.size(),1,(UINT)batch.layout.cabin,0);}
   sceneBarrier.Transition.StateBefore=D3D12_RESOURCE_STATE_RENDER_TARGET;sceneBarrier.Transition.StateAfter=D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;list->ResourceBarrier(1,&sceneBarrier);list->OMSetRenderTargets(1,&swapRT,FALSE,nullptr);list->SetGraphicsRootSignature(postRoot.Get());list->SetPipelineState(postPipeline.Get());auto postSRV=atlasHeap->GetGPUDescriptorHandleForHeapStart();postSRV.ptr+=device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);list->SetGraphicsRootDescriptorTable(1,postSRV);float post[]={1.f/width,1.f/height,antiAliasEnabled?1.f:0.f,0};list->SetGraphicsRoot32BitConstants(0,4,post,0);list->DrawInstanced(3,1,0,0);
   list->OMSetRenderTargets(1,&swapRT,FALSE,&ds);list->SetGraphicsRootSignature(root.Get());list->SetGraphicsRootDescriptorTable(1,atlasHeap->GetGPUDescriptorHandleForHeapStart());list->SetPipelineState(hudPipeline.Get());camera=cameraData(XMMatrixIdentity(),1);list->SetGraphicsRoot32BitConstants(0,60,&camera,0);list->DrawInstanced((UINT)hud.size(),1,(UINT)batch.layout.hud,0);

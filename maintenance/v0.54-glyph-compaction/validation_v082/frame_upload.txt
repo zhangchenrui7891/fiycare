@@ -1,0 +1,2 @@
+Actual DX11/DX12 upload statements: 5 fleet assets x 4 view/empty combinations; bytes match legacy staging.
+CPU stand-ins only: Windows APIs, GPU fences and rendering remain unverified.

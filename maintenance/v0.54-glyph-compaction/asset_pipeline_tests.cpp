@@ -44,9 +44,9 @@ void importFixtures(const std::filesystem::path& folder){
 }
 
 void newFleet(const std::filesystem::path& assets,const std::filesystem::path& temporary){
-    assetRequire(sim::aircraftCount==10,"Ten registered aircraft");
+    assetRequire(sim::aircraftCount==11,"Eleven registered aircraft");
     assetRequire(ui::aircraftIdForCommand(ui::A320)==4&&ui::aircraftIdForCommand(ui::B737)==5&&ui::aircraftIdForCommand(ui::B787)==6,"New menu commands select the right profiles");
-    for(int id=4;id<sim::aircraftCount;id++){
+    for(int id=4;id<10;id++){
         const auto* profile=sim::fleetAsset(id);assetRequire(profile!=nullptr,"Registered mesh profile exists");
         AircraftImportOptions options;options.lengthMeters=profile->lengthMeters;options.groundOffset=profile->bodyGroundOffset;options.yawDegrees=profile->yawDegrees;
         const auto source=assets/"source"/profile->sourceName;

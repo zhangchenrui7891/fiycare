@@ -213,8 +213,9 @@ void saveAircraftModel(const ImportedModel& model, const std::filesystem::path& 
     std::ofstream out(path, std::ios::binary);
     const bool atlas=std::all_of(model.vertices.begin(),model.vertices.end(),[](const Vertex& vertex){return vertex.textured==1;});
     const bool colored=std::all_of(model.vertices.begin(),model.vertices.end(),[](const Vertex& vertex){return vertex.textured==0;});
-    if(!atlas&&!colored)throw std::runtime_error("Mixed unsupported model materials");
-    out.write(atlas?"FCMESH06":"FCMESH07", 8);
+    const bool fg=std::all_of(model.vertices.begin(),model.vertices.end(),[](const Vertex& v){return v.textured==0||v.textured==5;});
+    if(!atlas&&!colored&&!fg)throw std::runtime_error("Mixed unsupported model materials");
+    out.write(atlas?"FCMESH06":colored?"FCMESH07":"FCMESH08", 8);
     putU32(out, uint32_t(model.vertices.size())); putU32(out, 12); putU32(out, uint32_t(model.gear.size()));
     out.write(reinterpret_cast<const char*>(model.vertices.data()), std::streamsize(model.vertices.size()*sizeof(Vertex)));
     out.write(reinterpret_cast<const char*>(model.gear.data()), std::streamsize(model.gear.size()));

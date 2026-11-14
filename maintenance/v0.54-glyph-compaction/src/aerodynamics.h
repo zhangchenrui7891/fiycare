@@ -15,7 +15,7 @@ inline Atmosphere atmosphere(double altitude){
 // Prototype tuning values, NOT certified aircraft/airfoil data.
 struct AeroTuning {double aspectRatio,efficiency,stallAngle;};
 inline AeroTuning aeroTuning(int id){
- static constexpr AeroTuning values[]={{7.3,.78,.30},{10.,.80,.29},{9.3,.82,.28},{9.5,.85,.28},{9.48,.82,.28},{9.45,.80,.29},{9.6,.86,.28},{9.48,.82,.28},{9.48,.82,.28},{9.6,.86,.28}};
+ static constexpr AeroTuning values[]={{7.3,.78,.30},{10.,.80,.29},{9.3,.82,.28},{9.5,.85,.28},{9.48,.82,.28},{9.45,.80,.29},{9.6,.86,.28},{9.48,.82,.28},{9.48,.82,.28},{9.6,.86,.28},{9.6,.82,.28}};
  static_assert(sizeof(values)/sizeof(values[0])==aircraftCount,"Aero table size");
  return values[std::clamp(id,0,aircraftCount-1)];
 }
