@@ -1,0 +1,1 @@
+v0.82 texture initialization rejected missing livery: Invalid asset header

@@ -2,7 +2,7 @@
 
 基线为 v0.82。项目已有 DX11/DX12、11 机型、中文飞行简报、交互通用三维座舱、PFD/NAV/ENGINE、训练导航、生涯、浦东离线影像和 FXAA。上版 Windows 源码 CI 成功，Linux 48/48 通过。777 索引绘制的上传量已由 CPU 检查核实，游戏画面和 HD 6000 帧率待验收。
 
-本轮将两个 DirectX 后端接入共用贴图加载逻辑。可选 777 涂装失效时使用纯白材质层，记录文件名和原因。必要的基础图集失败仍报告错误。使用真实资源及异常样本验证。详见 LIVERY_FALLBACK.md、validation_v083 及 GitHub 工作流。
+本轮将两个 DirectX 后端接入共用贴图加载逻辑。可选 777 涂装失效时使用纯白材质层，记录文件名和原因。必要的基础图集失败仍报告错误。使用真实资源及异常样本验证。Linux Release（Assimp ON）全量构建和 48/48 CTest 通过，机型回归另通过严格 C++17 编译及 ASan/UBSan。Windows CI 的编译和 21 项检查通过（Assimp OFF，资源复制 OFF，无游戏/GPU 执行）。本版 CI https://github.com/zhangchenrui7891/fiycare/actions/runs/43645627732 。详见 LIVERY_FALLBACK.md、validation_v083 及 GitHub 工作流。
 
 与 MSFS 2024 对比，仍缺 777 专用座舱、完整航电/FMS、气动标定、细致地景与天气，以及目标机完整航班证据。下一步对照 Boot Camp 正常和缺失涂装启动，再采集相同视角帧时间、内存和完整航班记录。
 
