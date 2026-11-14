@@ -40,9 +40,12 @@ inline void assetPayloadSize(std::ifstream& in,std::uintmax_t expected,const cha
   throw std::runtime_error(message);
  in.seekg(start);if(!in)throw std::runtime_error(message);
 }
-inline AtlasImage loadAtlas(const std::filesystem::path& p){
- std::ifstream in(p,std::ios::binary);assetMagic(in,"FCTEX005");AtlasImage a;a.width=assetU32(in);a.height=assetU32(in);
+inline AtlasImage loadAtlas(const std::filesystem::path& p,uint32_t expectedSide=0){
+ std::ifstream in(p,std::ios::binary);
+ if(!in)throw std::runtime_error("Could not open texture file");
+ assetMagic(in,"FCTEX005");AtlasImage a;a.width=assetU32(in);a.height=assetU32(in);
  if(!a.width||!a.height||a.width>4096||a.height>4096)throw std::runtime_error("Invalid atlas dimensions");
+ if(expectedSide&&(a.width!=expectedSide||a.height!=expectedSide))throw std::runtime_error("Aircraft texture resolution mismatch");
  assetPayloadSize(in,std::uintmax_t(a.width)*a.height*4,"Invalid atlas payload size");
  a.rgba.resize(size_t(a.width)*a.height*4);in.read(reinterpret_cast<char*>(a.rgba.data()),static_cast<std::streamsize>(a.rgba.size()));
  if(!in||in.peek()!=std::char_traits<char>::eof())throw std::runtime_error("Invalid atlas payload");

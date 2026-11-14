@@ -56,7 +56,9 @@ struct Renderer12 final : IRenderer {
   check(device->CreateGraphicsPipelineState(&pd,IID_PPV_ARGS(&pipeline)));
   pd.DepthStencilState.DepthEnable=FALSE;pd.DepthStencilState.DepthWriteMask=D3D12_DEPTH_WRITE_MASK_ZERO;check(device->CreateGraphicsPipelineState(&pd,IID_PPV_ARGS(&hudPipeline)));
   sm.Filter=D3D12_FILTER_MIN_MAG_MIP_LINEAR;sm.MaxAnisotropy=1;params[0].Constants.Num32BitValues=4;check(D3D12SerializeRootSignature(&rd,D3D_ROOT_SIGNATURE_VERSION_1,&blob,&error));check(device->CreateRootSignature(0,blob->GetBufferPointer(),blob->GetBufferSize(),IID_PPV_ARGS(&postRoot)));auto pv=compilePost("postVS","vs_5_0"),pp=compilePost("postPS","ps_5_0");pd.pRootSignature=postRoot.Get();pd.VS={pv->GetBufferPointer(),pv->GetBufferSize()};pd.PS={pp->GetBufferPointer(),pp->GetBufferSize()};pd.InputLayout={nullptr,0};pd.DSVFormat=DXGI_FORMAT_UNKNOWN;check(device->CreateGraphicsPipelineState(&pd,IID_PPV_ARGS(&postPipeline)));
-  const auto textures=buildFleetTextures(loadAtlas(assetFolder()/L"atlas.fctex"),loadAtlas(assetFolder()/L"b777.fctex"));
+  std::string textureWarning;
+  const auto textures=loadFleetTextures(assetFolder(),textureWarning);
+  if(!textureWarning.empty())logLine(textureWarning);
   const UINT subresourceCount=static_cast<UINT>(textures.subresources.size());
   D3D12_RESOURCE_DESC at{};at.Dimension=D3D12_RESOURCE_DIMENSION_TEXTURE2D;at.Width=textures.subresources[0].width;at.Height=textures.subresources[0].height;at.DepthOrArraySize=6;at.MipLevels=static_cast<UINT16>(textures.mipCount);at.Format=DXGI_FORMAT_R8G8B8A8_UNORM;at.SampleDesc.Count=1;
   check(device->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_NONE,&at,D3D12_RESOURCE_STATE_COPY_DEST,nullptr,IID_PPV_ARGS(&atlas)));

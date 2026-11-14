@@ -4,6 +4,7 @@
 #include "src/ui_state.h"
 #include "src/model_transform.h"
 #include "src/texture_quality.h"
+#include <chrono>
 #include <iostream>
 #include <sstream>
 void need(bool ok){if(!ok)throw std::runtime_error("Fleet variant regression");}
@@ -56,7 +57,62 @@ int main(int argc,char**argv){need(argc==2);for(int id=0;id<sim::aircraftCount;i
  }
  frame.beginFrame(terrain);
  need(frame.indexedScene.indices.empty()&&frame.indexedScene.vertexCount==0);
- const auto textures=buildFleetTextures(loadAtlas(assets/"atlas.fctex"),loadAtlas(assets/"b777.fctex"));
+ std::string warning;
+ const auto textures=loadFleetTextures(assets,warning);
+ need(warning.empty());
  need(textures.subresources.size()==6*textures.mipCount&&textures.subresources[5*textures.mipCount].width==1024);
+ const auto original=loadAtlas(assets/"b777.fctex");
+ need(textures.subresources[5*textures.mipCount].rgba==original.rgba);
+ struct Temporary {
+  std::filesystem::path path=std::filesystem::temp_directory_path()/
+   ("fcair_livery_"+std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
+  Temporary(){std::filesystem::create_directory(path);}
+  ~Temporary(){std::error_code ignored;std::filesystem::remove_all(path,ignored);}
+ } temporary;
+ const auto base=temporary.path/"atlas.fctex", livery=temporary.path/"b777.fctex";
+ // Tiny valid atlas and a wrong-sized livery exercise the same startup paths.
+ const auto writeTexture=[](const std::filesystem::path& file,unsigned char side){
+  std::ofstream output(file,std::ios::binary);
+  const unsigned char dimensions[]={side,0,0,0,side,0,0,0};
+  output.write("FCTEX005",8);
+  output.write(reinterpret_cast<const char*>(dimensions),sizeof(dimensions));
+  for(int i=0;i<side*side*4;++i)output.put(char(i));
+  need(bool(output));
+ };
+ const auto rejectMissingBase=[&]{
+  try{loadFleetTextures(temporary.path,warning);}
+  catch(const std::runtime_error& error){return std::string(error.what()).find("atlas.fctex")!=std::string::npos;}
+  return false;
+ };
+ need(rejectMissingBase());
+ std::ofstream(base)<<"bad";
+ need(rejectMissingBase());
+ writeTexture(base,8);
+ const auto checkFallback=[&](const char* expectedReason){
+  const auto result=loadFleetTextures(temporary.path,warning);
+  need(warning.find("b777.fctex")!=std::string::npos&&warning.find(expectedReason)!=std::string::npos);
+  need(result.mipCount==3&&result.subresources.size()==18);
+  const auto unchanged=buildMaterialTextures(loadAtlas(base));
+  for(size_t i=0;i<unchanged.subresources.size();++i)
+   need(result.subresources[i].rgba==unchanged.subresources[i].rgba);
+  for(size_t i=15;i<18;++i){
+   const auto& mip=result.subresources[i];
+   const auto expectedSide=4u>>(i-15);
+   need(mip.width==expectedSide&&mip.height==expectedSide&&mip.rgba.size()==expectedSide*expectedSide*4);
+   need(std::all_of(mip.rgba.begin(),mip.rgba.end(),[](unsigned char value){return value==255;}));
+  }
+ };
+ checkFallback("Could not open texture file");
+ std::ofstream(livery)<<"bad";
+ checkFallback("Invalid asset header");
+ writeTexture(livery,2);
+ checkFallback("resolution mismatch");
+ writeTexture(livery,4);
+ std::filesystem::resize_file(livery,17);
+ checkFallback("payload size");
+ writeTexture(livery,4);
+ const auto recovered=loadFleetTextures(temporary.path,warning);
+ need(warning.empty()&&recovered.subresources[15].rgba==loadAtlas(livery).rgba);
+ std::cout<<"PASS: missing, corrupt, truncated and wrong-size optional livery; required atlas errors and restored livery.\n";
  std::cout<<"PASS: 11 aircraft, 777 scale, orientation, gear, indexed geometry, and texture mip chain.\n";
 }

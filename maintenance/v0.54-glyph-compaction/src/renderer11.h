@@ -42,7 +42,9 @@ struct Renderer11 final : IRenderer {
   D3D11_RASTERIZER_DESC rd{};rd.FillMode=D3D11_FILL_SOLID;rd.CullMode=D3D11_CULL_NONE;rd.DepthClipEnable=TRUE;check(device->CreateRasterizerState(&rd,&raster));
   D3D11_DEPTH_STENCIL_DESC dd{};dd.DepthEnable=TRUE;dd.DepthWriteMask=D3D11_DEPTH_WRITE_MASK_ALL;dd.DepthFunc=D3D11_COMPARISON_GREATER;
   dd.FrontFace={D3D11_STENCIL_OP_KEEP,D3D11_STENCIL_OP_KEEP,D3D11_STENCIL_OP_KEEP,D3D11_COMPARISON_ALWAYS};dd.BackFace=dd.FrontFace;
-  const auto textures=buildFleetTextures(loadAtlas(assetFolder()/L"atlas.fctex"),loadAtlas(assetFolder()/L"b777.fctex"));
+  std::string textureWarning;
+  const auto textures=loadFleetTextures(assetFolder(),textureWarning);
+  if(!textureWarning.empty())logLine(textureWarning);
   D3D11_TEXTURE2D_DESC at{};at.Width=textures.subresources[0].width;at.Height=textures.subresources[0].height;at.MipLevels=textures.mipCount;at.ArraySize=6;at.Format=DXGI_FORMAT_R8G8B8A8_UNORM;at.SampleDesc.Count=1;at.Usage=D3D11_USAGE_IMMUTABLE;at.BindFlags=D3D11_BIND_SHADER_RESOURCE;
   std::vector<D3D11_SUBRESOURCE_DATA> data(textures.subresources.size());
   for(size_t i=0;i<data.size();i++){data[i].pSysMem=textures.subresources[i].rgba.data();data[i].SysMemPitch=textures.subresources[i].width*4;}

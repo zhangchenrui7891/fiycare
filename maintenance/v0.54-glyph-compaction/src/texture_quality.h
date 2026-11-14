@@ -56,10 +56,31 @@ inline MaterialTextures buildMaterialTextures(const AtlasImage& atlas){
  return result;
 }
 
-inline MaterialTextures buildFleetTextures(const AtlasImage& atlas,AtlasImage aircraft){
- auto result=buildMaterialTextures(atlas);
- const auto side=result.subresources[0].width;
- if(aircraft.width!=side||aircraft.height!=side)throw std::runtime_error("Aircraft texture resolution mismatch");
- for(auto& mip:textureMips(std::move(aircraft))) result.subresources.push_back(std::move(mip));
+// The base atlas is required for scenery and existing aircraft materials.
+// A missing optional livery uses white, retaining vertex color and lighting.
+inline MaterialTextures loadFleetTextures(const std::filesystem::path& folder,std::string& warning){
+ warning.clear();
+ MaterialTextures result;
+ try{
+  result=buildMaterialTextures(loadAtlas(folder/L"atlas.fctex"));
+ }catch(const std::runtime_error& error){
+  throw std::runtime_error(std::string("Required texture atlas.fctex: ")+error.what());
+ }
+ const auto side=result.subresources.front().width;
+ AtlasImage aircraft;
+ try{
+  aircraft=loadAtlas(folder/L"b777.fctex",side);
+ }catch(const std::runtime_error& error){
+  warning=std::string("Optional texture b777.fctex: ")+error.what()+"; using neutral 777 livery";
+ }
+ if(warning.empty()){
+  for(auto& mip:textureMips(std::move(aircraft)))result.subresources.push_back(std::move(mip));
+ }else{
+  auto mipSide=side;
+  for(uint32_t level=0;level<result.mipCount;++level){
+   result.subresources.push_back({mipSide,mipSide,std::vector<unsigned char>(size_t(mipSide)*mipSide*4,255)});
+   mipSide=std::max(1u,mipSide/2);
+  }
+ }
  return result;
 }
