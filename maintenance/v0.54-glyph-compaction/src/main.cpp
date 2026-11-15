@@ -195,7 +195,9 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   auto saveTracks=[&](){if(!runFiles.gameSavesEnabled())return;auto temp=folder/L"tracks.tmp",dest=folder/L"tracks.txt";{std::ofstream out(temp);for(auto m:marks)out<<m.x<<' '<<m.z<<'\n';out.flush();if(!out)throw std::runtime_error("Track save write failed");out.close();if(!out)throw std::runtime_error("Track save close failed");}if(!MoveFileExW(temp.c_str(),dest.c_str(),MOVEFILE_REPLACE_EXISTING|MOVEFILE_WRITE_THROUGH))throw std::runtime_error("Track save commit failed");};
   if(benchmark&&benchmarkPreset.camera==0&&aircraftModels.find(benchmarkPreset.aircraftId)==aircraftModels.end())
    throw std::runtime_error("777 chase benchmark requires a loadable assets/b777.fcmesh");
-  int camera=benchmark?benchmarkPreset.camera:smoke&&!args.has(L"--cockpit")?0:1;
+  int camera=smoke?0:1;
+  if(benchmark)camera=benchmarkPreset.camera;
+  else if(smoke&&args.has(L"--cockpit"))camera=1;
   if(args.has(L"--no-aa"))state.antiAlias=false;else if(smoke)state.antiAlias=true;
   bool paused=smoke,walking=false,powerSaver=low&&!benchmark;ui::Page menuPage=(smoke||benchmark)?ui::Page::None:ui::Page::Home;XMFLOAT3 walker{};float walkYaw=0;
   presentation::TerrainStream<std::vector<Vertex>> terrainStream;
