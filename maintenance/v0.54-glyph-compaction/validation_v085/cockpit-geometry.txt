@@ -1,0 +1,2 @@
+PASS 777 window: solid budget, three clear forward rays, visible mullion, display and control center clearance. CPU geometry only.
+PASS production glass: 990 aircraft/pitch/bank/heading/power cases; units, RPM, fuel/flap/throttle bindings, bounds, vertex budget, invalid waypoint and stall warning. CPU adapters only.

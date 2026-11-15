@@ -25,7 +25,38 @@ inline void cockpitAttitude(std::vector<Vertex>& out,float x,float y,float z,dou
  for(int i=-3;i<=3;i++){float yy=y+i*.022f;if(i!=0)cockpitFace(out,x,yy,z-.003f,i%2?.018f:.032f,.001f,{.9f,.93f,.95f},transform);}
  cockpitFace(out,x-.055f,y,z-.005f,.035f,.002f,{1,.85f,.13f},transform);cockpitFace(out,x+.055f,y,z-.005f,.035f,.002f,{1,.85f,.13f},transform);cockpitFace(out,x,y-.008f,z-.005f,.002f,.01f,{1,.85f,.13f},transform);
 }
-inline void cockpitInterior(std::vector<Vertex>& out,const XMMATRIX& transform){
+// Raked 777 windscreen frame in the existing pilot-eye coordinate system.
+inline void cockpit777WindowFrame(std::vector<Vertex>& out,const XMMATRIX& transform){
+ const XMFLOAT3 trim{.205f,.232f,.255f},returnFace{.118f,.142f,.164f};
+ const auto beam=[&](XMFLOAT3 a,XMFLOAT3 b,float width,float depth){
+  const float dx=b.x-a.x,dy=b.y-a.y;
+  const float scale=width/std::sqrt(dx*dx+dy*dy);
+  const float nx=dy*scale,ny=-dx*scale;
+  XMFLOAT3 points[8];
+  for(int i=0;i<8;i++){
+   const auto& end=(i&2)?b:a;
+   const float side=(i&1)?1.f:-1.f;
+   const XMFLOAT3 p{end.x+side*nx,end.y+side*ny,end.z+((i&4)?depth:-depth)};
+   XMStoreFloat3(&points[i],XMVector3TransformCoord(XMLoadFloat3(&p),transform));
+  }
+  constexpr int indices[]={0,2,3,0,3,1,4,5,7,4,7,6,
+                           0,1,5,0,5,4,2,6,7,2,7,3,
+                           0,4,6,0,6,2,1,3,7,1,7,5};
+  for(int i=0;i<36;i+=3)tri(out,points[indices[i]],points[indices[i+1]],points[indices[i+2]],i<12?trim:returnFace);
+ };
+ const XMFLOAT3 leftB{-1.04f,-.105f,1.38f},rightB{1.04f,-.105f,1.38f};
+ const XMFLOAT3 leftT{-.82f,.61f,.97f},rightT{.82f,.61f,.97f};
+ beam(leftB,rightB,.045f,.050f);
+ beam(leftT,rightT,.052f,.060f);
+ beam(leftB,leftT,.047f,.047f);
+ beam(rightB,rightT,.047f,.047f);
+ // The existing eye is on the captain's side of the centre post. Give the
+ // captain a clear straight-ahead ray while keeping the post in the right pane.
+ beam({.32f,leftB.y,leftB.z},{.26f,leftT.y,leftT.z},.037f,.049f);
+ for(float side:{-1.f,1.f})
+  box(out,side*1.04f,.12f,.50f,.050f,.043f,.85f,returnFace,transform);
+}
+inline void cockpitInterior(std::vector<Vertex>& out,const XMMATRIX& transform,bool b777){
  const XMFLOAT3 shell{.20f,.23f,.25f},edge{.075f,.085f,.10f},metal{.40f,.43f,.45f};
  box(out,0,-1.06f,1.0f,1.10f,.15f,.09f,shell,transform);
  // Angled glare shield, side consoles and fabric seats.
@@ -41,9 +72,12 @@ inline void cockpitInterior(std::vector<Vertex>& out,const XMMATRIX& transform){
   // Side-stick with grip and trigger, decorative until flight axes are connected.
   box(out,side*.95f,-.64f,-.05f,.04f,.11f,.035f,metal,transform);box(out,side*.95f,-.51f,-.05f,.045f,.055f,.055f,edge,transform);
   // Angled windscreen pillars and side window sill.
-  box(out,0,0,0,.035f,.59f,.045f,shell,XMMatrixRotationZ(side*.30f)*XMMatrixTranslation(side*.94f,.47f,1.20f)*transform);
-  box(out,side*1.01f,.19f,.18f,.045f,.035f,1.0f,shell,transform);
+  if(!b777){
+   box(out,0,0,0,.035f,.59f,.045f,shell,XMMatrixRotationZ(side*.30f)*XMMatrixTranslation(side*.94f,.47f,1.20f)*transform);
+   box(out,side*1.01f,.19f,.18f,.045f,.035f,1.0f,shell,transform);
+  }
  }
+ if(b777)cockpit777WindowFrame(out,transform);
  // Overhead electrical panel, individual switch housings and indicator lamps.
  box(out,0,.87f,.52f,.48f,.06f,.39f,edge,transform);
  for(int row=0;row<1;row++)for(int col=0;col<8;col++){

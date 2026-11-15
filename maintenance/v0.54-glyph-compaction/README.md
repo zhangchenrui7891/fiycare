@@ -678,3 +678,7 @@ FlightGear 777 外模、UV 贴图、顶点变换缓存与飞行简报菜单，�
 ## v0.84
 
 新增 777 驾驶舱和追尾性能基准。运行方法与输出见 [BENCHMARK_777.md](BENCHMARK_777.md)。
+
+## v0.85
+
+777-300ER 新增独立前风挡原型。验证和实机对照见 [COCKPIT_777_WINDOW.md](COCKPIT_777_WINDOW.md)。

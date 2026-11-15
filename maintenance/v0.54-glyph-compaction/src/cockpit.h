@@ -14,15 +14,16 @@ inline void cockpitText(std::vector<Vertex>& out,const std::wstring& text,float 
 #include "cockpit_avionics.h"
 inline void cockpitMesh(std::vector<Vertex>& out,const sim::Snapshot& state,const XMMATRIX& transform){
  const size_t firstVertex=out.size();
- const auto& f=state.flight;XMFLOAT3 panel{.13f,.16f,.18f},trim{.23f,.27f,.3f};
+ const auto& f=state.flight;const bool b777=f.aircraftId==10;
+ XMFLOAT3 panel{.13f,.16f,.18f},trim{.23f,.27f,.3f};
  box(out,0,-.65f,1.03f,.95f,.33f,.13f,panel,transform);
  
  box(out,0,-1.05f,.1f,1.25f,.04f,1.4f,panel,transform);
- for(float x:{-1.1f,1.1f}){box(out,x,-.4f,.1f,.055f,.65f,1.1f,panel,transform);box(out,x,.34f,1.1f,.055f,.7f,.065f,trim,transform);}
+ for(float x:{-1.1f,1.1f}){box(out,x,-.4f,.1f,.055f,.65f,1.1f,panel,transform);if(!b777)box(out,x,.34f,1.1f,.055f,.7f,.065f,trim,transform);}
  box(out,0,.95f,.65f,1.15f,.055f,.55f,panel,transform);
- box(out,0,.5f,1.35f,.035f,.43f,.035f,trim,transform);
+ if(!b777)box(out,0,.5f,1.35f,.035f,.43f,.035f,trim,transform);
  box(out,.63f,-.93f,.40f,.22f,.15f,.32f,panel,transform);
- cockpitInterior(out,transform);
+ cockpitInterior(out,transform,b777);
  auto n=[](double v){return std::to_wstring(int(std::lround(v)));};
  const bool waypointValid=sim::validNavigationWaypoint(state.navigationWaypoint);
  const std::wstring waypointNumber=waypointValid?n(state.navigationWaypoint+1):L"--";

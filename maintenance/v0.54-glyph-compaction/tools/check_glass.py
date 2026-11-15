@@ -97,16 +97,51 @@ XMFLOAT3 XMVectorSet(float x,float y,float z,float){return {x,y,z};}
 struct TestFont{void draw(std::vector<Vertex>&,const std::wstring&,float,float,XMFLOAT3={1,1,1},float=900){}};
 TestFont& chineseFont(){static TestFont f;return f;}
 ''' + quad + box + detail + body + r'''
+bool windowFrameBlocks(const std::vector<Vertex>& frame,cockpit::Point ray,float maxDistance){
+ auto subtract=[](cockpit::Point a,cockpit::Point b){return cockpit::Point{a.x-b.x,a.y-b.y,a.z-b.z};};
+ auto cross=[](cockpit::Point a,cockpit::Point b){return cockpit::Point{a.y*b.z-a.z*b.y,a.z*b.x-a.x*b.z,a.x*b.y-a.y*b.x};};
+ auto dot=[](cockpit::Point a,cockpit::Point b){return a.x*b.x+a.y*b.y+a.z*b.z;};
+ auto point=[](const Vertex& v){return cockpit::Point{v.x,v.y,v.z};};
+ for(size_t i=0;i<frame.size();i+=3){
+  const auto a=point(frame[i]),ab=subtract(point(frame[i+1]),a),ac=subtract(point(frame[i+2]),a);
+  const auto perpendicular=cross(ray,ac);
+  const float determinant=dot(ab,perpendicular);
+  if(std::abs(determinant)<1e-6f)continue;
+  const cockpit::Point toEye{-a.x,-a.y,-a.z};
+  const auto q=cross(toEye,ab);
+  const float u=dot(toEye,perpendicular)/determinant,v=dot(ray,q)/determinant;
+  const float distance=dot(ac,q)/determinant;
+  if(u>=0&&v>=0&&u+v<=1&&distance>0&&distance<maxDistance)return true;
+ }
+ return false;
+}
+void check777WindowFrame(){
+ std::vector<Vertex> frame;
+ cockpit777WindowFrame(frame,0);
+ require(frame.size()==7*36,"777 frame uses the shared frame's seven-solid budget");
+ for(const auto& vertex:frame)require(std::isfinite(vertex.x)&&std::isfinite(vertex.y)&&std::isfinite(vertex.z),"Finite window geometry");
+ require(windowFrameBlocks(frame,{.24f,0,1},3),"Right-of-centre mullion is opaque");
+ for(float x:{-.32f,0.f,.48f})
+  require(!windowFrameBlocks(frame,{x,0,1},3),"Forward window apertures remain open");
+ for(double throttle:{0.,.5,1.})
+  for(const auto& control:cockpit::solids(throttle))
+   require(!windowFrameBlocks(frame,control.center,1),"777 frame must not cover a control centre");
+ for(float x:{-.55f,0.f,.55f})
+  require(!windowFrameBlocks(frame,{x,-.735f,.873f},1),"777 frame must not cover a display centre");
+ std::cout<<"PASS 777 window: solid budget, three clear forward rays, visible mullion, display and control center clearance. CPU geometry only.\n";
+}
 void checkCockpitIntegration(){
  for(int id=0;id<sim::aircraftCount;id++)for(bool on:{false,true}){
   sim::Snapshot state;state.flight.configure(id);state.avionics.master=on;std::vector<Vertex> geometry;
   cockpitMesh(geometry,state,0);
   require(!geometry.empty(),"Full cockpit draws geometry");
+  const auto trimVertices=std::count_if(geometry.begin(),geometry.end(),[](const Vertex& v){return v.r==.205f&&v.g==.232f&&v.b==.255f&&v.textured==3;});
+  require(trimVertices==(id==10?60:0),"777 opaque window trim is emitted only for the 777");
   for(const auto& v:geometry)require(std::isfinite(v.x)&&std::isfinite(v.y)&&std::isfinite(v.z)&&(v.textured==3||v.textured==4),"Cockpit finite and material integration");
  }
 }
 '''
-code = code.replace('int main(int argc,char** argv){', integration + '\nint main(int argc,char** argv){\n checkCockpitIntegration();')
+code = code.replace('int main(int argc,char** argv){', integration + '\nint main(int argc,char** argv){\n checkCockpitIntegration();\n check777WindowFrame();')
 with tempfile.TemporaryDirectory(prefix='fcair-glass-') as folder:
     source = Path(folder) / 'glass.cpp'
     exe = Path(folder) / 'glass'
