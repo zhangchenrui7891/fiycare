@@ -7,7 +7,7 @@
 void require(bool value,const char* why){if(!value)throw std::runtime_error(why);}
 void close(double a,double b,const char* why){require(std::abs(a-b)<1e-8,why);}
 std::string report(const timing::BenchmarkSamples& samples){
- std::ostringstream out;timing::writeBenchmarkSummary(out,"v0.41","CPU_TEST_ONLY",true,false,samples);return out.str();
+ std::ostringstream out;timing::writeBenchmarkSummary(out,"v0.41","CPU_TEST_ONLY",true,false,samples,timing::benchmarkPreset(launch::Options()));return out.str();
 }
 void noVerdict(const timing::BenchmarkSamples& samples){
  const auto text=report(samples);
@@ -23,6 +23,31 @@ void diagnosticRouting(){
           "Diagnostic path routing and benchmark precedence");
   require(files.gameSavesEnabled()==(!benchmark&&!smoke),"Only ordinary games allow career persistence");
  }
+}
+void benchmarkPresets(){
+ const auto original=timing::benchmarkPreset(launch::Options({L"--benchmark-777-chase=1"}));
+ const auto cockpit=timing::benchmarkPreset(launch::Options({L"--benchmark-777-cockpit"}));
+ const auto chase=timing::benchmarkPreset(launch::Options({L"--benchmark-777-cockpit",L"--benchmark-777-chase"}));
+ require(original.aircraftId==3&&original.camera==1,"Default remains A350 cockpit");
+ require(cockpit.aircraftId==10&&cockpit.camera==1,"777 cockpit starts with cockpit camera");
+ require(chase.aircraftId==10&&chase.camera==0,"777 chase wins when both options are present");
+ const std::filesystem::path base="PLAYER_DATA",root=base/"diagnostics"/"benchmark";
+ require(runfiles::RunFiles(base,true,false,cockpit.outputSubfolder).folder()==root/"777-cockpit","Cockpit output is isolated");
+ require(runfiles::RunFiles(base,true,false,chase.outputSubfolder).folder()==root/"777-chase","Chase output is isolated");
+ require(runfiles::RunFiles(base,false,false,chase.outputSubfolder).folder()==base,"Benchmark modifier leaves normal data path alone");
+ timing::BenchmarkSamples samples;
+ timing::FrameContext context;
+ context.aircraft=10;context.camera=1;
+ samples.requirePreset(context,cockpit);
+ require(samples.configurationValid(),"Expected aircraft and view accepted");
+ samples.requirePreset(context,chase);
+ context.camera=0;
+ samples.requirePreset(context,chase);
+ require(!samples.configurationValid(),"Wrong initial view invalidates the run permanently");
+ std::ostringstream out;
+ timing::writeBenchmarkSummary(out,"v0.84","CPU_TEST_ONLY",true,false,samples,chase);
+ require(out.str().find("initial_scene=PVG,777-300ER,chase,noon,low\n")!=std::string::npos,"Report identifies selected preset");
+ require(out.str().find("result_status=NOT_EVALUATED")!=std::string::npos,"Mismatched preset gets no verdict");
 }
 void reproduceLegacyClock(){
  // v0.35 add/elapsed excerpt. Virtual intervals, NOT measured GPU frames.
@@ -120,7 +145,7 @@ void configurationChanges(){
  std::cout<<"PASS 11 configuration mutations after valid full runs, sticky invalidation, early change, and report suppression. CPU only.\n";
 }
 int main(){
- try{configurationChanges();diagnosticRouting();reproduceLegacyClock();capacityBoundaryAndEarlyEnd();normalAndIncompleteRuns();malformedEvidence();
+ try{configurationChanges();diagnosticRouting();benchmarkPresets();reproduceLegacyClock();capacityBoundaryAndEarlyEnd();normalAndIncompleteRuns();malformedEvidence();
   std::cout<<"Benchmark CPU clock/report checks passed; no Windows, GPU FPS or HD6000 measurement performed.\n";
  }catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 1;}
 }

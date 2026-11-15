@@ -123,15 +123,20 @@ void help(HWND window){
   L"存档/照片/日志：%LOCALAPPDATA%\\FlightCareerAir\n"
   L"诊断输出另存：diagnostics\\benchmark 或 diagnostics\\smoke；不保存游戏生涯。\n"
   L"DX12初始化失败会自动尝试DX11；可用--dx11强制兼容模式。",
-  L"飞行生涯 v0.83 · 中文操作说明",MB_OK);
+  L"飞行生涯 v0.84 · 中文操作说明",MB_OK);
 }
 int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
  std::filesystem::path folder;
  try{
-  const auto args=launch::currentOptions();const bool benchmark=args.has(L"--benchmark");const bool low=args.has(L"--low")||benchmark;const bool smoke=args.has(L"--smoke-test");int smokeFrames=0;
-  const runfiles::RunFiles runFiles(dataFolder(),benchmark,smoke);
+  const auto args=launch::currentOptions();const bool benchmark=args.has(L"--benchmark");const bool low=args.has(L"--low")||benchmark;const bool smoke=!benchmark&&args.has(L"--smoke-test");int smokeFrames=0;
+  const auto benchmarkPreset=timing::benchmarkPreset(args);
+  const runfiles::RunFiles runFiles(dataFolder(),benchmark,smoke,benchmarkPreset.outputSubfolder);
   folder=runFiles.folder();std::filesystem::create_directories(folder);
-  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.83 startup");
+  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.84 startup");
+  if(benchmark){
+   std::filesystem::remove(folder/L"performance_summary.txt");
+   std::filesystem::remove(folder/L"benchmark_final.bmp");
+  }
   if(!runFiles.gameSavesEnabled())logLine("Diagnostic output isolated; live game saves disabled");
   sim::Snapshot state;bool loaded=false,primaryValid=false;
   {std::ifstream saved(folder/L"state.txt");if(saved){if(!state.read(saved))logLine("Invalid state.txt ignored; attempting legacy career");else {loaded=primaryValid=true;logLine("Loaded compatible full flight state");}}}
@@ -139,7 +144,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   if(!loaded){std::ifstream legacy(folder/L"career.txt");state.career.load(legacy);logLine("Legacy v2 career migration attempted");}
   if(smoke&&(args.has(L"--airliner")||args.has(L"--a330")||args.has(L"--a350"))){state.flight=sim::Flight{};state.flight.configure(args.has(L"--a350")?3:args.has(L"--a330")?2:1);state.career.stage=state.career.gate=0;}
   if(smoke){state.clock=args.has(L"--sunset")?17.4:12;state.exposureEV=0;state.terrainMode=1;state.haze=.00016;state.shadows=true;}
-  if(benchmark){state=sim::Snapshot{};state.flight.configure(3);state.clock=12;state.exposureEV=0;state.terrainMode=1;state.haze=.00016;state.shadows=true;state.antiAlias=!args.has(L"--no-aa");}
+  if(benchmark){state=sim::Snapshot{};state.flight.configure(benchmarkPreset.aircraftId);state.clock=12;state.exposureEV=0;state.terrainMode=1;state.haze=.00016;state.shadows=true;state.antiAlias=!args.has(L"--no-aa");}
   if(smoke){
    if(args.has(L"--night"))state.clock=0;
    if(args.has(L"--flood-off"))state.cockpitFlood=false;
@@ -165,7 +170,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   const DWORD style=WS_OVERLAPPEDWINDOW;
   WNDCLASSW wc{};wc.lpfnWndProc=windowProc;wc.hInstance=instance;wc.lpszClassName=L"FlightCareerAir";wc.hCursor=LoadCursor(nullptr,IDC_ARROW);if(!RegisterClassW(&wc))throw std::runtime_error("Window registration failed");
   RECT bounds{0,0,low?640:1600,low?360:900};HMENU nativeMenu=createChineseMenu();AdjustWindowRect(&bounds,style,TRUE);
-  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.83 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
+  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.84 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
   if(!window)throw std::runtime_error("Window creation failed");ShowWindow(window,SW_SHOW);
   if(args.has(L"--fullscreen"))toggleFullscreen(window);
   renderScale=launch::initialRenderScale(args);
@@ -188,8 +193,9 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   struct Mark{float x,z;};std::deque<Mark> marks;
   {std::ifstream in(folder/L"tracks.txt");float x,z;while(marks.size()<400&&in>>x>>z)if(std::isfinite(x)&&std::isfinite(z))marks.push_back({x,z});}
   auto saveTracks=[&](){if(!runFiles.gameSavesEnabled())return;auto temp=folder/L"tracks.tmp",dest=folder/L"tracks.txt";{std::ofstream out(temp);for(auto m:marks)out<<m.x<<' '<<m.z<<'\n';out.flush();if(!out)throw std::runtime_error("Track save write failed");out.close();if(!out)throw std::runtime_error("Track save close failed");}if(!MoveFileExW(temp.c_str(),dest.c_str(),MOVEFILE_REPLACE_EXISTING|MOVEFILE_WRITE_THROUGH))throw std::runtime_error("Track save commit failed");};
-  int camera=smoke?0:1;
-  if((smoke&&args.has(L"--cockpit"))||benchmark)camera=1;
+  if(benchmark&&benchmarkPreset.camera==0&&aircraftModels.find(benchmarkPreset.aircraftId)==aircraftModels.end())
+   throw std::runtime_error("777 chase benchmark requires a loadable assets/b777.fcmesh");
+  int camera=benchmark?benchmarkPreset.camera:smoke&&!args.has(L"--cockpit")?0:1;
   if(args.has(L"--no-aa"))state.antiAlias=false;else if(smoke)state.antiAlias=true;
   bool paused=smoke,walking=false,powerSaver=low&&!benchmark;ui::Page menuPage=(smoke||benchmark)?ui::Page::None:ui::Page::Home;XMFLOAT3 walker{};float walkYaw=0;
   presentation::TerrainStream<std::vector<Vertex>> terrainStream;
@@ -521,6 +527,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
    // that old interval and the next transition frame before reporting again.
    const auto frameExtent=launch::renderExtent(UINT(std::max(1L,clientWidth)),UINT(std::max(1L,clientHeight)),appliedScale,low);
    const timing::FrameContext frameContext{flight.aircraftId,camera,state.terrainMode,static_cast<int>(menuPage),state.antiAlias,low,wasActive,walking,powerSaver,frameExtent.width,frameExtent.height};
+   if(benchmark)benchmarkSamples.requirePreset(frameContext,benchmarkPreset);
    if(benchmark)benchmarkSamples.observeContext(frameContext);
    if(frameContextGate.changed(frameContext)){frameWindow.reset();reportTime=0;previousMeasured=false;}
    if(!saveError.empty())notice=saveError;
@@ -571,7 +578,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
    if(smoke&&++smokeFrames>=3){logLine("Smoke test: three rendered frames and BMP capture succeeded");DestroyWindow(window);}
    if(benchmark&&timing::benchmarkFinished(benchmarkStarted,benchmarkSamples)){
     std::ofstream summary(folder/L"performance_summary.txt",std::ios::trunc);
-    const auto result=timing::writeBenchmarkSummary(summary,"v0.83",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples);
+    const auto result=timing::writeBenchmarkSummary(summary,"v0.84",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples,benchmarkPreset);
     summary.flush();if(!summary)logLine("Benchmark summary write failed; no report file success claimed");
     pendingPhoto=folder/L"benchmark_final.bmp";renderer->draw(mesh,hud,XMMatrixLookToLH(XMVectorZero(),viewDirection,up)*reversedPerspective(activeFov,cockpit::viewportAspect,presentation::worldNear,presentation::worldFar),daylight,pendingPhoto,cabin,cabinView,frameGeometry.indexedScene);pendingPhoto.clear();
     logLine(result.complete?"Benchmark completed with valid full-run statistics":"Benchmark ended without a valid performance verdict; inspect summary status/counts");DestroyWindow(window);

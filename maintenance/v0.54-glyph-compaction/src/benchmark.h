@@ -1,5 +1,6 @@
 #pragma once
 #include "performance.h"
+#include "launch_options.h"
 #include <cmath>
 #include <limits>
 #include <ostream>
@@ -7,6 +8,19 @@
 #include <vector>
 
 namespace timing {
+struct BenchmarkPreset {
+ int aircraftId;
+ int camera;
+ const char* scene;
+ const char* outputSubfolder;
+};
+
+inline BenchmarkPreset benchmarkPreset(const launch::Options& options){
+ if(options.has(L"--benchmark-777-chase"))return {10,0,"PVG,777-300ER,chase,noon,low","777-chase"};
+ if(options.has(L"--benchmark-777-cockpit"))return {10,1,"PVG,777-300ER,cockpit,noon,low","777-cockpit"};
+ return {3,1,"PVG,A350,cockpit,noon,low",""};
+}
+
 // Bounded full-run samples, separate from the 300-frame HUD window.
 class BenchmarkSamples {
  std::vector<double> frames;
@@ -21,6 +35,9 @@ public:
  void observeContext(const FrameContext& context){
   if(!contextObserved){initialContext=context;contextObserved=true;}
   else if(!(initialContext==context))configurationChanged=true;
+ }
+ void requirePreset(const FrameContext& context,const BenchmarkPreset& preset){
+  if(context.aircraft!=preset.aircraftId||context.camera!=preset.camera)configurationChanged=true;
  }
  bool configurationValid()const{return !configurationChanged;}
  void add(double seconds){
@@ -79,10 +96,11 @@ inline BenchmarkResult assessBenchmark(double elapsed,const FrameStats& stats,bo
  return r;
 }
 inline BenchmarkResult writeBenchmarkSummary(std::ostream& out,const std::string& version,
- const std::string& backend,bool fxaa,bool powerSaver,const BenchmarkSamples& samples){
+ const std::string& backend,bool fxaa,bool powerSaver,const BenchmarkSamples& samples,
+ const BenchmarkPreset& preset){
  const auto stats=samples.summary();const auto result=assessBenchmark(samples.elapsed(),stats,samples.valid());
  out<<"FlightCareerAir "<<version<<" fixed benchmark\nbackend="<<backend
-    <<"\ninitial_scene=PVG,A350,cockpit,noon,low\nscene_assumption=continuous_scene_not_locked\nconfiguration_guard=FrameContext_11_fields\nfxaa="<<(fxaa?"on":"off")
+    <<"\ninitial_scene="<<preset.scene<<"\nscene_assumption=continuous_scene_not_locked\nconfiguration_guard=FrameContext_11_fields\nfxaa="<<(fxaa?"on":"off")
     <<"\nsoftware_frame_cap="<<(powerSaver?20:0)<<"\nrender_size=640x360\nsample_scope=full_active_run\ntiming_source=CPU_wall_frame_intervals_not_GPU_timestamps"
     <<"\nsample_limit="<<BenchmarkSamples::sampleLimit<<"\nsample_overflow="<<samples.overflowed()
     <<"\nconfiguration_valid="<<samples.configurationValid()
