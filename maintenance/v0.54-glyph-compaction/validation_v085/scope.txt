@@ -1,0 +1,3 @@
+Baseline d99c92e739efb7c48546334c3f6d9d9a296172db (v0.84).
+Linux Release, Assimp ON, full v0.84 package resources and reference fixtures, 48/48 CTest.
+CPU window geometry with DirectX math/text adapters. No Windows gameplay or HD 6000 execution.
