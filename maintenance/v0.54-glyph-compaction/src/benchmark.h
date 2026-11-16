@@ -3,6 +3,8 @@
 #include "launch_options.h"
 #include <cmath>
 #include <limits>
+#include <cstddef>
+#include <optional>
 #include <ostream>
 #include <string>
 #include <vector>
@@ -95,9 +97,16 @@ inline BenchmarkResult assessBenchmark(double elapsed,const FrameStats& stats,bo
  else r.recommendation="未达到20 FPS目标：先关闭FXAA，再用DX11低负载模式复测。";
  return r;
 }
+// Working set is physical memory mapped into the process. The peak covers
+// the lifetime of this process through the point at which it is queried.
+struct ProcessWorkingSet {
+ std::size_t currentBytes;
+ std::size_t lifetimePeakBytes;
+};
+
 inline BenchmarkResult writeBenchmarkSummary(std::ostream& out,const std::string& version,
  const std::string& backend,bool fxaa,bool powerSaver,const BenchmarkSamples& samples,
- const BenchmarkPreset& preset){
+ const BenchmarkPreset& preset,std::optional<ProcessWorkingSet> workingSet={}){
  const auto stats=samples.summary();const auto result=assessBenchmark(samples.elapsed(),stats,samples.valid());
  out<<"FlightCareerAir "<<version<<" fixed benchmark\nbackend="<<backend
     <<"\ninitial_scene="<<preset.scene<<"\nscene_assumption=continuous_scene_not_locked\nconfiguration_guard=FrameContext_11_fields\nfxaa="<<(fxaa?"on":"off")
@@ -111,6 +120,10 @@ inline BenchmarkResult writeBenchmarkSummary(std::ostream& out,const std::string
     <<"\nresult_status="<<(result.complete?"VALID":"NOT_EVALUATED");
  if(result.complete)out<<"\navg_fps="<<stats.fps<<"\np95_ms="<<stats.p95Ms<<"\nmax_ms="<<stats.maxMs;
  else out<<"\navg_fps=NA\np95_ms=NA\nmax_ms=NA";
+ out<<"\nmemory_scope=process_working_set_at_report_and_lifetime_peak";
+ if(workingSet)out<<"\nworking_set_bytes="<<workingSet->currentBytes
+                  <<"\npeak_working_set_bytes="<<workingSet->lifetimePeakBytes;
+ else out<<"\nworking_set_bytes=NA\npeak_working_set_bytes=NA";
  out<<"\ntarget_20="<<(result.complete?(result.target20?"PASS":"FAIL"):"NOT_EVALUATED")
     <<"\ntarget_30="<<(result.complete?(result.target30?"PASS":"FAIL"):"NOT_EVALUATED")
     <<"\nrecommendation="<<result.recommendation<<'\n';

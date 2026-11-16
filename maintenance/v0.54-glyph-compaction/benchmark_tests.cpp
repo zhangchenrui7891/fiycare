@@ -3,6 +3,9 @@
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#ifdef _WIN32
+#include "src/windows_benchmark_memory.h"
+#endif
 
 void require(bool value,const char* why){if(!value)throw std::runtime_error(why);}
 void close(double a,double b,const char* why){require(std::abs(a-b)<1e-8,why);}
@@ -48,6 +51,21 @@ void benchmarkPresets(){
  timing::writeBenchmarkSummary(out,"v0.84","CPU_TEST_ONLY",true,false,samples,chase);
  require(out.str().find("initial_scene=PVG,777-300ER,chase,noon,low\n")!=std::string::npos,"Report identifies selected preset");
  require(out.str().find("result_status=NOT_EVALUATED")!=std::string::npos,"Mismatched preset gets no verdict");
+}
+void workingSetReport(){
+ timing::BenchmarkSamples samples;
+ for(int i=0;i<3200;++i)samples.add(.02);
+ const auto preset=timing::benchmarkPreset(launch::Options());
+ std::ostringstream reported,unavailable;
+ const auto measured=timing::writeBenchmarkSummary(reported,"v0.87","CPU_TEST_ONLY",true,false,samples,preset,
+                                                   timing::ProcessWorkingSet{228589568,291504128});
+ const auto missing=timing::writeBenchmarkSummary(unavailable,"v0.87","CPU_TEST_ONLY",true,false,samples,preset);
+ require(reported.str().find("working_set_bytes=228589568\npeak_working_set_bytes=291504128\n")!=std::string::npos,
+         "OS counters reported in bytes without rounding");
+ require(unavailable.str().find("working_set_bytes=NA\npeak_working_set_bytes=NA\n")!=std::string::npos,
+         "Unavailable memory counters must not look like zero usage");
+ require(measured.complete&&missing.complete&&measured.target30==missing.target30,
+         "Memory availability is independent of the timing verdict");
 }
 void reproduceLegacyClock(){
  // v0.35 add/elapsed excerpt. Virtual intervals, NOT measured GPU frames.
@@ -145,7 +163,13 @@ void configurationChanges(){
  std::cout<<"PASS 11 configuration mutations after valid full runs, sticky invalidation, early change, and report suppression. CPU only.\n";
 }
 int main(){
- try{configurationChanges();diagnosticRouting();benchmarkPresets();reproduceLegacyClock();capacityBoundaryAndEarlyEnd();normalAndIncompleteRuns();malformedEvidence();
-  std::cout<<"Benchmark CPU clock/report checks passed; no Windows, GPU FPS or HD6000 measurement performed.\n";
+ try{configurationChanges();diagnosticRouting();benchmarkPresets();workingSetReport();reproduceLegacyClock();capacityBoundaryAndEarlyEnd();normalAndIncompleteRuns();malformedEvidence();
+#ifdef _WIN32
+  const auto actual=timing::readProcessWorkingSet();
+  require(actual&&actual->currentBytes>0&&actual->lifetimePeakBytes>=actual->currentBytes,
+          "Windows process working set query failed or returned inconsistent data");
+  std::cout<<"Windows working set API passed in the test process.\n";
+#endif
+  std::cout<<"Benchmark CPU clock/report checks passed; no simulator or GPU measurements performed.\n";
  }catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 1;}
 }
