@@ -1,0 +1,4 @@
+Baseline fe457e589dc03b98e0ef17870395e6aba871eb02 (v0.85).
+Linux Release, Assimp ON, full v0.85 package resources and reference fixtures, 48/48 CTest.
+The same pointer test fails when click picking is reverted to use currentView().
+No Windows runtime, real mouse or HD 6000 testing.
