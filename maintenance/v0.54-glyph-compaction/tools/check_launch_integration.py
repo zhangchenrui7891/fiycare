@@ -14,8 +14,11 @@ assert '--supersample' in (root/'run_high_quality.bat').read_text()
 assert 'args.find(' not in main+graphics
 assert 'const auto args=launch::currentOptions();' in main
 assert main.count('createRenderer(window,renderArgs)') == 2
-assert 'target_link_libraries(FlightCareerAir PRIVATE' in (root/'CMakeLists.txt').read_text()
-assert 'comdlg32 shell32)' in (root/'CMakeLists.txt').read_text()
+cmake = (root/'CMakeLists.txt').read_text()
+windows_libraries = set()
+for call in re.findall(r'target_link_libraries\(FlightCareerAir\s+PRIVATE\s+([^)]*)\)', cmake):
+    windows_libraries.update(call.split())
+assert {'comdlg32', 'shell32'} <= windows_libraries
 render_options = next(l.strip() for l in main.splitlines() if 'const auto renderArgs=' in l)
 renderer = '\n'.join(l for l in graphics.splitlines() if not l.startswith(('#include','#pragma')))
 code = r'''

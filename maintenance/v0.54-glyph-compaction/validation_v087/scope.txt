@@ -1,0 +1,4 @@
+Baseline 5502f4422e3dd6be079c79c608991789a2e77aac (v0.86).
+Linux Release, Assimp ON, v0.86 runtime resources and reference fixtures, 48/48 CTest.
+Windows source compiled and process-counter test results: https://github.com/zhangchenrui7891/fiycare/actions/runs/43887364814
+No Windows game execution or HD 6000 measurements.
