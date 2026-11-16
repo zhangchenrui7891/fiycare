@@ -86,11 +86,16 @@ inline std::array<Solid,27> solids(double throttle){
 }
 inline float lookYaw=0,lookPitch=-.40f;
 inline float viewportAspect=960.f/540;
-inline Point ray(float x,float y){
- const float a=(x/480-1)*.57735027f*viewportAspect,b=(1-y/270)*.57735027f;
- const float sy=std::sin(lookYaw),cy=std::cos(lookYaw),sp=std::sin(lookPitch),cp=std::cos(lookPitch);
- return {a*cy-b*sy*sp+sy*cp,b*cp+sp,-a*sy-b*cy*sp+cy*cp};
-}
+struct View {
+ float yaw=0,pitch=-.40f,aspect=960.f/540;
+ Point ray(float x,float y)const{
+  const float a=(x/480-1)*.57735027f*aspect,b=(1-y/270)*.57735027f;
+  const float sy=std::sin(yaw),cy=std::cos(yaw),sp=std::sin(pitch),cp=std::cos(pitch);
+  return {a*cy-b*sy*sp+sy*cp,b*cp+sp,-a*sy-b*cy*sp+cy*cp};
+ }
+};
+inline View currentView(){return {lookYaw,lookPitch,viewportAspect};}
+inline Point ray(float x,float y){return currentView().ray(x,y);}
 inline int pick(Point d,double throttle){
  float nearest=1e9f;int hit=-1;auto s=solids(throttle);
  for(size_t i=0;i<s.size();i++){
@@ -100,8 +105,9 @@ inline int pick(Point d,double throttle){
  }return hit;
 }
 struct SpatialInput:Input {
+ View presentedView;
  double throttle=0;float lastY=0;
- bool press(float x,float y){if(!enabled||looking)return false;int hit=pick(ray(x,y),throttle);if(hit<0)return false;auto action=solids(throttle)[hit].action;dragging=action==Action::Throttle;lastY=y;enqueue(action,throttle);return true;}
+ bool press(float x,float y){if(!enabled||looking)return false;int hit=pick(presentedView.ray(x,y),throttle);if(hit<0)return false;auto action=solids(throttle)[hit].action;dragging=action==Action::Throttle;lastY=y;enqueue(action,throttle);return true;}
  void move(float y){if(enabled&&dragging){throttle=std::clamp(throttle+(lastY-y)/160.,0.,1.);lastY=y;enqueue(Action::Throttle,throttle);}}
 };
 }

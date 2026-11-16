@@ -123,7 +123,7 @@ void help(HWND window){
   L"存档/照片/日志：%LOCALAPPDATA%\\FlightCareerAir\n"
   L"诊断输出另存：diagnostics\\benchmark 或 diagnostics\\smoke；不保存游戏生涯。\n"
   L"DX12初始化失败会自动尝试DX11；可用--dx11强制兼容模式。",
-  L"飞行生涯 v0.85 · 中文操作说明",MB_OK);
+  L"飞行生涯 v0.86 · 中文操作说明",MB_OK);
 }
 int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
  std::filesystem::path folder;
@@ -132,7 +132,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   const auto benchmarkPreset=timing::benchmarkPreset(args);
   const runfiles::RunFiles runFiles(dataFolder(),benchmark,smoke,benchmarkPreset.outputSubfolder);
   folder=runFiles.folder();std::filesystem::create_directories(folder);
-  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.85 startup");
+  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.86 startup");
   if(benchmark){
    std::filesystem::remove(folder/L"performance_summary.txt");
    std::filesystem::remove(folder/L"benchmark_final.bmp");
@@ -170,7 +170,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   const DWORD style=WS_OVERLAPPEDWINDOW;
   WNDCLASSW wc{};wc.lpfnWndProc=windowProc;wc.hInstance=instance;wc.lpszClassName=L"FlightCareerAir";wc.hCursor=LoadCursor(nullptr,IDC_ARROW);if(!RegisterClassW(&wc))throw std::runtime_error("Window registration failed");
   RECT bounds{0,0,low?640:1600,low?360:900};HMENU nativeMenu=createChineseMenu();AdjustWindowRect(&bounds,style,TRUE);
-  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.85 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
+  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.86 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
   if(!window)throw std::runtime_error("Window creation failed");ShowWindow(window,SW_SHOW);
   if(args.has(L"--fullscreen"))toggleFullscreen(window);
   renderScale=launch::initialRenderScale(args);
@@ -518,11 +518,12 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
    XMVECTOR position=XMVectorSet((float)renderFlight.x,(float)renderFlight.y,(float)renderFlight.z,1);
    auto orientation=XMMatrixRotationRollPitchYaw(-(float)renderFlight.pitch,(float)renderFlight.yaw,-(float)renderFlight.roll);
    XMVECTOR forward=XMVector3TransformNormal(XMVectorSet(0,0,1,0),orientation),eye,viewDirection,up=XMVectorSet(0,1,0,0);
+   const auto cockpitView=cockpit::currentView();
    if(walking){eye=XMLoadFloat3(&walker);viewDirection=XMVectorSet(std::sin(walkYaw),0,std::cos(walkYaw),0);}
-   else if(camera==1){auto anchor=XMMatrixTranslation(0,renderFlight.aircraftId>0?1.1f:.7f,renderFlight.aircraftId>=2?float(sim::visualLength(renderFlight.aircraftId)*.43):renderFlight.aircraftId==1?11.f:0.f)*plane;eye=XMVector3TransformCoord(XMVectorZero(),anchor);auto look=cockpit::ray(480,270);viewDirection=XMVector3TransformNormal(XMVectorSet(look.x,look.y,look.z,0),orientation);up=XMVector3TransformNormal(XMVectorSet(-std::sin(cockpit::lookYaw)*std::sin(cockpit::lookPitch),std::cos(cockpit::lookPitch),-std::cos(cockpit::lookYaw)*std::sin(cockpit::lookPitch),0),orientation);cockpitMesh(cabin,renderState,XMMatrixIdentity());
+   else if(camera==1){auto anchor=XMMatrixTranslation(0,renderFlight.aircraftId>0?1.1f:.7f,renderFlight.aircraftId>=2?float(sim::visualLength(renderFlight.aircraftId)*.43):renderFlight.aircraftId==1?11.f:0.f)*plane;eye=XMVector3TransformCoord(XMVectorZero(),anchor);auto look=cockpitView.ray(480,270);viewDirection=XMVector3TransformNormal(XMVectorSet(look.x,look.y,look.z,0),orientation);up=XMVector3TransformNormal(XMVectorSet(-std::sin(cockpitView.yaw)*std::sin(cockpitView.pitch),std::cos(cockpitView.pitch),-std::cos(cockpitView.yaw)*std::sin(cockpitView.pitch),0),orientation);cockpitMesh(cabin,renderState,XMMatrixIdentity());
     const auto localLook=XMVectorSet(look.x,look.y,look.z,0);
-    const auto localUp=XMVectorSet(-std::sin(cockpit::lookYaw)*std::sin(cockpit::lookPitch),std::cos(cockpit::lookPitch),-std::cos(cockpit::lookYaw)*std::sin(cockpit::lookPitch),0);
-    cabinView=XMMatrixLookAtLH(XMVectorZero(),localLook,localUp)*reversedPerspective(XM_PI/3,cockpit::viewportAspect,presentation::cabinNear,presentation::cabinFar);cockpitInput.throttle=renderFlight.throttle;}
+    const auto localUp=XMVectorSet(-std::sin(cockpitView.yaw)*std::sin(cockpitView.pitch),std::cos(cockpitView.pitch),-std::cos(cockpitView.yaw)*std::sin(cockpitView.pitch),0);
+    cabinView=XMMatrixLookAtLH(XMVectorZero(),localLook,localUp)*reversedPerspective(XM_PI/3,cockpitView.aspect,presentation::cabinNear,presentation::cabinFar);cockpitInput.throttle=renderFlight.throttle;}
    else if(camera==2){eye=position+XMVectorSet(0,renderFlight.aircraftId>=2?280:renderFlight.aircraftId==1?200:120,-20,0);viewDirection=position-eye;}
    else{eye=position-forward*(renderFlight.aircraftId>=2?125:renderFlight.aircraftId==1?85:22)+XMVectorSet(0,renderFlight.aircraftId>=2?38:renderFlight.aircraftId==1?25:7,0,0);viewDirection=forward*((renderFlight.aircraftId>=2?125:renderFlight.aircraftId==1?85:22)+15)-XMVectorSet(0,renderFlight.aircraftId>=2?38:renderFlight.aircraftId==1?25:7,0,0);}
    // Input can change configuration after the interval was sampled. Discard
@@ -576,11 +577,12 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
    const auto dimensions=sim::airframeDimensions(flight.aircraftId);lightingFrame.shape=LightVec{float(std::max(.65,dimensions.span*.045)),float(dimensions.length*.5),float(dimensions.span*.5),float(flight.spec().gearHeight)};
    antiAliasEnabled=state.antiAlias;
    renderer->draw(mesh,hud,XMMatrixLookToLH(XMVectorZero(),viewDirection,up)*reversedPerspective(activeFov,cockpit::viewportAspect,presentation::worldNear,presentation::worldFar),daylight,pendingPhoto,cabin,cabinView,frameGeometry.indexedScene);
+   if(cockpitEnabled)cockpitInput.presentedView=cockpitView;
    if(!pendingPhoto.empty()){if(!smoke){career.photograph(flight);notice=L"照片已保存，摄影航点已确认。";trySave();}pendingPhoto.clear();}
    if(smoke&&++smokeFrames>=3){logLine("Smoke test: three rendered frames and BMP capture succeeded");DestroyWindow(window);}
    if(benchmark&&timing::benchmarkFinished(benchmarkStarted,benchmarkSamples)){
     std::ofstream summary(folder/L"performance_summary.txt",std::ios::trunc);
-    const auto result=timing::writeBenchmarkSummary(summary,"v0.85",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples,benchmarkPreset);
+    const auto result=timing::writeBenchmarkSummary(summary,"v0.86",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples,benchmarkPreset);
     summary.flush();if(!summary)logLine("Benchmark summary write failed; no report file success claimed");
     pendingPhoto=folder/L"benchmark_final.bmp";renderer->draw(mesh,hud,XMMatrixLookToLH(XMVectorZero(),viewDirection,up)*reversedPerspective(activeFov,cockpit::viewportAspect,presentation::worldNear,presentation::worldFar),daylight,pendingPhoto,cabin,cabinView,frameGeometry.indexedScene);pendingPhoto.clear();
     logLine(result.complete?"Benchmark completed with valid full-run statistics":"Benchmark ended without a valid performance verdict; inspect summary status/counts");DestroyWindow(window);

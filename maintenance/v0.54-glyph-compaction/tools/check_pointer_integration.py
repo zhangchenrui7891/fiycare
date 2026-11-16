@@ -12,6 +12,9 @@ resize_start=main.index(' if(msg==WM_ENTERSIZEMOVE)')
 hook=main[resize_start:main.index('\n',resize_start)]+'\n'+hook
 for event in ('WM_KILLFOCUS','WM_ENTERMENULOOP'):
     i=main.index(' if(msg=='+event+')');hook=main[i:main.index('\n',i)]+'\n'+hook
+view_snapshot = 'const auto cockpitView=cockpit::currentView();'
+publish = 'if(cockpitEnabled)cockpitInput.presentedView=cockpitView;'
+assert main.index(view_snapshot)<main.index('auto look=cockpitView.ray(480,270)')<main.index('renderer->draw(mesh,hud,')<main.index(publish)
 prefix = r'''
 #include "cockpit_controls.h"
 #include "keyboard_state.h"
@@ -105,6 +108,29 @@ int main(){try{
  require(cockpit::lookYaw==after,"Released look does not stick");
  send(WM_RBUTTONDOWN,x,y);ReleaseCapture();send(WM_MOUSEMOVE,x+30,y);
  require(cockpit::lookYaw==after,"Capture loss stops look");
+ clickableButtons.clear();
+ cockpitInput={};cockpitInput.enabled=true;cockpitInput.throttle=.5;
+ cockpit::lookYaw=0;
+ send(WM_RBUTTONDOWN,x,y);send(WM_MOUSEMOVE,x+125,y);send(WM_RBUTTONUP,x+125,y);
+ require(std::abs(cockpit::lookYaw-.5f)<1e-6f,"Look was updated before render");
+ require(cockpit::pick(cockpit::ray(float(x),float(y)),.5)!=5,"The unpublished look would miss this displayed throttle");
+ send(WM_LBUTTONDOWN,x,y);send(WM_LBUTTONUP,x,y);
+ require(cockpitInput.pending.size()==1&&cockpitInput.pending[0].action==cockpit::Action::Throttle,"Click after batched look/release must use last displayed view");
+ cockpitInput.pending.clear();
+ {const bool cockpitEnabled=true;
+ ''' + view_snapshot + publish + r'''
+ }
+ send(WM_LBUTTONDOWN,x,y);send(WM_LBUTTONUP,x,y);
+ require(cockpitInput.pending.empty()||cockpitInput.pending[0].action!=cockpit::Action::Throttle,"After publish the old throttle position must miss");
+ cockpitInput.pending.clear();
+ const float sy=std::sin(cockpit::lookYaw),cy=std::cos(cockpit::lookYaw);
+ const float newForward=(p.x*sy+p.z*cy)*cp+p.y*sp;
+ const float newUp=p.y*cp-(p.x*sy+p.z*cy)*sp;
+ const int newX=int(480*(1+(p.x*cy-p.z*sy)/newForward/(.57735027f*cockpit::viewportAspect)));
+ const int newY=int(270*(1-newUp/newForward/.57735027f));
+ send(WM_LBUTTONDOWN,newX,newY);send(WM_LBUTTONUP,newX,newY);
+ require(cockpitInput.pending.size()==1&&cockpitInput.pending[0].action==cockpit::Action::Throttle,"Published view hits moved throttle");
+ std::cout<<"Batched look and click use displayed view; both old and new throttle positions checked.\n";
  std::cout<<"Actual mouse hook: throttle-first both release orders, look-first left suppression, capture callbacks and idle recovery passed.\nCPU Win32 stand-ins only; no Windows message delivery, real mouse or GPU verification.\n";
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}
 '''
