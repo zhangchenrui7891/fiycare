@@ -1,0 +1,5 @@
+Baseline 2b33af8f8d5cd541d17fb33da22d3a39fdfd243a (v0.89).
+Linux Release, Assimp ON, v0.89 assets, 48/48 CTest.
+New ground-motion integration assertion fails with the v0.89 display header.
+Windows CI https://github.com/zhangchenrui7891/fiycare/actions/runs/44164970172
+No simulator rendering or HD 6000 measurement.

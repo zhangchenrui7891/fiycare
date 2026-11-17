@@ -1,0 +1,1 @@
+PASS 40001 heading-range cases plus cardinal/north-boundary, unit conversion, fractional VS, invalid and signed-zero cases. Text/CPU only.
