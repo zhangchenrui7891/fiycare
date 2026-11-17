@@ -55,7 +55,7 @@ void bothAirportsAndEnds(){
    if(f.y>=0){require(g.valid,"Low nonnegative-altitude sample valid");close(g.localizer,-120,"Aircraft left is negative");close(g.glideslope,-40,"Low is negative");}
    ++samples;
   }
- std::cout<<"7 aircraft x2 airports x2 directions x6 distances: "<<samples<<" threshold, slope and signed-deviation samples passed.\n";
+ std::cout<<sim::aircraftCount<<" aircraft x2 airports x2 directions x6 distances: "<<samples<<" threshold, slope and signed-deviation samples passed.\n";
 }
 void selectionPowerAndPersistence(){
  sim::Snapshot state;state.flight=inbound(1,1,5000);
@@ -78,6 +78,30 @@ void selectionPowerAndPersistence(){
  require(loaded.read(stream)&&sim::approachGuidance(loaded).runwayIndex==1,"Existing v16 state restores same arrival without new fields");
  state.career.mission=0;state.flight=inbound(0,1,1000);
  require(sim::approachGuidance(state).runwayIndex==0,"Non-passenger training auto-selects eligible runway end");
+}
+void groundTrackAcquisition(){
+ for(int airport:{0,1})for(int direction:{1,-1})for(int crosswind:{-1,1}){
+  auto f=inbound(airport,direction,2000);
+  for(double angle:{30.,59.,61.,89.,91.}){
+   const double radians=angle*sim::pi/180;
+   f.vx=crosswind*90*std::sin(radians);
+   f.vz=direction*90*std::cos(radians);
+   require(sim::approachGuidance(f,airport).valid==(angle<60),
+           "Ground track must be inside the inbound cone for both ends and crosswind signs");
+  }
+  f.vx=crosswind*4;f.vz=0;
+  require(sim::approachGuidance(f,airport).valid,"Heading remains decisive below the track speed floor");
+  f.vx=crosswind*6;
+  require(!sim::approachGuidance(f,airport).valid,"Moving broadside above the speed floor hides guidance");
+ }
+ sim::Snapshot mission;
+ mission.career.mission=2;mission.career.stage=1;mission.career.arrivalRunway=1;
+ mission.flight=inbound(1,-1,3000);
+ mission.flight.vx=90;mission.flight.vz=-2;
+ require(!sim::approachGuidance(mission).valid,"Passenger cockpit shares the ground-track guard");
+ mission.flight.vz=-90;
+ require(sim::approachGuidance(mission).valid,"Valid destination approach reacquires immediately");
+ std::cout<<"Both airports, reciprocal ends and crosswind signs: acquisition and reacquisition checks passed.\n";
 }
 void validityAndContinuity(){
  auto f=inbound(0,1,1000);
@@ -102,7 +126,7 @@ void validityAndContinuity(){
  std::cout<<"12,001 one-metre path samples: continuous slope; selection/power/save and invalid envelopes passed.\n";
 }
 int main(){
- try{legacyDefects();bothAirportsAndEnds();selectionPowerAndPersistence();validityAndContinuity();
+ try{legacyDefects();bothAirportsAndEnds();selectionPowerAndPersistence();groundTrackAcquisition();validityAndContinuity();
   std::cout<<"Training approach CPU geometry passed; not Windows, radio ILS, certified procedure or autoland validation.\n";
  }catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 1;}
 }
