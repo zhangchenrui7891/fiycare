@@ -698,3 +698,7 @@ FlightGear 777 外模、UV 贴图、顶点变换缓存与飞行简报菜单，�
 ## v0.89
 
 训练进近会筛除地面航迹明显横切跑道的情况。详见 [TRAINING_APPROACH.md](TRAINING_APPROACH.md)。
+
+## v0.90
+
+NAV 屏新增地面航迹角 TRK 和地速 GS。详见 [NAV_GROUND_MOTION.md](NAV_GROUND_MOTION.md)。

@@ -25,6 +25,21 @@ int main(){
   require(instruments::verticalSpeed(-.049)==L"0.0"&&instruments::verticalSpeed(.049)==L"0.0","No negative or positive signed zero");
   require(instruments::verticalSpeed(-0.)==L"0.0","Signed zero");
   require(instruments::whole(12.5)==L"13"&&instruments::whole(-12.5)==L"-13","Whole readings preserve nearest-away rounding");
+  const double east[]={0,10,0,-10};
+  const double north[]={10,0,-10,0};
+  const wchar_t* tracks[]={L"000",L"090",L"180",L"270"};
+  for(int i=0;i<4;++i){
+   const auto ground=instruments::groundMotion(east[i],north[i]);
+   require(ground.track==tracks[i]&&ground.speed==L"36","Ground-track cardinals and km/h conversion");
+  }
+  const auto diagonal=instruments::groundMotion(30,40);
+  require(diagonal.track==L"037"&&diagonal.speed==L"180","Crosswind ground motion uses both velocity components");
+  require(instruments::groundMotion(0,0).track==L"---"&&instruments::groundMotion(0,0).speed==L"0","Parked track hidden but zero ground speed visible");
+  require(instruments::groundMotion(4.99,0).track==L"---"&&instruments::groundMotion(5,0).track==L"090","Low-speed track boundary");
+  for(double invalid:{double(NAN),double(INFINITY),-double(INFINITY),std::numeric_limits<double>::max()}){
+   const auto ground=instruments::groundMotion(invalid,invalid);
+   require(ground.track==L"---"&&ground.speed==L"---","Invalid or overflowed ground motion hidden");
+  }
   auto text=instruments::primary(100,1500,.4,-.4*pi/180);
   require(text.speedAltitude==L"IAS 360 km/h ALT 1500 m","Metric units and speed conversion");
   require(text.headingVertical==L"HDG 000° VS +0.4 m/s","Heading and fractional VS units");

@@ -34,6 +34,14 @@ inline std::wstring whole(double value){
  std::wostringstream out;out.imbue(std::locale::classic());
  out<<std::fixed<<std::setprecision(0)<<std::round(value);return out.str();
 }
+struct GroundMotionText {std::wstring track,speed;};
+inline GroundMotionText groundMotion(double velocityX,double velocityZ){
+ if(!std::isfinite(velocityX)||!std::isfinite(velocityZ))return {L"---",L"---"};
+ const double speed=std::hypot(velocityX,velocityZ);
+ if(!std::isfinite(speed)||!std::isfinite(speed*3.6))return {L"---",L"---"};
+ // Below 5 m/s, a ground-track angle is unstable during parking/taxi.
+ return {speed>=5?heading(std::atan2(velocityX,velocityZ)):L"---",whole(speed*3.6)};
+}
 inline std::wstring verticalSpeed(double metresPerSecond){
  if(!std::isfinite(metresPerSecond))return L"---";
  if(std::abs(metresPerSecond)<.05)metresPerSecond=0;

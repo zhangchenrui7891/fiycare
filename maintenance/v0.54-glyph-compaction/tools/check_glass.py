@@ -68,6 +68,16 @@ int main(int argc,char** argv){
  sim::Snapshot state;state.flight.configure(3);state.flight.rpm=2250;state.flight.vz=90;state.flight.y=1234;state.flight.vy=1.2;state.flight.pitch=.035;state.flight.roll=-.12;state.flight.throttle=.84;state.flight.flap=.5;state.flight.fuel=87;state.headingHold=true;state.navigationHold=true;state.flight.z=1000;
  out.clear();labels.clear();glass::draw(out,state,0,label);
  require(contains(L"2250")&&contains(L"FUEL 87%")&&contains(L"FLAP 50%")&&contains(L"THR 84%"),"Flight state feeds engine/system glass");
+ state.flight.vx=30;state.flight.vz=40;state.flight.yaw=0;
+ out.clear();labels.clear();glass::draw(out,state,0,label);validate(out);
+ require(contains(L"TRK 037")&&contains(L"GS 180 km/h")&&contains(L"HDG 000"),"Track follows ground velocity while heading follows aircraft yaw");
+ state.flight.vx=state.flight.vz=0;
+ out.clear();labels.clear();glass::draw(out,state,0,label);validate(out);
+ require(contains(L"TRK ---")&&contains(L"GS 0 km/h"),"Stationary heading is not presented as ground track");
+ state.avionics.master=false;
+ out.clear();labels.clear();glass::draw(out,state,0,label);
+ require(!contains(L"TRK")&&!contains(L"GS "),"Ground motion text obeys avionics power");
+ state.avionics.master=true;
  state.navigationWaypoint=99;out.clear();labels.clear();glass::draw(out,state,0,label);require(contains(L"WPT INVALID"),"Invalid waypoint never dereferenced");
  state.navigationWaypoint=0;state.flight.stallWarning=true;out.clear();labels.clear();glass::draw(out,state,0,label);require(contains(L"STALL"),"Stall warning retained");
  state.flight.stallWarning=false;out.clear();labels.clear();glass::draw(out,state,0,label);validate(out);

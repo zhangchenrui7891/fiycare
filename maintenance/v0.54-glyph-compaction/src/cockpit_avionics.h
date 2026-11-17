@@ -101,7 +101,8 @@ template<class Text> inline void draw(std::vector<Vertex>& out,const sim::Snapsh
  p.label(L"QNH "+whole(state.avionics.qnh),184,182,cyan,.67f);
  if(f.stallWarning){p.rect(103,134,93,19,{.35f,.025f,.018f},7);p.label(L"STALL",119,136,amber,.85f);}
  // NAV: heading-up map, real training route positions and active leg.
- nav.label(L"NAV / TRAINING",8,5,cyan,.75f);nav.label(L"HDG "+instruments::heading(f.yaw),197,5,white,.7f);
+ const auto ground=instruments::groundMotion(f.vx,f.vz);
+ nav.label(L"NAV / TRAINING",8,5,cyan,.75f);nav.label(L"TRK "+ground.track,197,5,white,.7f);
  for(float radius:{34.f,65.f,96.f})nav.arc(150,111,radius,float(-sim::pi*.5),float(sim::pi*.5),muted);
  for(int a=-90;a<=90;a+=30){float r=float(a*sim::pi/180);nav.line(150+std::sin(r)*92,111-std::cos(r)*92,150+std::sin(r)*98,111-std::cos(r)*98,white);}
  nav.label(L"2 km",226,138,muted,.65f);nav.aircraft(150,111,white);
@@ -132,7 +133,7 @@ template<class Text> inline void draw(std::vector<Vertex>& out,const sim::Snapsh
  const bool valid=sim::validNavigationWaypoint(state.navigationWaypoint);
  nav.rect(0,165,300,35,black,6);
  nav.label(valid?L"WPT "+whole(state.navigationWaypoint+1)+L"   "+whole(sim::navigationDistance(state))+L" m":L"WPT INVALID",8,167,valid?magenta:amber,.75f);
- nav.label(L"XTK "+whole(sim::navigationCrossTrack(state))+L" m   QNH "+whole(state.avionics.qnh),8,184,cyan,.63f);
+ nav.label(L"XTK "+whole(sim::navigationCrossTrack(state))+L" m   GS "+ground.speed+L" km/h",8,184,cyan,.63f);
  // Engine/system display. RPM is the model's actual RPM, not a fictitious jet N1.
  engine.label(L"ENGINE / SYSTEM",8,5,cyan,.8f);
  const int engines=f.engines.count(f.aircraftId);
