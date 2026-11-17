@@ -1,0 +1,4 @@
+Baseline 7d25cffc819e4430fc105eb716aab91461c2e420 (v0.87).
+Linux Release, Assimp ON, full v0.87 package resources and reference fixtures, 48/48 CTest.
+Windows batch script statically checked: sequential waits, only --no-aa differs, distinct VALID report paths.
+No end-to-end simulator or HD 6000 execution.
