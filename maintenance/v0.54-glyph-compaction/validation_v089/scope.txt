@@ -1,0 +1,4 @@
+Baseline de4e2340195750e03be1fbc3b95f3ca10587c43c (v0.88).
+Linux Release, Assimp ON, v0.88 assets, 48/48 CTest.
+New tests with the v0.88 approach header fail at the inbound ground-track assertion.
+No simulator flight or HD 6000 measurement.

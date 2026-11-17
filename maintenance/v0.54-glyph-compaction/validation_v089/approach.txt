@@ -1,0 +1,5 @@
+Legacy PVG threshold: centre-distance=1800m, path delta=74.9014m relative to chosen training clearance.
+11 aircraft x2 airports x2 directions x6 distances: 264 threshold, slope and signed-deviation samples passed.
+Both airports, reciprocal ends and crosswind signs: acquisition and reacquisition checks passed.
+12,001 one-metre path samples: continuous slope; selection/power/save and invalid envelopes passed.
+Training approach CPU geometry passed; not Windows, radio ILS, certified procedure or autoland validation.
