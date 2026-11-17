@@ -690,3 +690,7 @@ FlightGear 777 外模、UV 贴图、顶点变换缓存与飞行简报菜单，�
 ## v0.87
 
 性能基准摘要新增当前和峰值进程工作集。详见 [BENCHMARK_777.md](BENCHMARK_777.md)。
+
+## v0.88
+
+用 run_benchmark_777_fxaa_pair.bat 对比 DX11 下 777 座舱开启与关闭 FXAA 的结果。详见 [BENCHMARK_777.md](BENCHMARK_777.md)。

@@ -124,16 +124,17 @@ void help(HWND window){
   L"存档/照片/日志：%LOCALAPPDATA%\\FlightCareerAir\n"
   L"诊断输出另存：diagnostics\\benchmark 或 diagnostics\\smoke；不保存游戏生涯。\n"
   L"DX12初始化失败会自动尝试DX11；可用--dx11强制兼容模式。",
-  L"飞行生涯 v0.87 · 中文操作说明",MB_OK);
+  L"飞行生涯 v0.88 · 中文操作说明",MB_OK);
 }
 int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
  std::filesystem::path folder;
  try{
   const auto args=launch::currentOptions();const bool benchmark=args.has(L"--benchmark");const bool low=args.has(L"--low")||benchmark;const bool smoke=!benchmark&&args.has(L"--smoke-test");int smokeFrames=0;
   const auto benchmarkPreset=timing::benchmarkPreset(args);
-  const runfiles::RunFiles runFiles(dataFolder(),benchmark,smoke,benchmarkPreset.outputSubfolder);
+  const bool fxaaRequested=!args.has(L"--no-aa");
+  const runfiles::RunFiles runFiles(dataFolder(),benchmark,smoke,benchmarkPreset.outputSubfolder,fxaaRequested);
   folder=runFiles.folder();std::filesystem::create_directories(folder);
-  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.87 startup");
+  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.88 startup");
   if(benchmark){
    std::filesystem::remove(folder/L"performance_summary.txt");
    std::filesystem::remove(folder/L"benchmark_final.bmp");
@@ -145,7 +146,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   if(!loaded){std::ifstream legacy(folder/L"career.txt");state.career.load(legacy);logLine("Legacy v2 career migration attempted");}
   if(smoke&&(args.has(L"--airliner")||args.has(L"--a330")||args.has(L"--a350"))){state.flight=sim::Flight{};state.flight.configure(args.has(L"--a350")?3:args.has(L"--a330")?2:1);state.career.stage=state.career.gate=0;}
   if(smoke){state.clock=args.has(L"--sunset")?17.4:12;state.exposureEV=0;state.terrainMode=1;state.haze=.00016;state.shadows=true;}
-  if(benchmark){state=sim::Snapshot{};state.flight.configure(benchmarkPreset.aircraftId);state.clock=12;state.exposureEV=0;state.terrainMode=1;state.haze=.00016;state.shadows=true;state.antiAlias=!args.has(L"--no-aa");}
+  if(benchmark){state=sim::Snapshot{};state.flight.configure(benchmarkPreset.aircraftId);state.clock=12;state.exposureEV=0;state.terrainMode=1;state.haze=.00016;state.shadows=true;state.antiAlias=fxaaRequested;}
   if(smoke){
    if(args.has(L"--night"))state.clock=0;
    if(args.has(L"--flood-off"))state.cockpitFlood=false;
@@ -171,7 +172,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   const DWORD style=WS_OVERLAPPEDWINDOW;
   WNDCLASSW wc{};wc.lpfnWndProc=windowProc;wc.hInstance=instance;wc.lpszClassName=L"FlightCareerAir";wc.hCursor=LoadCursor(nullptr,IDC_ARROW);if(!RegisterClassW(&wc))throw std::runtime_error("Window registration failed");
   RECT bounds{0,0,low?640:1600,low?360:900};HMENU nativeMenu=createChineseMenu();AdjustWindowRect(&bounds,style,TRUE);
-  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.87 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
+  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.88 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
   if(!window)throw std::runtime_error("Window creation failed");ShowWindow(window,SW_SHOW);
   if(args.has(L"--fullscreen"))toggleFullscreen(window);
   renderScale=launch::initialRenderScale(args);
@@ -199,7 +200,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   int camera=smoke?0:1;
   if(benchmark)camera=benchmarkPreset.camera;
   else if(smoke&&args.has(L"--cockpit"))camera=1;
-  if(args.has(L"--no-aa"))state.antiAlias=false;else if(smoke)state.antiAlias=true;
+  if(!fxaaRequested)state.antiAlias=false;else if(smoke)state.antiAlias=true;
   bool paused=smoke,walking=false,powerSaver=low&&!benchmark;ui::Page menuPage=(smoke||benchmark)?ui::Page::None:ui::Page::Home;XMFLOAT3 walker{};float walkYaw=0;
   presentation::TerrainStream<std::vector<Vertex>> terrainStream;
   presentation::FrameGeometry<Vertex> frameGeometry;frameGeometry.scene.reserve(140000);
@@ -531,7 +532,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
    // that old interval and the next transition frame before reporting again.
    const auto frameExtent=launch::renderExtent(UINT(std::max(1L,clientWidth)),UINT(std::max(1L,clientHeight)),appliedScale,low);
    const timing::FrameContext frameContext{flight.aircraftId,camera,state.terrainMode,static_cast<int>(menuPage),state.antiAlias,low,wasActive,walking,powerSaver,frameExtent.width,frameExtent.height};
-   if(benchmark)benchmarkSamples.requirePreset(frameContext,benchmarkPreset);
+   if(benchmark)benchmarkSamples.requirePreset(frameContext,benchmarkPreset,fxaaRequested);
    if(benchmark)benchmarkSamples.observeContext(frameContext);
    if(frameContextGate.changed(frameContext)){frameWindow.reset();reportTime=0;previousMeasured=false;}
    if(!saveError.empty())notice=saveError;
@@ -584,7 +585,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
    if(benchmark&&timing::benchmarkFinished(benchmarkStarted,benchmarkSamples)){
     const auto workingSet=timing::readProcessWorkingSet();
     std::ofstream summary(folder/L"performance_summary.txt",std::ios::trunc);
-    const auto result=timing::writeBenchmarkSummary(summary,"v0.87",renderer->name(),state.antiAlias,powerSaver,benchmarkSamples,benchmarkPreset,workingSet);
+    const auto result=timing::writeBenchmarkSummary(summary,"v0.88",renderer->name(),fxaaRequested,powerSaver,benchmarkSamples,benchmarkPreset,workingSet);
     summary.flush();if(!summary)logLine("Benchmark summary write failed; no report file success claimed");
     pendingPhoto=folder/L"benchmark_final.bmp";renderer->draw(mesh,hud,XMMatrixLookToLH(XMVectorZero(),viewDirection,up)*reversedPerspective(activeFov,cockpit::viewportAspect,presentation::worldNear,presentation::worldFar),daylight,pendingPhoto,cabin,cabinView,frameGeometry.indexedScene);pendingPhoto.clear();
     logLine(result.complete?"Benchmark completed with valid full-run statistics":"Benchmark ended without a valid performance verdict; inspect summary status/counts");DestroyWindow(window);

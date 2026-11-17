@@ -8,10 +8,13 @@ class RunFiles {
  std::filesystem::path output;
  bool diagnostic;
 public:
- RunFiles(const std::filesystem::path& gameFolder,bool benchmark,bool smoke,const char* benchmarkSubfolder="")
+ RunFiles(const std::filesystem::path& gameFolder,bool benchmark,bool smoke,const char* benchmarkSubfolder="",bool fxaa=true)
   :output(benchmark?gameFolder/"diagnostics"/"benchmark":
           smoke?gameFolder/"diagnostics"/"smoke":gameFolder),diagnostic(benchmark||smoke){
-  if(benchmark&&*benchmarkSubfolder)output/=benchmarkSubfolder;
+  if(benchmark){
+   if(!fxaa)output/="no-fxaa";
+   if(*benchmarkSubfolder)output/=benchmarkSubfolder;
+  }
  }
  const std::filesystem::path& folder()const{return output;}
  bool gameSavesEnabled()const{return !diagnostic;}

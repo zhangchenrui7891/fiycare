@@ -20,9 +20,11 @@ void noVerdict(const timing::BenchmarkSamples& samples){
 }
 void diagnosticRouting(){
  const std::filesystem::path base="PLAYER_DATA";
- for(bool benchmark:{false,true})for(bool smoke:{false,true}){
-  const runfiles::RunFiles files(base,benchmark,smoke);
-  require(files.folder()==(benchmark?base/"diagnostics"/"benchmark":smoke?base/"diagnostics"/"smoke":base),
+ for(bool benchmark:{false,true})for(bool smoke:{false,true})for(bool fxaa:{false,true}){
+  const runfiles::RunFiles files(base,benchmark,smoke,"",fxaa);
+  auto benchmarkPath=base/"diagnostics"/"benchmark";
+  if(!fxaa)benchmarkPath/="no-fxaa";
+  require(files.folder()==(benchmark?benchmarkPath:smoke?base/"diagnostics"/"smoke":base),
           "Diagnostic path routing and benchmark precedence");
   require(files.gameSavesEnabled()==(!benchmark&&!smoke),"Only ordinary games allow career persistence");
  }
@@ -38,14 +40,27 @@ void benchmarkPresets(){
  require(runfiles::RunFiles(base,true,false,cockpit.outputSubfolder).folder()==root/"777-cockpit","Cockpit output is isolated");
  require(runfiles::RunFiles(base,true,false,chase.outputSubfolder).folder()==root/"777-chase","Chase output is isolated");
  require(runfiles::RunFiles(base,false,false,chase.outputSubfolder).folder()==base,"Benchmark modifier leaves normal data path alone");
+ for(const auto& preset:{original,cockpit,chase}){
+  const auto expected=(*preset.outputSubfolder)?root/"no-fxaa"/preset.outputSubfolder:root/"no-fxaa";
+  const auto off=runfiles::RunFiles(base,true,false,preset.outputSubfolder,false);
+  const auto on=runfiles::RunFiles(base,true,false,preset.outputSubfolder,true);
+  require(off.folder()==expected&&off.folder()!=on.folder(),"FXAA off preserves the corresponding FXAA on output");
+ }
+ timing::FrameContext fxaaContext;
+ fxaaContext.aircraft=cockpit.aircraftId;fxaaContext.camera=cockpit.camera;
+ timing::BenchmarkSamples wrongFxaa;
+ wrongFxaa.requirePreset(fxaaContext,cockpit,true);
+ fxaaContext.antiAlias=true;
+ wrongFxaa.requirePreset(fxaaContext,cockpit,true);
+ require(!wrongFxaa.configurationValid(),"Wrong FXAA in first rendered frame invalidates the run permanently");
  timing::BenchmarkSamples samples;
  timing::FrameContext context;
  context.aircraft=10;context.camera=1;
- samples.requirePreset(context,cockpit);
+ samples.requirePreset(context,cockpit,false);
  require(samples.configurationValid(),"Expected aircraft and view accepted");
- samples.requirePreset(context,chase);
+ samples.requirePreset(context,chase,false);
  context.camera=0;
- samples.requirePreset(context,chase);
+ samples.requirePreset(context,chase,false);
  require(!samples.configurationValid(),"Wrong initial view invalidates the run permanently");
  std::ostringstream out;
  timing::writeBenchmarkSummary(out,"v0.84","CPU_TEST_ONLY",true,false,samples,chase);

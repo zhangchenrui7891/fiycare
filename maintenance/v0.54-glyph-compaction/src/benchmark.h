@@ -38,8 +38,9 @@ public:
   if(!contextObserved){initialContext=context;contextObserved=true;}
   else if(!(initialContext==context))configurationChanged=true;
  }
- void requirePreset(const FrameContext& context,const BenchmarkPreset& preset){
-  if(context.aircraft!=preset.aircraftId||context.camera!=preset.camera)configurationChanged=true;
+ void requirePreset(const FrameContext& context,const BenchmarkPreset& preset,bool fxaa){
+  if(context.aircraft!=preset.aircraftId||context.camera!=preset.camera||context.antiAlias!=fxaa)
+   configurationChanged=true;
  }
  bool configurationValid()const{return !configurationChanged;}
  void add(double seconds){
