@@ -293,10 +293,43 @@ void landingChecklistTests() {
     }
 }
 
+void landingPhaseContinuityTests() {
+    sim::Snapshot state;
+    state.flight.configure(3);
+    auto& f = state.flight;
+    f.y = 500; f.vy = -2;
+    sim::AlertManager alerts;
+    alerts.beginFlight(state);
+    expect(alerts.landingPhase, "Descending flight acquires landing phase");
+    for (double height : {599., 601., 650., 699., 700.}) {
+        f.y = height;
+        for (double vertical : {-2., -.5, 0., .5, .99}) {
+            f.vy = vertical; alerts.update(state);
+            expect(alerts.landingPhase, "Acquired phase survives level segments and bounded excursions");
+        }
+    }
+    f.vy = 1; alerts.update(state);
+    expect(!alerts.landingPhase, "Go-around climb releases landing phase");
+    f.y = 500; f.vy = 0; alerts.update(state);
+    expect(!alerts.landingPhase, "Released phase requires another descent to acquire");
+    f.vy = -2; alerts.update(state);
+    f.y = 701; alerts.update(state);
+    expect(!alerts.landingPhase, "Climb above retention altitude releases landing phase");
+    f.y = 500; alerts.update(state);
+    f.y = f.spec().gearHeight; alerts.update(state);
+    expect(!alerts.landingPhase, "Ground contact releases landing phase");
+    f.y = 500; f.vy = -2; alerts.update(state);
+    f.vy = 0; alerts.beginFlight(state);
+    expect(!alerts.landingPhase, "Reload cannot inherit a previous flight's acquired phase");
+    f.vy = -2; alerts.update(state);
+    f.crashed = true; alerts.update(state);
+    expect(!alerts.landingPhase, "Crash releases landing phase");
+}
+
 int main() {
     try {
         rotationTests(); surfaceTests(); engineTests(); faultAndAlertTests();
-        storageAndTelemetryTests(); fullFlightTests(); landingChecklistTests();
+        storageAndTelemetryTests(); fullFlightTests(); landingChecklistTests(); landingPhaseContinuityTests();
         std::cout << "PASS: rigid-body, panel aerodynamics, independent engines, faults, alerts, v15, CSV, four takeoffs, engine-out\n";
         return 0;
     } catch (const std::exception& e) {

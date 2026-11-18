@@ -61,15 +61,31 @@ inline std::vector<FlightAlert> collectFlightAlerts(const Snapshot& state) {
     return alerts;
 }
 
+// Retain an acquired landing phase through level segments and small altitude
+// excursions. Each newly loaded flight starts with fresh phase acquisition.
+inline bool landingChecklistActive(const Snapshot& state, bool wasActive = false) {
+    const auto& f = state.flight;
+    const double agl = f.y - terrain(f.x, f.z);
+    if (f.crashed || f.grounded() || !std::isfinite(agl) || agl < 0 || !std::isfinite(f.vy))
+        return false;
+    if (wasActive) return agl <= 700 && f.vy < 1;
+    return agl <= 600 && f.vy < -.5;
+}
+
 // Acknowledgement silences the attention state but never clears an active fault.
 // A resolved fault is removed; if it happens again it needs a new acknowledgement.
 struct AlertManager {
     std::vector<FlightAlert> active;
+    bool landingPhase = false;
 
     // A different loaded/restarted flight must not inherit old acknowledgements.
-    void beginFlight(const Snapshot& state) { active = collectFlightAlerts(state); }
+    void beginFlight(const Snapshot& state) {
+        active = collectFlightAlerts(state);
+        landingPhase = landingChecklistActive(state);
+    }
 
     void update(const Snapshot& state) {
+        landingPhase = landingChecklistActive(state, landingPhase);
         auto next = collectFlightAlerts(state);
         for (auto& alert : next) {
             const auto old = std::find_if(active.begin(), active.end(), [&](const FlightAlert& a) {
@@ -126,14 +142,6 @@ inline std::vector<ChecklistItem> takeoffChecklist(const Snapshot& state) {
             {L"客机起飞襟翼", f.aircraftId == 0 || (f.flap >= .25 && f.flap <= .5)},
             {L"停留刹车释放", !state.parkingBrake},
             {L"配平范围", std::abs(f.trim) <= .25}};
-}
-
-// Illustrative game-phase selection, expressed in metres above local terrain.
-inline bool landingChecklistActive(const Snapshot& state) {
-    const auto& f = state.flight;
-    const double agl = f.y - terrain(f.x, f.z);
-    return !f.crashed && !f.grounded() && std::isfinite(agl) &&
-           agl >= 0 && agl <= 600 && std::isfinite(f.vy) && f.vy < -.5;
 }
 
 inline std::vector<ChecklistItem> landingChecklist(const Snapshot& state) {

@@ -710,3 +710,7 @@ NAV 地图以绿色方向线和菱形显示地面航迹。详见 [NAV_GROUND_MOT
 ## v0.92
 
 F2 面板在低空下降时显示着陆检查。详见 [LANDING_CHECKLIST.md](LANDING_CHECKLIST.md)。
+
+## v0.93
+
+着陆检查在短暂平飞和小幅高度变化中保持，按退出条件和新飞行状态重置。详见 [LANDING_CHECKLIST.md](LANDING_CHECKLIST.md)。

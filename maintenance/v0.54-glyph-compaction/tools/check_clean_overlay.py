@@ -58,10 +58,11 @@ int main(){
  paused=false;state.debugPanel=true;frame();require(has(L"P95")&&has(L"DX12"),"Performance is available on F2 only");
  state.flight.y=sim::terrain(state.flight.x,state.flight.z)+400;state.flight.vy=-2;
  state.flight.gear=false;state.flight.flap=0;state.parkingBrake=true;
- frame();require(has(L"着陆检查")&&has(L"[待办] 起落架放下")&&has(L"[待办] 着陆襟翼")&&has(L"[待办] 停留刹车释放"),
+ flightAlerts.update(state);frame();require(has(L"着陆检查")&&has(L"[待办] 起落架放下")&&has(L"[待办] 着陆襟翼")&&has(L"[待办] 停留刹车释放"),
                  "Real F2 panel selects and binds landing checklist");
  for(const auto& item:labels)if(item.x==655)require(item.y>=121&&item.y+19<=469,"Checklist stays within the engineering panel");
- state.flight.vy=1;frame();require(has(L"起飞检查")&&!has(L"着陆检查"),"Go-around changes the visible checklist");
+ state.flight.vy=0;flightAlerts.update(state);frame();require(has(L"着陆检查"),"Level approach preserves visible landing checklist");
+ state.flight.vy=1;flightAlerts.update(state);frame();require(has(L"起飞检查")&&!has(L"着陆检查"),"Go-around changes the visible checklist");
  state.flight.vy=0;state.parkingBrake=false;
  state.debugPanel=false;frame();require(!has(L"P95")&&!has(L"帧/秒"),"Performance hidden by default");
  menuPage=ui::Page::Pause;frame();require(labels.size()==1,"Menu excludes flight overlay but preserves attribution");
