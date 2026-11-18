@@ -1,0 +1,5 @@
+Baseline bfaa47e1659b18d0ca559c826dfa67f27e14b27f (v0.92).
+CPU cases cover phase retention, boundaries, level flight, go-around, ground contact, crash and beginFlight reset.
+Removing the prior-phase input makes the retention regression fail.
+Windows workflow https://github.com/zhangchenrui7891/fiycare/actions/runs/44345063141
+No simulator rendering or HD 6000 measurements.

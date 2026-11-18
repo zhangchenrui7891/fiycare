@@ -1,0 +1,5 @@
+surface_takeoff aircraft=0 max_altitude_m=342.941
+surface_takeoff aircraft=1 max_altitude_m=1201.8
+surface_takeoff aircraft=2 max_altitude_m=1714.51
+surface_takeoff aircraft=3 max_altitude_m=1821.84
+PASS: rigid-body, panel aerodynamics, independent engines, faults, alerts, v15, CSV, four takeoffs, engine-out
