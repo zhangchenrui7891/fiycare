@@ -1,0 +1,5 @@
+Baseline ea84ea6b60308a9f960829c92f2c6b3ae3ccab14 (v0.90).
+CPU track-cue checks cover 45 heading and velocity combinations, marker endpoint, map bounds and stopped state.
+The same integration test fails on the previous display header at the missing-track-cue assertion.
+Windows workflow: https://github.com/zhangchenrui7891/fiycare/actions/runs/44249158956
+No simulator screenshots or HD 6000 measurements.
