@@ -33,8 +33,10 @@ inline void drawEngineeringPanel(std::vector<Vertex>& out, const sim::Snapshot& 
     row(L"力 L/D " + number(f.liftForce/1000) + L" / " + number(f.dragForce/1000) + L" kN");
     row(L"矩 俯仰 " + number(f.bodyForceMoment.moment.x/1000) + L" kNm");
     row(L"左翼 " + number(f.surfaceResult.leftLift/1000) + L" 右翼 " + number(f.surfaceResult.rightLift/1000));
-    row(L"起飞检查（状态提示）", {1, .8f, .3f});
-    for (const auto& item : sim::takeoffChecklist(state)) {
+    const bool landing = sim::landingChecklistActive(state);
+    row(landing ? L"着陆检查（状态提示）" : L"起飞检查（状态提示）", {1, .8f, .3f});
+    const auto checklist = landing ? sim::landingChecklist(state) : sim::takeoffChecklist(state);
+    for (const auto& item : checklist) {
         row((item.complete ? L"[通过] " : L"[待办] ") + item.label,
             item.complete ? XMFLOAT3{.4f, 1, .65f} : XMFLOAT3{1, .65f, .2f});
     }

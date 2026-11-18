@@ -128,4 +128,22 @@ inline std::vector<ChecklistItem> takeoffChecklist(const Snapshot& state) {
             {L"配平范围", std::abs(f.trim) <= .25}};
 }
 
+// Illustrative game-phase selection, expressed in metres above local terrain.
+inline bool landingChecklistActive(const Snapshot& state) {
+    const auto& f = state.flight;
+    const double agl = f.y - terrain(f.x, f.z);
+    return !f.crashed && !f.grounded() && std::isfinite(agl) &&
+           agl >= 0 && agl <= 600 && std::isfinite(f.vy) && f.vy < -.5;
+}
+
+inline std::vector<ChecklistItem> landingChecklist(const Snapshot& state) {
+    const auto& f = state.flight;
+    return {{L"航电供电", state.avionics.powered(f)},
+            {L"起落架放下", f.gear},
+            {L"着陆襟翼", std::isfinite(f.flap) && (f.aircraftId == 0 ? f.flap > 0 : f.flap >= .5)},
+            {L"停留刹车释放", !state.parkingBrake},
+            {L"下降率不超过6m/s", std::isfinite(f.vy) && f.vy >= -6},
+            {L"无失速警告", !f.stallWarning && !f.crashed}};
+}
+
 } // namespace sim

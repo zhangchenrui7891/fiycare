@@ -706,3 +706,7 @@ NAV 屏新增地面航迹角 TRK 和地速 GS。详见 [NAV_GROUND_MOTION.md](NA
 ## v0.91
 
 NAV 地图以绿色方向线和菱形显示地面航迹。详见 [NAV_GROUND_MOTION.md](NAV_GROUND_MOTION.md)。
+
+## v0.92
+
+F2 面板在低空下降时显示着陆检查。详见 [LANDING_CHECKLIST.md](LANDING_CHECKLIST.md)。

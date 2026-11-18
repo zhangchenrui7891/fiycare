@@ -248,10 +248,55 @@ void fullFlightTests() {
     expect(!state.headingHold && !state.altitudeHold, "Power loss releases AP after engine-out flight");
 }
 
+void landingChecklistTests() {
+    for (int id = 0; id < sim::aircraftCount; ++id) {
+        sim::Snapshot state;
+        state.flight.configure(id);
+        auto& f = state.flight;
+        expect(!sim::landingChecklistActive(state), "Parked aircraft keeps takeoff checklist");
+        f.y = sim::terrain(f.x, f.z) + 500;
+        f.vy = -2;
+        f.gear = true;
+        f.flap = 1;
+        expect(sim::landingChecklistActive(state), "Low descending aircraft gets landing checklist");
+        for (const auto& item : sim::landingChecklist(state))
+            expect(item.complete, "Configured landing aircraft passes all checklist items");
+        f.flap = 0;
+        expect(!sim::landingChecklist(state)[2].complete, "Clean wing needs landing flaps");
+        f.flap = .25;
+        expect(sim::landingChecklist(state)[2].complete == (id == 0), "Flap status uses the current model's available settings");
+        f.gear = false;
+        f.flap = 0;
+        state.parkingBrake = true;
+        f.vy = -6.01;
+        f.stallWarning = true;
+        state.avionics.master = false;
+        const auto failures = sim::landingChecklist(state);
+        for (const auto& item : failures) expect(!item.complete, "Each unprepared landing item is shown as pending");
+        state.avionics.master = true;
+        f.vy = -6;
+        expect(sim::landingChecklist(state)[4].complete, "Descent-rate boundary matches the existing sink warning");
+        f.vy = 1;
+        expect(!sim::landingChecklistActive(state), "Go-around climb returns to takeoff checklist");
+        f.vy = -.5;
+        expect(!sim::landingChecklistActive(state), "Level-flight threshold remains outside landing phase");
+        f.vy = -2;
+        f.y = sim::terrain(f.x, f.z) + 601;
+        expect(!sim::landingChecklistActive(state), "High descent keeps takeoff checklist");
+        f.y = sim::terrain(f.x, f.z) + 600;
+        expect(sim::landingChecklistActive(state), "600-metre threshold includes descending flight");
+        f.y = sim::terrain(f.x, f.z) + f.spec().gearHeight;
+        expect(!sim::landingChecklistActive(state), "Touchdown restores ground checklist");
+        f.y += 100;
+        f.crashed = true;
+        expect(!sim::landingChecklistActive(state), "Crashed aircraft cannot activate landing phase");
+    }
+}
+
 int main() {
     try {
         rotationTests(); surfaceTests(); engineTests(); faultAndAlertTests();
-        storageAndTelemetryTests(); fullFlightTests();
+        storageAndTelemetryTests(); fullFlightTests(); landingChecklistTests();
         std::cout << "PASS: rigid-body, panel aerodynamics, independent engines, faults, alerts, v15, CSV, four takeoffs, engine-out\n";
         return 0;
     } catch (const std::exception& e) {
