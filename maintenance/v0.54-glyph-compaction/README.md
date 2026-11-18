@@ -702,3 +702,7 @@ FlightGear 777 外模、UV 贴图、顶点变换缓存与飞行简报菜单，�
 ## v0.90
 
 NAV 屏新增地面航迹角 TRK 和地速 GS。详见 [NAV_GROUND_MOTION.md](NAV_GROUND_MOTION.md)。
+
+## v0.91
+
+NAV 地图以绿色方向线和菱形显示地面航迹。详见 [NAV_GROUND_MOTION.md](NAV_GROUND_MOTION.md)。

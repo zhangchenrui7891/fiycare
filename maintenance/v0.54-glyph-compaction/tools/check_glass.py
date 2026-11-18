@@ -65,6 +65,36 @@ int main(int argc,char** argv){
   for(const auto& v:out)if(v.x>-.224f&&v.x<.224f&&v.r==glass::magenta.x&&v.g==glass::magenta.y&&v.b==glass::magenta.z)++routeVertices;
   require(routeVertices==6,"Closing route leg crossing viewport must remain visible with both endpoints outside");
  }
+ // Isolate the NAV's green ground-track cue and verify its endpoint in
+ // the real heading-up display coordinates, including reciprocal motion.
+ for(double yaw:{-sim::pi,-.7,0.,.8,sim::pi})
+  for(double vx:{-40.,0.,40.})for(double vz:{-30.,0.,30.}){
+   sim::Snapshot flight;flight.flight.configure(3);
+   flight.flight.yaw=yaw;flight.flight.vx=vx;flight.flight.vz=vz;
+   out.clear();labels.clear();glass::draw(out,flight,0,label);validate(out);
+   std::vector<Vertex> cue;
+   for(const auto& v:out)
+    if(v.x>-.2241f&&v.x<.2241f&&v.r==glass::green.x&&v.g==glass::green.y&&v.b==glass::green.z)
+     cue.push_back(v);
+   const double speed=std::hypot(vx,vz);
+   require(cue.size()==(speed>=5?30u:0u),"Ground-track cue has bounded geometry and hides when stopped");
+   if(speed>=5){
+    const float x=150+float((vx*std::cos(yaw)-vz*std::sin(yaw))/speed)*44;
+    const float y=111-float((vx*std::sin(yaw)+vz*std::cos(yaw))/speed)*44;
+    // The four diamond strokes are centrally symmetric around the endpoint.
+    double centerX=0,centerY=0;
+    for(size_t i=6;i<cue.size();++i){
+     centerX+=150+cue[i].x*300/.448;
+     centerY+=100-(cue[i].y+.735)*200/.294;
+    }
+    require(std::abs(centerX/24-x)<.001&&std::abs(centerY/24-y)<.001,"Ground-track cue follows velocity relative to heading");
+    for(const auto& v:cue){
+     const float logicalX=150+v.x*300/.448f,logicalY=100-(v.y+.735f)*200/.294f;
+     require(logicalX>=102&&logicalX<=198&&logicalY>=63&&logicalY<=159,
+             "Cue stays within the NAV map and above the footer");
+    }
+   }
+  }
  sim::Snapshot state;state.flight.configure(3);state.flight.rpm=2250;state.flight.vz=90;state.flight.y=1234;state.flight.vy=1.2;state.flight.pitch=.035;state.flight.roll=-.12;state.flight.throttle=.84;state.flight.flap=.5;state.flight.fuel=87;state.headingHold=true;state.navigationHold=true;state.flight.z=1000;
  out.clear();labels.clear();glass::draw(out,state,0,label);
  require(contains(L"2250")&&contains(L"FUEL 87%")&&contains(L"FLAP 50%")&&contains(L"THR 84%"),"Flight state feeds engine/system glass");

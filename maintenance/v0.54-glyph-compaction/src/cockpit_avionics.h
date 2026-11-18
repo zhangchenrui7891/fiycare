@@ -130,6 +130,18 @@ template<class Text> inline void draw(std::vector<Vertex>& out,const sim::Snapsh
    nav.label(whole(i+1),x+6,y-6,col,.56f);
   }
  }
+ // Ground-track direction in the heading-up map. Fixed length encodes
+ // direction only; the GS readout supplies speed.
+ if(ground.track!=L"---"){
+  const double groundSpeed=std::hypot(f.vx,f.vz);
+  const float x=150+float((f.vx*cs-f.vz*sn)/groundSpeed)*44;
+  const float y=111-float((f.vx*sn+f.vz*cs)/groundSpeed)*44;
+  nav.line(150,111,x,y,green,1.4f,6);
+  nav.line(x,y-3,x+3,y,green,1.4f,6);
+  nav.line(x+3,y,x,y+3,green,1.4f,6);
+  nav.line(x,y+3,x-3,y,green,1.4f,6);
+  nav.line(x-3,y,x,y-3,green,1.4f,6);
+ }
  const bool valid=sim::validNavigationWaypoint(state.navigationWaypoint);
  nav.rect(0,165,300,35,black,6);
  nav.label(valid?L"WPT "+whole(state.navigationWaypoint+1)+L"   "+whole(sim::navigationDistance(state))+L" m":L"WPT INVALID",8,167,valid?magenta:amber,.75f);
