@@ -2,6 +2,7 @@
 #include "assets.h"
 #include <map>
 #include <optional>
+#include <set>
 #include <string>
 
 // Load and validate before touching the displayed model. The caller removes
@@ -29,4 +30,18 @@ inline StartupModel loadStartupModel(const std::filesystem::path& defaultPath,
  }catch(const std::runtime_error& error){result.warning=error.what();}
  if(!defaultPath.empty())result.model=loadModel(defaultPath);
  return result;
+}
+
+// Each visited profile is read once, including procedural-only aircraft. A
+// failed required mesh is not marked ready, so repair and retry remain possible.
+inline std::string ensureAircraftModel(std::map<int,ImportedModel>& models,
+                                      std::set<int>& ready,std::set<int>& custom,
+                                      int id,const std::filesystem::path& defaultPath,
+                                      const std::filesystem::path& customPath){
+ if(ready.count(id))return {};
+ auto selected=loadStartupModel(defaultPath,customPath);
+ if(selected.model)models.insert_or_assign(id,std::move(*selected.model));
+ if(selected.custom)custom.insert(id);else custom.erase(id);
+ ready.insert(id);
+ return selected.warning;
 }

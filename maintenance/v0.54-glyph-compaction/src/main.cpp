@@ -124,7 +124,7 @@ void help(HWND window){
   L"存档/照片/日志：%LOCALAPPDATA%\\FlightCareerAir\n"
   L"诊断输出另存：diagnostics\\benchmark 或 diagnostics\\smoke；不保存游戏生涯。\n"
   L"DX12初始化失败会自动尝试DX11；可用--dx11强制兼容模式。",
-  L"飞行生涯 v0.96 · 中文操作说明",MB_OK);
+  L"飞行生涯 v0.97 · 中文操作说明",MB_OK);
 }
 int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
  std::filesystem::path folder;
@@ -134,7 +134,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   const bool fxaaRequested=!args.has(L"--no-aa");
   const runfiles::RunFiles runFiles(dataFolder(),benchmark,smoke,benchmarkPreset.outputSubfolder,fxaaRequested);
   folder=runFiles.folder();std::filesystem::create_directories(folder);
-  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.96 startup");
+  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.97 startup");
   if(benchmark){
    std::filesystem::remove(folder/L"performance_summary.txt");
    std::filesystem::remove(folder/L"benchmark_final.bmp");
@@ -172,7 +172,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   const DWORD style=WS_OVERLAPPEDWINDOW;
   WNDCLASSW wc{};wc.lpfnWndProc=windowProc;wc.hInstance=instance;wc.lpszClassName=L"FlightCareerAir";wc.hCursor=LoadCursor(nullptr,IDC_ARROW);if(!RegisterClassW(&wc))throw std::runtime_error("Window registration failed");
   RECT bounds{0,0,low?640:1600,low?360:900};HMENU nativeMenu=createChineseMenu();AdjustWindowRect(&bounds,style,TRUE);
-  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.96 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
+  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.97 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
   if(!window)throw std::runtime_error("Window creation failed");ShowWindow(window,SW_SHOW);
   if(args.has(L"--fullscreen"))toggleFullscreen(window);
   renderScale=launch::initialRenderScale(args);
@@ -181,17 +181,16 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   RECT renderClient{};GetClientRect(window,&renderClient);
   LONG clientWidth=renderClient.right,clientHeight=renderClient.bottom;UINT appliedScale=renderScale;
   cockpit::viewportAspect=low?960.f/540:float(clientWidth)/std::max(1L,clientHeight);
-  std::map<int,ImportedModel> aircraftModels;std::set<int> customModels;
-  for(int id=0;id<sim::aircraftCount;id++){
+  std::map<int,ImportedModel> aircraftModels;std::set<int> customModels,readyModels;
+  auto ensureModel=[&](int id){
    const auto* profile=sim::fleetAsset(id);
    const auto defaultPath=profile?assetFolder()/profile->nativeName:std::filesystem::path{};
    const auto customPath=folder/("custom_aircraft_"+std::to_string(id)+".fcmesh");
-   auto selected=loadStartupModel(defaultPath,customPath);
-   if(!selected.warning.empty())logLine("Custom model ignored (aircraft "+std::to_string(id)+"): "+selected.warning);
-   if(selected.model)aircraftModels.emplace(id,std::move(*selected.model));
-   if(selected.custom)customModels.insert(id);
-  }
-  logLine("Aircraft catalog ready: "+std::to_string(sim::aircraftCount)+" profiles, "+std::to_string(aircraftModels.size())+" loaded meshes, "+std::to_string(customModels.size())+" custom meshes");
+   const auto warning=ensureAircraftModel(aircraftModels,readyModels,customModels,id,defaultPath,customPath);
+   if(!warning.empty())logLine("Custom model ignored (aircraft "+std::to_string(id)+"): "+warning);
+  };
+  ensureModel(flight.aircraftId);
+  logLine("Aircraft catalog ready: "+std::to_string(sim::aircraftCount)+" profiles, "+std::to_string(aircraftModels.size())+" loaded meshes (on demand)");
   struct Mark{float x,z;};std::deque<Mark> marks;
   {std::ifstream in(folder/L"tracks.txt");float x,z;while(marks.size()<400&&in>>x>>z)if(std::isfinite(x)&&std::isfinite(z))marks.push_back({x,z});}
   auto saveTracks=[&](){if(!runFiles.gameSavesEnabled())return;auto temp=folder/L"tracks.tmp",dest=folder/L"tracks.txt";{std::ofstream out(temp);for(auto m:marks)out<<m.x<<' '<<m.z<<'\n';out.flush();if(!out)throw std::runtime_error("Track save write failed");out.close();if(!out)throw std::runtime_error("Track save close failed");}if(!MoveFileExW(temp.c_str(),dest.c_str(),MOVEFILE_REPLACE_EXISTING|MOVEFILE_WRITE_THROUGH))throw std::runtime_error("Track save commit failed");};
@@ -359,12 +358,21 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
      case ui::Save:if(trySave())notice=runFiles.gameSavesEnabled()?L"已保存飞行状态与生涯。":L"诊断运行不保存飞行状态与生涯。";break;
      case ui::Load:{
       sim::Snapshot loadedState;std::ifstream in(folder/L"state.txt");
-      if(in&&loadedState.read(in)){state=loadedState;flightAlerts.beginFlight(state);sim::worldMode.store(state.terrainMode);backupEligible=true;walking=false;physicsTime.reset();menuPage=ui::Page::Pause;notice=L"已读取飞行，可选择继续。";}else notice=L"读取失败：没有有效存档，当前飞行保持不变。";break;
+      if(in&&loadedState.read(in)){
+       try{ensureModel(loadedState.flight.aircraftId);last=std::chrono::steady_clock::now();dt=0;previousMeasured=false;}catch(const std::exception& error){last=std::chrono::steady_clock::now();dt=0;previousMeasured=false;logLine(std::string("Saved aircraft mesh load failed: ")+error.what());notice=L"存档机型的模型读取失败，当前飞行保持不变。请检查资源后重试。";break;}
+       state=loadedState;flightAlerts.beginFlight(state);sim::worldMode.store(state.terrainMode);backupEligible=true;walking=false;physicsTime.reset();menuPage=ui::Page::Pause;notice=L"已读取飞行，可选择继续。";}else notice=L"读取失败：没有有效存档，当前飞行保持不变。";break;
      }
      case ui::Restart:ui::restart(state);flightAlerts.beginFlight(state);walking=false;physicsTime.reset();notice=L"已重新出发，保留燃油；事故恢复会扣费。";trySave();break;
      case ui::Exit:exitApproved=requestExit();break;
      case ui::Trainer:case ui::Airliner:case ui::A330:case ui::A350:case ui::A320:case ui::B737:case ui::B787:case ui::A319:case ui::A321:case ui::B7879:case ui::B777:
-      if(ui::switchAircraft(state,ui::aircraftIdForCommand(cmd))){flightAlerts.beginFlight(state);walking=false;physicsTime.reset();notice=L"已切换飞机，并重置本次任务。";trySave();}else notice=L"换机需要在跑道停稳；空中请先返场。";break;
+     {
+      auto candidate=state;
+      if(ui::switchAircraft(candidate,ui::aircraftIdForCommand(cmd))){
+       try{ensureModel(candidate.flight.aircraftId);last=std::chrono::steady_clock::now();dt=0;previousMeasured=false;}catch(const std::exception& error){last=std::chrono::steady_clock::now();dt=0;previousMeasured=false;logLine(std::string("Aircraft selection mesh load failed: ")+error.what());notice=L"所选机型的模型读取失败，已保留当前飞机与航班。请检查资源后重试。";break;}
+       state=std::move(candidate);flightAlerts.beginFlight(state);walking=false;physicsTime.reset();notice=L"已切换飞机，并重置本次任务。";trySave();
+      }else notice=L"换机需要在跑道停稳；空中请先返场。";
+      break;
+     }
      case ui::ImportModel:{
       if(!career.parked(flight)){notice=L"请先在跑道停稳后导入机模。";break;}
 #ifdef FCAIR_WITH_ASSIMP
@@ -586,7 +594,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
    if(benchmark&&timing::benchmarkFinished(benchmarkStarted,benchmarkSamples)){
     const auto workingSet=timing::readProcessWorkingSet();
     std::ofstream summary(folder/L"performance_summary.txt",std::ios::trunc);
-    const auto result=timing::writeBenchmarkSummary(summary,"v0.96",renderer->name(),fxaaRequested,powerSaver,benchmarkSamples,benchmarkPreset,workingSet);
+    const auto result=timing::writeBenchmarkSummary(summary,"v0.97",renderer->name(),fxaaRequested,powerSaver,benchmarkSamples,benchmarkPreset,workingSet);
     summary.flush();if(!summary)logLine("Benchmark summary write failed; no report file success claimed");
     pendingPhoto=folder/L"benchmark_final.bmp";renderer->draw(mesh,hud,XMMatrixLookToLH(XMVectorZero(),viewDirection,up)*reversedPerspective(activeFov,cockpit::viewportAspect,presentation::worldNear,presentation::worldFar),daylight,pendingPhoto,cabin,cabinView,frameGeometry.indexedScene);pendingPhoto.clear();
     logLine(result.complete?"Benchmark completed with valid full-run statistics":"Benchmark ended without a valid performance verdict; inspect summary status/counts");DestroyWindow(window);

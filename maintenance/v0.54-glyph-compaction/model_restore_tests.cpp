@@ -54,6 +54,26 @@ int main(){
   }else std::cout<<"Probe-exception case not exercised on this platform; ordinary fallback cases still run.\n";
   bool failed=false;try{loadStartupModel(missing,bad);}catch(const std::runtime_error&){failed=true;}
   check(failed,"No valid custom or required default must still report startup failure");
+  // Startup only requests the active profile. Other paths remain unopened,
+  // and revisiting a ready profile never replaces a live imported/edited mesh.
+  std::map<int,ImportedModel> lazy;std::set<int> ready,custom;
+  check(ensureAircraftModel(lazy,ready,custom,3,path,missing).empty(),"Active default loads without warning");
+  check(lazy.size()==1&&ready.size()==1&&ready.count(3)&&custom.empty(),"Only requested profile becomes resident");
+  lazy.at(3).vertices[0].x=99;
+  check(ensureAircraftModel(lazy,ready,custom,3,missing,bad).empty()&&lazy.at(3).vertices[0].x==99,"Cached profile skips disk and preserves edits");
+  ensureAircraftModel(lazy,ready,custom,0,{},missing);
+  check(ready.count(0)&&lazy.size()==1,"Procedural profile remembered without mesh allocation");
+  check(ensureAircraftModel(lazy,ready,custom,0,missing,bad).empty(),"Revisiting procedural profile skips disk");
+  ensureAircraftModel(lazy,ready,custom,2,missing,path);
+  check(lazy.size()==2&&custom.count(2),"New profile loads custom before missing default");
+  check(!ensureAircraftModel(lazy,ready,custom,4,path,bad).empty()&&!custom.count(4)&&ready.count(4),"Corrupt custom fallback is retained and marked ready");
+  bool lazyFailed=false;
+  try{ensureAircraftModel(lazy,ready,custom,10,missing,bad);}catch(const std::runtime_error&){lazyFailed=true;}
+  check(lazyFailed&&!ready.count(10)&&!lazy.count(10)&&!custom.count(10),"Failed request leaves profile retryable");
+  check(lazy.size()==3&&ready.size()==4&&lazy.at(3).vertices[0].x==99&&custom.count(2),"Failed selection preserves previous resident models and custom markers");
+  ensureAircraftModel(lazy,ready,custom,10,path,missing);
+  check(ready.count(10)&&lazy.at(10).vertices[0].x==7,"Repair and retry succeeds");
+  std::cout<<"On-demand profiles: one active mesh, cached edits/procedural skip, custom fallback, failure isolation and repair/retry passed.\n";
   std::filesystem::remove_all(dir);std::cout<<"PASS: missing, corrupt and truncated defaults preserve current model; valid replace/insert succeed. Custom-first startup, default/procedural fallbacks and unrecoverable failure passed. CPU filesystem test.\n";
  }catch(const std::exception& e){std::filesystem::remove_all(dir);std::cerr<<e.what()<<'\n';return 1;}
 }
