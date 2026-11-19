@@ -1,0 +1,11 @@
+Baseline v0.96 final commit c97fbbf5712e7c3b6e6fe93a2f998855e753dff1.
+Tested v0.97 source commit 630c8ed92f45a52e332ae9d933ef7cfbd76c20ff.
+Linux C++17 Release, Assimp ON, Ninja complete build (284 steps), CTest 49/49.
+Windows workflow https://github.com/zhangchenrui7891/fiycare/actions/runs/44520136795
+Windows source compilation uses Assimp OFF and no runtime asset staging.
+No simulator, GPU, DX11/DX12 rendering, Boot Camp, HD6000 FPS/startup-time/working-set or full flight execution performed.
+Payload values measure CPU vector capacities using real stock fcmesh files, not process memory.
+Main-block test extracts real startup/selection/load code and uses CPU UI/timer substitutes.
+Cache mutant removes ready-hit short circuit; new regression rejects it with exit 1.
+Full package includes source/resources; no compiled Windows EXE.
+Windows CI completed success; 24/24 selected tests passed. Logs inspected on 2026-11-19.

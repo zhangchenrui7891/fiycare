@@ -726,3 +726,7 @@ F2 面板在低空下降时显示着陆检查。详见 [LANDING_CHECKLIST.md](LA
 ## v0.96
 
 驾驶舱基准改变环视角后取消本轮判定。详见 [BENCHMARK_777.md](BENCHMARK_777.md)。
+
+
+### v0.97 按需模型加载
+启动只准备当前机型，换机/读档先加载后提交；失败保留航班并允许修复重试，已访问机型缓存复用。Linux 49/49 CTest、Windows 主程序编译及 24/24 项检查通过。源码与 CPU 网格容量统计见 ON_DEMAND_MODELS.md；Windows CI：https://github.com/zhangchenrui7891/fiycare/actions/runs/44520136795 。尚无 Boot Camp HD6000 启动耗时、工作集、FPS 或画面验收。本包不含 Windows EXE。

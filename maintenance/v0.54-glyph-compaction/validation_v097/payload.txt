@@ -1,0 +1,5 @@
+Stock assets, no custom models. CPU vector capacity bytes only; excludes textures, allocators, renderer, GPU and process working set.
+old_eager_meshes=9 old_eager_vector_capacity_bytes=14507076
+initial_profile=0 resident_meshes=0 vector_capacity_bytes=0 avoided_capacity_bytes=14507076
+initial_profile=3 resident_meshes=1 vector_capacity_bytes=2979315 avoided_capacity_bytes=11527761
+initial_profile=10 resident_meshes=1 vector_capacity_bytes=6363876 avoided_capacity_bytes=8143200

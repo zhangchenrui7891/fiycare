@@ -1,0 +1,3 @@
+Real filesystem probe exception: default/procedural fallback, diagnostic, required-default failure and existing data preservation passed.
+On-demand profiles: one active mesh, cached edits/procedural skip, custom fallback, failure isolation and repair/retry passed.
+PASS: missing, corrupt and truncated defaults preserve current model; valid replace/insert succeed. Custom-first startup, default/procedural fallbacks and unrecoverable failure passed. CPU filesystem test.

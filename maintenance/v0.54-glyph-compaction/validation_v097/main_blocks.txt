@@ -1,0 +1,1 @@
+Actual main blocks: lazy startup, switch failure/retry/cache, save-load failure/retry, state preservation and timing reset passed. CPU only.
