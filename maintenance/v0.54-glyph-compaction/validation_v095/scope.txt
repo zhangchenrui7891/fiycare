@@ -1,0 +1,5 @@
+Baseline af0fd99427951b1c22b47843c396aac8b02a080e (v0.94).
+Linux Release, Assimp ON, v0.94 assets, 48/48 CTest.
+Complete prior cockpit function compared byte-for-byte over 66 aircraft/power/throttle combinations using CPU math and font adapters.
+Windows DirectXMath tests also compare the fixed shell through identity, translation, rotation and scaling.
+No simulator screenshots or HD 6000 measurements.
