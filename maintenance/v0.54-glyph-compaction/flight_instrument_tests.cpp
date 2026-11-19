@@ -40,13 +40,22 @@ int main(){
    const auto ground=instruments::groundMotion(invalid,invalid);
    require(ground.track==L"---"&&ground.speed==L"---","Invalid or overflowed ground motion hidden");
   }
+  require(instruments::aboveGround(1234,1000)==L"234","AGL subtracts terrain from geometric altitude");
+  require(instruments::aboveGround(750,0)==L"750"&&instruments::aboveGround(750.001,0).empty(),"AGL range uses unrounded height with inclusive 750m boundary");
+  require(instruments::aboveGround(0,0)==L"0"&&instruments::aboveGround(1.6,0)==L"2","AGL is aircraft reference height, not wheel clearance");
+  require(instruments::aboveGround(249.49,126)==L"123"&&instruments::aboveGround(249.5,126)==L"124","AGL uses whole-metre rounding");
+  require(instruments::aboveGround(0,1)==L"---","Below-terrain reference is invalid rather than false zero");
+  for(double invalid:{double(NAN),double(INFINITY),-double(INFINITY)}){
+   require(instruments::aboveGround(invalid,0)==L"---"&&instruments::aboveGround(0,invalid)==L"---","Invalid geometric or terrain input uses AGL placeholder");
+  }
+  require(instruments::aboveGround(std::numeric_limits<double>::max(),-std::numeric_limits<double>::max())==L"---","AGL subtraction overflow rejected");
   auto text=instruments::primary(100,1500,.4,-.4*pi/180);
   require(text.speedAltitude==L"IAS 360 km/h ALT 1500 m","Metric units and speed conversion");
   require(text.headingVertical==L"HDG 000° VS +0.4 m/s","Heading and fractional VS units");
   text=instruments::primary(0,-25,-2.3,pi);
   require(text.speedAltitude==L"IAS 0 km/h ALT -25 m"&&text.headingVertical==L"HDG 180° VS -2.3 m/s","Ground/negative barometric altitude/descent");
   require(instruments::heading(std::numeric_limits<double>::max()).size()==3,"Large finite heading is bounded before rounding");
-  std::cout<<"PASS 40001 heading-range cases plus cardinal/north-boundary, unit conversion, fractional VS, invalid and signed-zero cases. Text/CPU only.\n";
+  std::cout<<"PASS 40001 heading-range cases plus cardinal/north-boundary, unit conversion, fractional VS, invalid and signed-zero cases. AGL terrain/range/rounding/invalid cases passed. Text/CPU only.\n";
   return 0;
  }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}
 }

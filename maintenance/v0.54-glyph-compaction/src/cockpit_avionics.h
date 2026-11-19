@@ -99,6 +99,13 @@ template<class Text> inline void draw(std::vector<Vertex>& out,const sim::Snapsh
  p.label(L"HDG "+instruments::heading(f.yaw),79,161,white,.8f);
  p.label(L"VS "+instruments::verticalSpeed(air.verticalSpeed)+L" m/s",8,182,cyan,.67f);
  p.label(L"QNH "+whole(state.avionics.qnh),184,182,cyan,.67f);
+ // Terrain-relative height uses the geometric reference point, independent
+ // of QNH. This is a training aid, not a simulated radar-altimeter sensor.
+ const auto aboveGround=instruments::aboveGround(f.y,sim::terrain(f.x,f.z));
+ if(!aboveGround.empty()){
+  p.rect(102,114,96,18,black,7);
+  p.label(L"AGL "+aboveGround+L" m",108,116,white,.70f);
+ }
  if(f.stallWarning){p.rect(103,134,93,19,{.35f,.025f,.018f},7);p.label(L"STALL",119,136,amber,.85f);}
  // NAV: heading-up map, real training route positions and active leg.
  const auto ground=instruments::groundMotion(f.vx,f.vz);

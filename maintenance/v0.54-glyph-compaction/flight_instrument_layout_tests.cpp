@@ -33,6 +33,17 @@ int main(){
     ++rows;vertices+=mesh.size();
    }
   }
+  for(double height:{0.,1.6,123.,749.6,750.,751.,double(NAN)}){
+   const auto value=instruments::aboveGround(height,0);
+   if(value.empty())continue;
+   std::vector<Vertex> mesh;font.draw(mesh,L"AGL "+value+L" m",0,0,{1,1,1},900);
+   require(!mesh.empty(),"AGL GDI label has visible glyph geometry");
+   for(const auto& v:mesh){
+    const float x=(v.x+1)*480*.70f,y=(1-v.y)*270*.70f;
+    require(x>=-.01f&&x<=84.01f&&y>=-.01f&&y<=16.01f,"AGL text exceeds reserved PFD box");
+   }
+   ++rows;vertices+=mesh.size();
+  }
   std::cout<<"PASS actual Windows GDI font: "<<rows<<" metric primary rows, "<<vertices
            <<" glyph vertices fit 300x21 logical text bounds. No screen/GPU/HD6000 validation.\n";
   return 0;

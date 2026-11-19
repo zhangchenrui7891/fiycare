@@ -96,6 +96,36 @@ int main(int argc,char** argv){
     }
    }
   }
+ // Actual display binding across both terrain modes and all aircraft.
+ // QNH affects ALT but never the geometric AGL readout.
+ int aglCases=0;
+ for(int id=0;id<sim::aircraftCount;++id)for(int terrainMode:{0,1})
+  for(double height:{-1.,0.,1.6,123.4,123.6,749.6,750.,751.}){
+   sim::worldMode.store(terrainMode);
+   sim::Snapshot low;low.flight.configure(id);low.flight.x=2600;low.flight.z=5000;
+   const double elevation=sim::terrain(low.flight.x,low.flight.z);
+   low.flight.y=elevation+height;
+   const auto expected=height<0?L"---":height>750?L"":instruments::whole(height);
+   double firstAltitude=0;bool first=true;
+   for(double qnh:{950.,1013.25,1050.}){
+    low.avionics.qnh=qnh;
+    out.clear();labels.clear();glass::draw(out,low,0,label);validate(out);
+    const Label* agl=nullptr;for(const auto& l:labels)if(l.text.rfind(L"AGL ",0)==0)agl=&l;
+    require(std::wstring(expected).empty()?agl==nullptr:agl&&agl->text==L"AGL "+std::wstring(expected)+L" m","PFD AGL uses geometric terrain clearance and unrounded visibility boundary");
+    if(agl)require(agl->color.x==glass::white.x&&agl->w==.448f*.70f,"AGL uses its reserved readable label style");
+    const auto altitude=sim::airData(low.flight,qnh).altitude;
+    if(first){firstAltitude=altitude;first=false;}else require(std::abs(altitude-firstAltitude)>1,"QNH changes barometric ALT while AGL stays fixed");
+    ++aglCases;
+   }
+   low.flight.stallWarning=true;
+   out.clear();labels.clear();glass::draw(out,low,0,label);validate(out);
+   require(contains(L"STALL"),"AGL cannot suppress the stall warning");
+   if(height>=0&&height<=750)require(contains(L"AGL "),"Low-altitude and stall labels coexist in separate rows");
+   low.avionics.master=false;out.clear();labels.clear();glass::draw(out,low,0,label);
+   require(labels.empty()&&out.size()==18,"AGL extinguishes with all displays after avionics power loss");
+  }
+ sim::worldMode.store(1);
+ std::cout<<aglCases<<" AGL aircraft/terrain/QNH display bindings plus range, invalid-height, stall and power checks passed. CPU only.\n";
  sim::Snapshot state;state.flight.configure(3);state.flight.rpm=2250;state.flight.vz=90;state.flight.y=1234;state.flight.vy=1.2;state.flight.pitch=.035;state.flight.roll=-.12;state.flight.throttle=.84;state.flight.flap=.5;state.flight.fuel=87;state.headingHold=true;state.navigationHold=true;state.flight.z=1000;
  out.clear();labels.clear();glass::draw(out,state,0,label);
  require(contains(L"2250")&&contains(L"FUEL 87%")&&contains(L"FLAP 50%")&&contains(L"THR 84%"),"Flight state feeds engine/system glass");
@@ -111,7 +141,7 @@ int main(int argc,char** argv){
  state.avionics.master=true;
  state.navigationWaypoint=99;out.clear();labels.clear();glass::draw(out,state,0,label);require(contains(L"WPT INVALID"),"Invalid waypoint never dereferenced");
  state.navigationWaypoint=0;state.flight.stallWarning=true;out.clear();labels.clear();glass::draw(out,state,0,label);require(contains(L"STALL"),"Stall warning retained");
- state.flight.stallWarning=false;out.clear();labels.clear();glass::draw(out,state,0,label);validate(out);
+ state.flight.stallWarning=false;state.flight.y=234;out.clear();labels.clear();glass::draw(out,state,0,label);validate(out);
  if(argc>1){std::ofstream file(argv[1]);file<<"{\"vertices\":[";bool first=true;for(const auto& v:out){if(!first)file<<',';first=false;file<<'['<<v.x<<','<<v.y<<','<<v.z<<','<<v.r<<','<<v.g<<','<<v.b<<']';}
   file<<"],\"labels\":[";first=true;for(const auto& l:labels){if(!first)file<<',';first=false;file<<"{\"text\":\"";for(wchar_t c:l.text)file<<char(c);file<<"\",\"x\":"<<l.x<<",\"y\":"<<l.y<<",\"w\":"<<l.w<<",\"color\":["<<l.color.x<<','<<l.color.y<<','<<l.color.z<<"]}";}file<<"]}";
  }
@@ -234,7 +264,9 @@ with tempfile.TemporaryDirectory(prefix='fcair-glass-') as folder:
     flags = ['-O1', '-g', '-fsanitize=address,undefined', '-fno-omit-frame-pointer'] if '--sanitize' in sys.argv else ['-O2']
     subprocess.run(['g++', '-std=c++17', '-Wall', '-Wextra', '-Werror', '-pedantic', *flags,
                     '-I', str(root / 'src'), str(source), '-o', str(exe)], check=True)
-    preview = root / 'validation_v052/glass_layout.json'
+    preview = root / 'validation_v098/glass_layout.json'
+    if '--preview' in sys.argv:
+        preview.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run([str(exe), *([str(preview)] if '--preview' in sys.argv else [])], check=True,
                    env={**os.environ, 'ASAN_OPTIONS': 'detect_leaks=0'})
 
@@ -261,5 +293,5 @@ if '--preview' in sys.argv:
         draw.text(point(l['x'],l['y']),l['text'],font=font,fill=color(l['color']))
     for x,title in [(77,'PRIMARY FLIGHT DISPLAY'),(595,'NAVIGATION DISPLAY'),(1110,'ENGINE / SYSTEM DISPLAY')]:
         draw.text((x,419),title,font=ImageFont.truetype(font_path,16),fill='#9fbdcd')
-    image.save(root/'validation_v052/glass_preview.png')
+    image.save(root/'validation_v098/glass_preview.png')
     print('Saved CPU glass layout preview.')

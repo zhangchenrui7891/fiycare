@@ -49,6 +49,15 @@ inline std::wstring verticalSpeed(double metresPerSecond){
  if(metresPerSecond>0)out<<L'+';
  out<<std::fixed<<std::setprecision(1)<<metresPerSecond;return out.str();
 }
+// Geometric height of the simulated aircraft reference point above terrain.
+// An empty result hides the low-altitude readout above the game display range.
+inline constexpr double aboveGroundDisplayCeiling=750.; // metres
+inline std::wstring aboveGround(double geometricAltitude,double terrainElevation){
+ if(!std::isfinite(geometricAltitude)||!std::isfinite(terrainElevation))return L"---";
+ const double height=geometricAltitude-terrainElevation;
+ if(!std::isfinite(height)||height<0)return L"---";
+ return height<=aboveGroundDisplayCeiling?whole(height):L"";
+}
 struct PrimaryText {std::wstring speedAltitude,headingVertical;};
 inline PrimaryText primary(double iasMetresPerSecond,double pressureAltitudeMetres,
                            double verticalMetresPerSecond,double headingRadians){

@@ -45,7 +45,7 @@ inline void drawMenu(std::vector<Vertex>& out,ui::Page page,const sim::Snapshot&
   screenQuad(out,180,100,600,3,{.34f,.83f,.72f});
   font.draw(out,L"FLIGHTCAREER AIR",210,116,{.45f,.86f,.78f},330);
   font.draw(out,paused?L"飞行暂停":L"飞行简报",210,140,{.95f,.98f,1.f},330);
-  font.draw(out,L"v0.97",702,120,{.64f,.75f,.83f},52);
+  font.draw(out,L"v0.98",702,120,{.64f,.75f,.83f},52);
 
   screenQuad(out,508,191,242,235,{.049f,.082f,.11f});
   screenQuad(out,508,191,2,235,{.18f,.48f,.50f});
