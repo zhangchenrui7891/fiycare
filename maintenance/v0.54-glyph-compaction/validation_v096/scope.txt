@@ -1,0 +1,6 @@
+Baseline 2de982ece61ea453a6e177a322908a3618b3babc (v0.95).
+Linux Release, Assimp ON, v0.95 assets, 48/48 CTest.
+Stable view, yaw and pitch changes, sticky invalidation, invalid first view and production sampling integration checked.
+Disabling changed-view invalidation makes the new regression fail.
+Windows workflow https://github.com/zhangchenrui7891/fiycare/actions/runs/44443177420
+No simulator rendering or HD 6000 measurements.
