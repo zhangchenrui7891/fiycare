@@ -1,0 +1,5 @@
+Baseline a4c71d7754aac6cff7c21ebf70dda5a5e374adf7 (v0.93).
+Linux Release, Assimp ON, v0.93 assets, 48/48 CTest.
+Both interior variants compared byte-for-byte against uncached generation; repeated frames and output-prefix preservation checked.
+Additional Windows DirectXMath regression covers identity, translation, rotation and scaling.
+No simulator screenshots or HD 6000 performance measurements.
