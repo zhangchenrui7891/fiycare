@@ -56,7 +56,7 @@ inline void cockpit777WindowFrame(std::vector<Vertex>& out,const XMMATRIX& trans
  for(float side:{-1.f,1.f})
   box(out,side*1.04f,.12f,.50f,.050f,.043f,.85f,returnFace,transform);
 }
-inline void cockpitInterior(std::vector<Vertex>& out,const XMMATRIX& transform,bool b777){
+inline void buildCockpitInterior(std::vector<Vertex>& out,const XMMATRIX& transform,bool b777){
  const XMFLOAT3 shell{.20f,.23f,.25f},edge{.075f,.085f,.10f},metal{.40f,.43f,.45f};
  box(out,0,-1.06f,1.0f,1.10f,.15f,.09f,shell,transform);
  // Angled glare shield, side consoles and fabric seats.
@@ -98,4 +98,34 @@ inline void cockpitInterior(std::vector<Vertex>& out,const XMMATRIX& transform,b
  }
  for(int i=0;i<24;i++)box(out,-.94f+i*.082f,-.97f,.887f,.019f,.002f,.002f,edge,transform);
  for(float x:{-.94f,.94f})cockpitCylinder(out,x,-.37f,.88f,.033f,.025f,metal,transform);
+}
+
+
+// Each variant is initialized on first use. Local immutable geometry survives
+// frame clears and is copied into the render thread's existing cabin buffer.
+inline const std::vector<Vertex>& cockpitInteriorGeometry(bool b777){
+ if(b777){
+  static const auto geometry=[]{
+   std::vector<Vertex> vertices;
+   buildCockpitInterior(vertices,XMMatrixIdentity(),true);
+   return vertices;
+  }();
+  return geometry;
+ }
+ static const auto geometry=[]{
+  std::vector<Vertex> vertices;
+  buildCockpitInterior(vertices,XMMatrixIdentity(),false);
+  return vertices;
+ }();
+ return geometry;
+}
+inline void cockpitInterior(std::vector<Vertex>& out,const XMMATRIX& transform,bool b777){
+ // Preserve the original construction/rounding for callers supplying a
+ // nonidentity transform. Normal cabin rendering uses local coordinates.
+ if(!XMMatrixIsIdentity(transform)){
+  buildCockpitInterior(out,transform,b777);
+  return;
+ }
+ const auto& geometry=cockpitInteriorGeometry(b777);
+ out.insert(out.end(),geometry.begin(),geometry.end());
 }

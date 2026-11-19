@@ -714,3 +714,7 @@ F2 面板在低空下降时显示着陆检查。详见 [LANDING_CHECKLIST.md](LA
 ## v0.93
 
 着陆检查在短暂平飞和小幅高度变化中保持，按退出条件和新飞行状态重置。详见 [LANDING_CHECKLIST.md](LANDING_CHECKLIST.md)。
+
+## v0.94
+
+座舱固定内饰按需缓存。验证和 Boot Camp 对照见 [COCKPIT_INTERIOR_CACHE.md](COCKPIT_INTERIOR_CACHE.md)。

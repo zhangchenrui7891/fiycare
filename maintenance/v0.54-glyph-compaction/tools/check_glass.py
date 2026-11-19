@@ -16,6 +16,7 @@ code = r'''
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
+#include <cstring>
 struct XMFLOAT3{float x,y,z;};
 using XMMATRIX=int;
 XMFLOAT3 XMLoadFloat3(const XMFLOAT3* p){return *p;}
@@ -131,6 +132,7 @@ integration = r'''
 constexpr float XM_2PI=6.283185307f;
 using XMVECTOR=XMFLOAT3;
 int XMMatrixIdentity(){return 0;}
+bool XMMatrixIsIdentity(int matrix){return matrix==0;}
 int XMMatrixRotationZ(float){return 0;}
 int XMMatrixTranslation(float,float,float){return 0;}
 XMFLOAT3 XMVectorSet(float x,float y,float z,float){return {x,y,z};}
@@ -170,6 +172,32 @@ void check777WindowFrame(){
   require(!windowFrameBlocks(frame,{x,-.735f,.873f},1),"777 frame must not cover a display centre");
  std::cout<<"PASS 777 window: solid budget, three clear forward rays, visible mullion, display and control center clearance. CPU geometry only.\n";
 }
+void checkInteriorCache(){
+ for(bool b777:{false,true}){
+  std::vector<Vertex> reference,cached;
+  buildCockpitInterior(reference,0,b777);
+  const auto& geometry=cockpitInteriorGeometry(b777);
+  require(reference.size()==geometry.size(),"Cached interior vertex count matches original");
+  const auto same=[&](const std::vector<Vertex>& values){
+   require(values.size()==reference.size(),"Cached interior append count");
+   require(std::memcmp(values.data(),reference.data(),reference.size()*sizeof(Vertex))==0,
+           "Cached interior bytes match the original construction");
+  };
+  same(geometry);
+  const auto* storage=geometry.data();
+  for(int frame=0;frame<20;++frame){
+   cached.clear();cockpitInterior(cached,0,b777);same(cached);
+   require(cockpitInteriorGeometry(b777).data()==storage,"Static interior storage survives frame clears");
+  }
+  cached.assign(1,Vertex{});cockpitInterior(cached,0,b777);
+  require(cached.size()==reference.size()+1,"Interior append preserves the caller's prefix");
+  require(std::memcmp(cached.data()+1,reference.data(),reference.size()*sizeof(Vertex))==0,"Appended interior order matches");
+  cached.clear();reference.clear();
+  buildCockpitInterior(reference,1,b777);cockpitInterior(cached,1,b777);same(cached);
+  std::cout<<"Interior variant "<<b777<<": "<<geometry.size()<<" vertices, "
+           <<geometry.capacity()*sizeof(Vertex)<<" retained bytes. CPU adapters only.\n";
+ }
+}
 void checkCockpitIntegration(){
  for(int id=0;id<sim::aircraftCount;id++)for(bool on:{false,true}){
   sim::Snapshot state;state.flight.configure(id);state.avionics.master=on;std::vector<Vertex> geometry;
@@ -181,7 +209,7 @@ void checkCockpitIntegration(){
  }
 }
 '''
-code = code.replace('int main(int argc,char** argv){', integration + '\nint main(int argc,char** argv){\n checkCockpitIntegration();\n check777WindowFrame();')
+code = code.replace('int main(int argc,char** argv){', integration + '\nint main(int argc,char** argv){\n checkCockpitIntegration();\n checkInteriorCache();\n check777WindowFrame();')
 with tempfile.TemporaryDirectory(prefix='fcair-glass-') as folder:
     source = Path(folder) / 'glass.cpp'
     exe = Path(folder) / 'glass'
