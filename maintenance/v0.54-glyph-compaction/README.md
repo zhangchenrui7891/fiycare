@@ -722,3 +722,7 @@ F2 面板在低空下降时显示着陆检查。详见 [LANDING_CHECKLIST.md](LA
 ## v0.95
 
 固定仪表台和最终舱内材质一并缓存。详见 [COCKPIT_INTERIOR_CACHE.md](COCKPIT_INTERIOR_CACHE.md)。
+
+## v0.96
+
+驾驶舱基准改变环视角后取消本轮判定。详见 [BENCHMARK_777.md](BENCHMARK_777.md)。

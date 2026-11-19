@@ -82,6 +82,29 @@ void workingSetReport(){
  require(measured.complete&&missing.complete&&measured.target30==missing.target30,
          "Memory availability is independent of the timing verdict");
 }
+void cockpitViewIntegrity(){
+ for(bool yawChange:{false,true}){
+  timing::BenchmarkSamples samples;
+  for(int i=0;i<3200;++i){
+   samples.observeCockpitView(0,-.4);
+   samples.add(.02);
+  }
+  require(samples.valid()&&samples.cockpitViewObserved(),"Stable cockpit view permits a complete run");
+  samples.observeCockpitView(yawChange?.01:0,yawChange?-.4:-.39);
+  require(!samples.valid()&&!samples.configurationValid(),"Yaw or pitch change invalidates a cockpit benchmark");
+  samples.observeCockpitView(0,-.4);
+  require(!samples.valid(),"Returning to the original view cannot repair a mixed-scene run");
+  require(timing::benchmarkFinished(true,samples),"Changed cockpit view ends benchmark promptly");
+  noVerdict(samples);
+ }
+ for(double invalid:{double(NAN),double(INFINITY),-double(INFINITY)}){
+  timing::BenchmarkSamples samples;
+  samples.observeCockpitView(invalid,0);
+  require(!samples.valid(),"Invalid first view cannot establish a usable baseline");
+  samples.observeCockpitView(0,0);
+  require(!samples.valid(),"Finite recovery cannot repair invalid view evidence");
+ }
+}
 void reproduceLegacyClock(){
  // v0.35 add/elapsed excerpt. Virtual intervals, NOT measured GPU frames.
  struct Legacy {
@@ -178,7 +201,7 @@ void configurationChanges(){
  std::cout<<"PASS 11 configuration mutations after valid full runs, sticky invalidation, early change, and report suppression. CPU only.\n";
 }
 int main(){
- try{configurationChanges();diagnosticRouting();benchmarkPresets();workingSetReport();reproduceLegacyClock();capacityBoundaryAndEarlyEnd();normalAndIncompleteRuns();malformedEvidence();
+ try{configurationChanges();diagnosticRouting();benchmarkPresets();workingSetReport();cockpitViewIntegrity();reproduceLegacyClock();capacityBoundaryAndEarlyEnd();normalAndIncompleteRuns();malformedEvidence();
 #ifdef _WIN32
   const auto actual=timing::readProcessWorkingSet();
   require(actual&&actual->currentBytes>0&&actual->lifetimePeakBytes>=actual->currentBytes,

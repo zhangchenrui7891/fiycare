@@ -30,6 +30,8 @@ class BenchmarkSamples {
  std::size_t observed=0,rejected=0;
  bool overflow=false,invalidTime=false,configurationChanged=false,contextObserved=false;
  FrameContext initialContext{};
+ bool viewObserved=false;
+ double initialYaw=0,initialPitch=0;
 public:
  static constexpr std::size_t sampleLimit=65536;
  // Sticky invalidation: returning to the original configuration cannot repair
@@ -38,6 +40,12 @@ public:
   if(!contextObserved){initialContext=context;contextObserved=true;}
   else if(!(initialContext==context))configurationChanged=true;
  }
+ void observeCockpitView(double yaw,double pitch){
+  if(!std::isfinite(yaw)||!std::isfinite(pitch)){configurationChanged=true;return;}
+  if(!viewObserved){initialYaw=yaw;initialPitch=pitch;viewObserved=true;}
+  else if(yaw!=initialYaw||pitch!=initialPitch)configurationChanged=true;
+ }
+ bool cockpitViewObserved()const{return viewObserved;}
  void requirePreset(const FrameContext& context,const BenchmarkPreset& preset,bool fxaa){
   if(context.aircraft!=preset.aircraftId||context.camera!=preset.camera||context.antiAlias!=fxaa)
    configurationChanged=true;
@@ -110,9 +118,10 @@ inline BenchmarkResult writeBenchmarkSummary(std::ostream& out,const std::string
  const BenchmarkPreset& preset,std::optional<ProcessWorkingSet> workingSet={}){
  const auto stats=samples.summary();const auto result=assessBenchmark(samples.elapsed(),stats,samples.valid());
  out<<"FlightCareerAir "<<version<<" fixed benchmark\nbackend="<<backend
-    <<"\ninitial_scene="<<preset.scene<<"\nscene_assumption=continuous_scene_not_locked\nconfiguration_guard=FrameContext_11_fields\nfxaa="<<(fxaa?"on":"off")
+    <<"\ninitial_scene="<<preset.scene<<"\nscene_assumption=continuous_scene_not_locked\nconfiguration_guard=FrameContext_11_fields_and_cockpit_view_when_used\nfxaa="<<(fxaa?"on":"off")
     <<"\nsoftware_frame_cap="<<(powerSaver?20:0)<<"\nrender_size=640x360\nsample_scope=full_active_run\ntiming_source=CPU_wall_frame_intervals_not_GPU_timestamps"
     <<"\nsample_limit="<<BenchmarkSamples::sampleLimit<<"\nsample_overflow="<<samples.overflowed()
+    <<"\ncockpit_view_observed="<<samples.cockpitViewObserved()
     <<"\nconfiguration_valid="<<samples.configurationValid()
     <<"\ntiming_valid="<<samples.timingValid()<<"\nsamples_valid="<<samples.valid()
     <<"\nelapsed_s="<<samples.elapsed()<<"\nsamples="<<stats.samples

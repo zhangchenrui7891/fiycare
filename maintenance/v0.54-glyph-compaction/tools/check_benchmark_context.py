@@ -3,6 +3,8 @@ from pathlib import Path
 import os, subprocess, sys, tempfile
 root=Path(__file__).resolve().parents[1]
 main=Path(sys.argv[1]).read_text() if len(sys.argv)>1 else (root/'src/main.cpp').read_text()
+view_statement=next(line.strip() for line in main.splitlines() if 'if(benchmark&&camera==1)benchmarkSamples.observeCockpitView(' in line)
+assert main.index('const auto cockpitView=')<main.index(view_statement)<main.index('const timing::FrameContext frameContext{')
 sampling=main[main.index('   if(measured&&previousMeasured)'):main.index('   if(benchmark&&measured')]
 boundary='\n'.join(line.strip() for line in main.splitlines() if any(key in line for key in (
     'const auto frameExtent=', 'const timing::FrameContext frameContext{', 'if(frameContextGate.changed(frameContext))', 'if(benchmark)benchmarkSamples.observeContext(frameContext);')))
@@ -17,6 +19,7 @@ using UINT=unsigned;
 struct {int aircraftId=3;} flight;
 struct {int terrainMode=1;bool antiAlias=true;} state;
 enum class Page {None,Pause}; Page menuPage=Page::None;
+struct {double yaw=0,pitch=-.4;} cockpitView;
 int camera=1;bool low=false,wasActive=true,walking=false,powerSaver=false;
 long clientWidth=1600,clientHeight=900;unsigned appliedScale=1;
 bool benchmark=true;timing::BenchmarkSamples benchmarkSamples;
@@ -25,7 +28,7 @@ bool previousMeasured=false;double reportTime=0;
 void frame(double wallDt,bool measured=true){
 ''' + sampling + r'''
  previousMeasured=measured;
-''' + boundary + r'''
+''' + view_statement + '\n' + boundary + r'''
 }
 void check(bool ok,const char* message){if(!ok)throw std::runtime_error(message);}
 void mature(){for(int i=0;i<60;++i)frame(.1);check(reportTime>=5,"Stable frames must reach reporting threshold");}
@@ -48,6 +51,11 @@ int main(){try{
  mature();frame(.5,false);check(frameWindow.summary().samples==0&&reportTime==0,"Focus loss retained samples");
  frame(.5,true);check(frameWindow.summary().samples==0,"Focus recovery interval retained");
  frame(.02);check(frameWindow.summary().samples==1,"Focus recovery never resumed");
+ benchmarkSamples={};camera=1;frame(.02);
+ for(int i=0;i<3200;++i)benchmarkSamples.add(.02);
+ check(benchmarkSamples.valid()&&benchmarkSamples.cockpitViewObserved(),"Production cockpit view establishes stable baseline");
+ cockpitView.yaw=.01;frame(.02);
+ check(!benchmarkSamples.valid()&&timing::benchmarkFinished(true,benchmarkSamples),"Production camera pan must invalidate a full run");
  std::cout<<"PASS actual main benchmark invalidation plus rolling boundary statements: 8 configuration changes, transition exclusion, five-second restart, focus recovery. CPU only.\n";
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}
 '''
