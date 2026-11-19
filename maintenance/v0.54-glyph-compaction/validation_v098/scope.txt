@@ -1,0 +1,11 @@
+Baseline v0.97 final commit bd190e9ad72ad1312e418062279937f02ed31f32.
+Tested v0.98 source commit cdd42791687723f13902fb06db00cd1f46321df9.
+Linux C++17 Release, Assimp ON, Ninja complete build (284 steps), CTest 49/49.
+Glass CPU adapter executes production geometry and display data bindings. 528 AGL profile/terrain/QNH cases passed, including invalid/boundary/rounding, stall coexistence and power loss.
+Geometric AGL is aircraft position reference height, not wheel clearance or a simulated radio-altimeter sensor.
+Mutant replacing geometric input with barometric altitude fails new display-binding assertion (exit 1).
+Layout PNG: production geometry, substitute font, orthographic CPU preview. Not an in-game screenshot or a picture-quality comparison.
+Windows source compilation uses Assimp OFF and no runtime asset staging.
+No simulator, GPU, DX11/DX12 rendering, Boot Camp, HD6000 FPS/memory or full-flight execution performed.
+Full package includes source/resources; no compiled Windows EXE.
+Windows workflow https://github.com/zhangchenrui7891/fiycare/actions/runs/44624590617 completed success; 24/24 selected tests passed. Logs inspected 2026-11-20.
