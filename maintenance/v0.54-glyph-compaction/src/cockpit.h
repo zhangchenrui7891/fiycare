@@ -12,9 +12,8 @@ inline void cockpitText(std::vector<Vertex>& out,const std::wstring& text,float 
  for(size_t i=first;i<out.size();i++){auto& v=out[i];XMFLOAT3 q{ x+(v.x+1)*480*width/300,y-(1-v.y)*270*width/300,z};XMStoreFloat3(&q,XMVector3TransformCoord(XMLoadFloat3(&q),transform));v.x=q.x;v.y=q.y;v.z=q.z;v.textured=2;}
 }
 #include "cockpit_avionics.h"
-inline void cockpitMesh(std::vector<Vertex>& out,const sim::Snapshot& state,const XMMATRIX& transform){
- const size_t firstVertex=out.size();
- const auto& f=state.flight;const bool b777=f.aircraftId==10;
+inline void buildCockpitFixedMesh(std::vector<Vertex>& out,const XMMATRIX& transform,bool b777){
+ const auto first=out.size();
  XMFLOAT3 panel{.13f,.16f,.18f},trim{.23f,.27f,.3f};
  box(out,0,-.65f,1.03f,.95f,.33f,.13f,panel,transform);
  
@@ -23,7 +22,38 @@ inline void cockpitMesh(std::vector<Vertex>& out,const sim::Snapshot& state,cons
  box(out,0,.95f,.65f,1.15f,.055f,.55f,panel,transform);
  if(!b777)box(out,0,.5f,1.35f,.035f,.43f,.035f,trim,transform);
  box(out,.63f,-.93f,.40f,.22f,.15f,.32f,panel,transform);
- cockpitInterior(out,transform,b777);
+ buildCockpitInterior(out,transform,b777);
+ for(size_t i=first;i<out.size();++i)out[i].textured=out[i].textured>1.5f?4.f:3.f;
+}
+inline const std::vector<Vertex>& cockpitFixedGeometry(bool b777){
+ if(b777){
+  static const auto geometry=[]{
+   std::vector<Vertex> vertices;
+   buildCockpitFixedMesh(vertices,XMMatrixIdentity(),true);
+   return vertices;
+  }();
+  return geometry;
+ }
+ static const auto geometry=[]{
+  std::vector<Vertex> vertices;
+  buildCockpitFixedMesh(vertices,XMMatrixIdentity(),false);
+  return vertices;
+ }();
+ return geometry;
+}
+inline void cockpitFixedMesh(std::vector<Vertex>& out,const XMMATRIX& transform,bool b777){
+ if(!XMMatrixIsIdentity(transform)){
+  buildCockpitFixedMesh(out,transform,b777);
+  return;
+ }
+ const auto& geometry=cockpitFixedGeometry(b777);
+ out.insert(out.end(),geometry.begin(),geometry.end());
+}
+inline void cockpitMesh(std::vector<Vertex>& out,const sim::Snapshot& state,const XMMATRIX& transform){
+ const auto& f=state.flight;
+ XMFLOAT3 trim{.23f,.27f,.3f};
+ cockpitFixedMesh(out,transform,f.aircraftId==10);
+ const size_t firstVertex=out.size();
  auto n=[](double v){return std::to_wstring(int(std::lround(v)));};
  const bool waypointValid=sim::validNavigationWaypoint(state.navigationWaypoint);
  const std::wstring waypointNumber=waypointValid?n(state.navigationWaypoint+1):L"--";

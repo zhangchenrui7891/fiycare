@@ -718,3 +718,7 @@ F2 面板在低空下降时显示着陆检查。详见 [LANDING_CHECKLIST.md](LA
 ## v0.94
 
 座舱固定内饰按需缓存。验证和 Boot Camp 对照见 [COCKPIT_INTERIOR_CACHE.md](COCKPIT_INTERIOR_CACHE.md)。
+
+## v0.95
+
+固定仪表台和最终舱内材质一并缓存。详见 [COCKPIT_INTERIOR_CACHE.md](COCKPIT_INTERIOR_CACHE.md)。

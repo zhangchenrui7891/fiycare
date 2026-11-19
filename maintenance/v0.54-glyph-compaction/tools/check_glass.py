@@ -138,7 +138,7 @@ int XMMatrixTranslation(float,float,float){return 0;}
 XMFLOAT3 XMVectorSet(float x,float y,float z,float){return {x,y,z};}
 struct TestFont{void draw(std::vector<Vertex>&,const std::wstring&,float,float,XMFLOAT3={1,1,1},float=900){}};
 TestFont& chineseFont(){static TestFont f;return f;}
-''' + quad + box + detail + body + r'''
+''' + quad + box + detail + body + (root/'tests/reference/cockpit_v094.h').read_text() + r'''
 bool windowFrameBlocks(const std::vector<Vertex>& frame,cockpit::Point ray,float maxDistance){
  auto subtract=[](cockpit::Point a,cockpit::Point b){return cockpit::Point{a.x-b.x,a.y-b.y,a.z-b.z};};
  auto cross=[](cockpit::Point a,cockpit::Point b){return cockpit::Point{a.y*b.z-a.z*b.y,a.z*b.x-a.x*b.z,a.x*b.y-a.y*b.x};};
@@ -198,6 +198,23 @@ void checkInteriorCache(){
            <<geometry.capacity()*sizeof(Vertex)<<" retained bytes. CPU adapters only.\n";
  }
 }
+void checkFullCockpitEquivalence(){
+ for(int id=0;id<sim::aircraftCount;++id)for(bool power:{false,true})
+  for(double throttle:{0.,.5,1.}){
+   sim::Snapshot state;state.flight.configure(id);state.avionics.master=power;
+   state.flight.throttle=throttle;
+   std::vector<Vertex> before(1),after(1);
+   legacyCockpitMesh(before,state,0);cockpitMesh(after,state,0);
+   require(before.size()==after.size()&&std::memcmp(before.data(),after.data(),before.size()*sizeof(Vertex))==0,
+           "Complete cockpit geometry and final materials must match v0.94");
+  }
+ for(bool b777:{false,true}){
+  const auto& geometry=cockpitFixedGeometry(b777);
+  require(!geometry.empty(),"Fixed shell cache populated");
+  for(const auto& v:geometry)require(v.textured==3||v.textured==4,"Cache stores final cabin materials");
+  std::cout<<"Fixed shell "<<b777<<": "<<geometry.size()<<" vertices bypass per-frame material rewrite.\n";
+ }
+}
 void checkCockpitIntegration(){
  for(int id=0;id<sim::aircraftCount;id++)for(bool on:{false,true}){
   sim::Snapshot state;state.flight.configure(id);state.avionics.master=on;std::vector<Vertex> geometry;
@@ -209,7 +226,7 @@ void checkCockpitIntegration(){
  }
 }
 '''
-code = code.replace('int main(int argc,char** argv){', integration + '\nint main(int argc,char** argv){\n checkCockpitIntegration();\n checkInteriorCache();\n check777WindowFrame();')
+code = code.replace('int main(int argc,char** argv){', integration + '\nint main(int argc,char** argv){\n checkCockpitIntegration();\n checkFullCockpitEquivalence();\n checkInteriorCache();\n check777WindowFrame();')
 with tempfile.TemporaryDirectory(prefix='fcair-glass-') as folder:
     source = Path(folder) / 'glass.cpp'
     exe = Path(folder) / 'glass'
