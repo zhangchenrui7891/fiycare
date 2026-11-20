@@ -1,0 +1,14 @@
+Baseline v0.99 final commit 5c5278a3270a1ca2a79fd4a6dac66fb6dabc7dbb.
+Tested v0.100 source commit 95e32ae921330a8926ed769e2b18b29311e2c386.
+Linux C++17 Release, Assimp ON, Ninja complete build (286 steps).
+110 arrival navigation geometry/aircraft/destination/bearing cases plus lifecycle, save, read-only state, selection and invalid input.
+30 actual glass airport position/heading/destination cases; line axis/width, clipping, footer, lifecycle, circuit title and power gates. Existing 792 PFD approach, 528 AGL and 990 glass cases retained.
+Nearest-airport mutant fails selected-arrival test (exit 1).
+Arrival information uses horizontal distance and local-world bearing to airport centre. No AP/FMS target change or real airport-layout database.
+Layout PNG is production geometry with substitute font, orthographic CPU preview, not a Windows in-game screenshot or picture-quality comparison.
+Windows CI uses Assimp OFF and no runtime asset staging.
+No simulator, GPU, DX11/DX12 rendering, Boot Camp, HD6000 FPS/memory or full-flight execution performed.
+Full package includes source/resources; no compiled Windows EXE.
+Linux CTest completed 50/50 passed, 9.88 seconds.
+Windows workflow https://github.com/zhangchenrui7891/fiycare/actions/runs/44789706783
+Windows CI completed success; 25/25 selected CPU/GDI/HLSL tests passed. Logs inspected 2026-11-21.

@@ -1,0 +1,2 @@
+Nearby departure cannot replace arrival
+mutant_exit=1 (expected nonzero)

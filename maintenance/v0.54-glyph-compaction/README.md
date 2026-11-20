@@ -738,3 +738,7 @@ F2 面板在低空下降时显示着陆检查。详见 [LANDING_CHECKLIST.md](LA
 
 ### v0.99 PFD 训练进近偏差
 训练进近增加 TRAIN、LOC/G/S 刻度和紫色菱形，使用既有进近几何与目的机场；失速和无效进近时隐藏。CPU 实际几何验证覆盖 792 组显示绑定；Linux 49/49 CTest、Windows CI 主程序编译与 24/24 项检查通过（工作流 44699125812）。说明及完整限制见 PFD_TRAINING_APPROACH.md。预览为生产几何与替代字体的 CPU 布局，不是游戏截图；无 Boot Camp/HD6000 渲染或完整航班验收。包内不含 EXE。
+
+
+### v0.100 NAV 目的机场
+增加两个训练机场的跑道轮廓、APT 编号与旅客航班目的机场高亮；ARR/BRG 显示机场中心水平距离和本地方位，NAV AP 仍明确为训练回路。详见 ARRIVAL_AIRPORT_MAP.md。新增 110 组导航数据及 30 组生产显示 CPU 检查；Linux 50/50 CTest、Windows CI 主程序编译与 25/25 项检查通过（工作流 44789706783）。预览不是游戏截图；尚无 Boot Camp/HD6000 性能或完整航班验收，包内不含 EXE。
