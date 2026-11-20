@@ -106,6 +106,24 @@ template<class Text> inline void draw(std::vector<Vertex>& out,const sim::Snapsh
   p.rect(102,114,96,18,black,7);
   p.label(L"AGL "+aboveGround+L" m",108,116,white,.70f);
  }
+ // Training approach scales share the same runway/track acquisition as the
+ // text guidance. Hide both for stall priority; no autopilot coupling is added.
+ const auto approach=sim::approachDeflection(sim::approachGuidance(state));
+ if(approach.valid&&!f.stallWarning){
+  p.rect(107,138,86,14,black,7);p.rect(221,42,18,70,black,7);
+  p.line(118,145,182,145,muted,1,8);p.line(230,45,230,109,muted,1,8);
+  for(int tick=-2;tick<=2;++tick){
+   p.line(150+tick*16.f,142,150+tick*16.f,148,white,1,8);
+   p.line(227,77+tick*16.f,233,77+tick*16.f,white,1,8);
+  }
+  auto diamond=[&](float x,float y){
+   p.triangle(x,y-3,x-3,y,x+3,y,magenta,9);
+   p.triangle(x,y+3,x+3,y,x-3,y,magenta,9);
+  };
+  diamond(150+float(approach.lateral)*32,145);
+  diamond(230,77+float(approach.vertical)*32);
+  p.label(L"TRAIN",68,27,cyan,.50f);p.label(L"LOC",195,140,cyan,.50f);p.label(L"G/S",210,27,cyan,.50f);
+ }
  if(f.stallWarning){p.rect(103,134,93,19,{.35f,.025f,.018f},7);p.label(L"STALL",119,136,amber,.85f);}
  // NAV: heading-up map, real training route positions and active leg.
  const auto ground=instruments::groundMotion(f.vx,f.vz);

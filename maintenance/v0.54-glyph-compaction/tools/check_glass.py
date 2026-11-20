@@ -96,6 +96,46 @@ int main(int argc,char** argv){
     }
    }
   }
+ // Extract only the PFD magenta diamonds to check actual display direction,
+ // magnitude and clipping for both airports and reciprocal runway headings.
+ auto approachDiamonds=[&](){std::vector<Vertex> result;
+  for(const auto& v:out)if(v.x<-.326f&&v.r==glass::magenta.x&&v.g==glass::magenta.y&&v.b==glass::magenta.z)result.push_back(v);
+  return result;
+ };
+ int approachCases=0;
+ for(int id=0;id<sim::aircraftCount;++id)for(int airport:{0,1})for(int direction:{1,-1})
+  for(double distance:{1000.,5000.})for(double lateral:{-120.,0.,120.})for(double vertical:{-20.,0.,20.}){
+   sim::Snapshot inbound;auto& f=inbound.flight;f.configure(id);
+   const auto& runway=sim::runways[airport];
+   f.x=runway.x+direction*lateral;f.z=runway.z-direction*(runway.halfLength+distance);
+   f.yaw=direction==1?0:sim::pi;f.vz=direction*90;
+   f.y=f.spec().gearHeight+sim::trainingThresholdClearance+std::tan(3*sim::pi/180)*distance+vertical;
+   inbound.career.mission=2;inbound.career.stage=1;inbound.career.arrivalRunway=airport;
+   out.clear();labels.clear();glass::draw(out,inbound,0,label);validate(out);
+   const auto diamonds=approachDiamonds();
+   require(diamonds.size()==12&&contains(L"TRAIN")&&contains(L"LOC")&&contains(L"G/S"),"Eligible destination approach displays two diamonds and both labels");
+   double x[2]{},y[2]{};
+   for(int cue=0;cue<2;++cue)for(int k=0;k<6;++k){
+    const auto& v=diamonds[size_t(cue*6+k)];
+    x[cue]+=(150+(v.x+.55)*300/.448)/6;
+    y[cue]+=(100-(v.y+.735)*200/.294)/6;
+   }
+   const double loc=std::clamp(-lateral/std::max(30.,distance*std::tan(2.5*sim::pi/180)),-1.,1.);
+   const double gs=std::clamp(vertical/std::max(10.,distance*std::tan(.7*sim::pi/180)),-1.,1.);
+   require(std::abs(x[0]-(150+loc*32))<.001&&std::abs(y[0]-145)<.001,"LOC diamond points toward course, with bounded range-scaled displacement");
+   require(std::abs(x[1]-230)<.001&&std::abs(y[1]-(77+gs*32))<.001,"G/S diamond points toward training path, with bounded range-scaled displacement");
+   f.stallWarning=true;out.clear();labels.clear();glass::draw(out,inbound,0,label);validate(out);
+   require(approachDiamonds().empty()&&!contains(L"LOC")&&!contains(L"G/S")&&contains(L"STALL"),"Stall has priority over approach display");
+   f.stallWarning=false;f.vz=-f.vz;out.clear();labels.clear();glass::draw(out,inbound,0,label);
+   require(approachDiamonds().empty()&&!contains(L"LOC"),"Outbound track hides approach display");
+   f.vz=-f.vz;inbound.career.arrivalRunway=-1;out.clear();labels.clear();glass::draw(out,inbound,0,label);
+   require(approachDiamonds().empty(),"Invalid mission destination cannot display nearest-airport cues");
+   inbound.career.arrivalRunway=airport;inbound.avionics.master=false;
+   out.clear();labels.clear();glass::draw(out,inbound,0,label);
+   require(approachDiamonds().empty()&&labels.empty()&&out.size()==18,"Power loss extinguishes approach cues");
+   ++approachCases;
+  }
+ std::cout<<approachCases<<" actual PFD approach aircraft/airport/direction/range/deviation cases plus stall, outbound, invalid destination and power gates passed. CPU only.\n";
  // Actual display binding across both terrain modes and all aircraft.
  // QNH affects ALT but never the geometric AGL readout.
  int aglCases=0;
@@ -141,7 +181,10 @@ int main(int argc,char** argv){
  state.avionics.master=true;
  state.navigationWaypoint=99;out.clear();labels.clear();glass::draw(out,state,0,label);require(contains(L"WPT INVALID"),"Invalid waypoint never dereferenced");
  state.navigationWaypoint=0;state.flight.stallWarning=true;out.clear();labels.clear();glass::draw(out,state,0,label);require(contains(L"STALL"),"Stall warning retained");
- state.flight.stallWarning=false;state.flight.y=234;out.clear();labels.clear();glass::draw(out,state,0,label);validate(out);
+ state.flight.stallWarning=false;
+ state.flight.x=40;state.flight.z=-3800;state.flight.y=state.flight.spec().gearHeight+sim::trainingThresholdClearance+std::tan(3*sim::pi/180)*2000+8;
+ state.flight.vx=0;state.flight.vz=90;
+ out.clear();labels.clear();glass::draw(out,state,0,label);validate(out);
  if(argc>1){std::ofstream file(argv[1]);file<<"{\"vertices\":[";bool first=true;for(const auto& v:out){if(!first)file<<',';first=false;file<<'['<<v.x<<','<<v.y<<','<<v.z<<','<<v.r<<','<<v.g<<','<<v.b<<']';}
   file<<"],\"labels\":[";first=true;for(const auto& l:labels){if(!first)file<<',';first=false;file<<"{\"text\":\"";for(wchar_t c:l.text)file<<char(c);file<<"\",\"x\":"<<l.x<<",\"y\":"<<l.y<<",\"w\":"<<l.w<<",\"color\":["<<l.color.x<<','<<l.color.y<<','<<l.color.z<<"]}";}file<<"]}";
  }
@@ -264,7 +307,7 @@ with tempfile.TemporaryDirectory(prefix='fcair-glass-') as folder:
     flags = ['-O1', '-g', '-fsanitize=address,undefined', '-fno-omit-frame-pointer'] if '--sanitize' in sys.argv else ['-O2']
     subprocess.run(['g++', '-std=c++17', '-Wall', '-Wextra', '-Werror', '-pedantic', *flags,
                     '-I', str(root / 'src'), str(source), '-o', str(exe)], check=True)
-    preview = root / 'validation_v098/glass_layout.json'
+    preview = root / 'validation_v099/glass_layout.json'
     if '--preview' in sys.argv:
         preview.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run([str(exe), *([str(preview)] if '--preview' in sys.argv else [])], check=True,
@@ -293,5 +336,5 @@ if '--preview' in sys.argv:
         draw.text(point(l['x'],l['y']),l['text'],font=font,fill=color(l['color']))
     for x,title in [(77,'PRIMARY FLIGHT DISPLAY'),(595,'NAVIGATION DISPLAY'),(1110,'ENGINE / SYSTEM DISPLAY')]:
         draw.text((x,419),title,font=ImageFont.truetype(font_path,16),fill='#9fbdcd')
-    image.save(root/'validation_v098/glass_preview.png')
+    image.save(root/'validation_v099/glass_preview.png')
     print('Saved CPU glass layout preview.')

@@ -125,8 +125,30 @@ void validityAndContinuity(){
  }
  std::cout<<"12,001 one-metre path samples: continuous slope; selection/power/save and invalid envelopes passed.\n";
 }
+void displayDeflections(){
+ sim::ApproachGuidance g;g.valid=true;g.distance=0;
+ auto d=sim::approachDeflection(g);require(d.valid&&d.lateral==0&&d.vertical==0,"Centered threshold display");
+ g.localizer=3;g.glideslope=1;d=sim::approachDeflection(g);
+ close(d.lateral,-.1,"Right of course commands a left diamond");close(d.vertical,.1,"High aircraft commands a lower diamond");
+ g.localizer=-3;g.glideslope=-1;d=sim::approachDeflection(g);
+ close(d.lateral,.1,"Left of course commands a right diamond");close(d.vertical,-.1,"Low aircraft commands an upper diamond");
+ for(double distance:{0.,100.,1000.,5000.,12000.})for(int sign:{-1,1}){
+  g.distance=distance;g.localizer=sign*2500.;g.glideslope=sign*1000.;d=sim::approachDeflection(g);
+  require(d.valid&&d.lateral==-sign&&d.vertical==sign,"Large deviations clamp to scale ends");
+ }
+ g.distance=1000;g.localizer=10;g.glideslope=5;d=sim::approachDeflection(g);
+ close(d.lateral,-10/(1000*std::tan(2.5*sim::pi/180)),"Lateral range scales with threshold distance");
+ close(d.vertical,5/(1000*std::tan(.7*sim::pi/180)),"Vertical range scales with threshold distance");
+ for(int field=0;field<3;++field)for(double invalid:{double(NAN),double(INFINITY),-double(INFINITY)}){
+  auto bad=g;(field==0?bad.distance:field==1?bad.localizer:bad.glideslope)=invalid;
+  require(!sim::approachDeflection(bad).valid,"Nonfinite deviation cannot reach display geometry");
+ }
+ g.valid=false;require(!sim::approachDeflection(g).valid,"Inactive guidance has no scale");
+ g.valid=true;g.distance=-1;require(!sim::approachDeflection(g).valid,"Negative threshold distance rejected");
+ std::cout<<"PFD approach deflection signs, distance sensitivity, clamps and invalid inputs passed. Training geometry only.\n";
+}
 int main(){
- try{legacyDefects();bothAirportsAndEnds();selectionPowerAndPersistence();groundTrackAcquisition();validityAndContinuity();
+ try{displayDeflections();legacyDefects();bothAirportsAndEnds();selectionPowerAndPersistence();groundTrackAcquisition();validityAndContinuity();
   std::cout<<"Training approach CPU geometry passed; not Windows, radio ILS, certified procedure or autoland validation.\n";
  }catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 1;}
 }

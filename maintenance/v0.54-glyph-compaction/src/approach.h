@@ -52,4 +52,17 @@ inline ApproachGuidance approachGuidance(const Snapshot& state){
  if(arriving&&(state.career.arrivalRunway<0||state.career.arrivalRunway>=int(std::size(runways))))return {};
  return approachGuidance(state.flight,arriving?state.career.arrivalRunway:-1);
 }
+struct ApproachDeflection {double lateral=0,vertical=0;bool valid=false;};
+// Bounded game-display sensitivity, not a radio receiver or ILS calibration.
+// Signs tell the pilot where to fly: right of course -> left diamond;
+// above the path -> lower diamond (screen Y increases downward).
+inline ApproachDeflection approachDeflection(const ApproachGuidance& g){
+ if(!g.valid||!std::isfinite(g.distance)||g.distance<0||
+    !std::isfinite(g.localizer)||!std::isfinite(g.glideslope))return {};
+ const double lateralScale=std::max(30.,g.distance*std::tan(2.5*pi/180));
+ const double verticalScale=std::max(10.,g.distance*std::tan(.7*pi/180));
+ return {std::clamp(-g.localizer/lateralScale,-1.,1.),
+         std::clamp(g.glideslope/verticalScale,-1.,1.),true};
+}
+
 }
