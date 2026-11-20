@@ -1,0 +1,13 @@
+Baseline v0.98 final commit 40633f5497db5c8b7361a8c4be2d211155872b05.
+Tested v0.99 source commit 6190cdeffecb78e8ae7d635711b8b7d604bbaf85.
+Linux C++17 Release, Assimp ON, Ninja complete build (284 steps).
+Glass CPU adapter executes production geometry and data bindings: 792 actual approach aircraft/airport/direction/range/deviation cases and stall/outbound/invalid destination/power gates; existing 528 AGL and 990 glass cases retained.
+Mutant reversing lateral correction fails the actual LOC diamond-centre assertion (exit 1).
+Game training approach scales only. No radio ILS, AP approach capture or autoland implementation/acceptance.
+Layout PNG is production geometry with substitute font, orthographic CPU preview, not an in-game screenshot or picture-quality comparison.
+Windows CI uses Assimp OFF and no runtime asset staging.
+No simulator, GPU, DX11/DX12 rendering, Boot Camp, HD6000 FPS/memory or full-flight execution performed.
+Full package includes source/resources; no compiled Windows EXE.
+Linux CTest completed: 49/49 passed, 5.68 seconds.
+Windows workflow https://github.com/zhangchenrui7891/fiycare/actions/runs/44699125812
+Windows CI completed success; 24/24 selected CPU/GDI/HLSL tests passed. Logs inspected 2026-11-20.

@@ -734,3 +734,7 @@ F2 面板在低空下降时显示着陆检查。详见 [LANDING_CHECKLIST.md](LA
 
 ### v0.98 PFD 低空 AGL
 新增地形相对高度显示，750 m 以下使用飞机坐标参考点，独立于 QNH；无效数据占位、超范围隐藏、断电熄灭，保留 STALL 提示。Linux 49/49 CTest、Windows CI 主程序编译与 24/24 项检查通过（工作流 44624590617）；细节和验证范围见 LOW_ALTITUDE_AGL.md。布局图为 CPU 预览。尚无 Boot Camp/HD6000 游戏画面、性能或完整航班验收。包内不含 Windows EXE。
+
+
+### v0.99 PFD 训练进近偏差
+训练进近增加 TRAIN、LOC/G/S 刻度和紫色菱形，使用既有进近几何与目的机场；失速和无效进近时隐藏。CPU 实际几何验证覆盖 792 组显示绑定；Linux 49/49 CTest、Windows CI 主程序编译与 24/24 项检查通过（工作流 44699125812）。说明及完整限制见 PFD_TRAINING_APPROACH.md。预览为生产几何与替代字体的 CPU 布局，不是游戏截图；无 Boot Camp/HD6000 渲染或完整航班验收。包内不含 EXE。

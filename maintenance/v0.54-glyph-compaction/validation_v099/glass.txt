@@ -1,0 +1,9 @@
+Fixed shell 0: 9900 vertices bypass per-frame material rewrite.
+Fixed shell 1: 9900 vertices bypass per-frame material rewrite.
+Interior variant 0: 9576 vertices, 786432 retained bytes. CPU adapters only.
+Interior variant 1: 9684 vertices, 786432 retained bytes. CPU adapters only.
+PASS 777 window: solid budget, three clear forward rays, visible mullion, display and control center clearance. CPU geometry only.
+792 actual PFD approach aircraft/airport/direction/range/deviation cases plus stall, outbound, invalid destination and power gates passed. CPU only.
+528 AGL aircraft/terrain/QNH display bindings plus range, invalid-height, stall and power checks passed. CPU only.
+PASS production glass: 990 aircraft/pitch/bank/heading/power cases; units, RPM, fuel/flap/throttle bindings, bounds, vertex budget, invalid waypoint and stall warning. CPU adapters only.
+Saved CPU glass layout preview.

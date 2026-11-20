@@ -1,0 +1,9 @@
+terminate called after throwing an instance of 'std::runtime_error'
+  what():  LOC diamond points toward course, with bounded range-scaled displacement
+Traceback (most recent call last):
+  File "/tmp/fca099-approach-mutant/tools/check_glass.py", line 313, in <module>
+    subprocess.run([str(exe), *([str(preview)] if '--preview' in sys.argv else [])], check=True,
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/tmp/fcair-glass-y82vkn9t/glass']' died with <Signals.SIGABRT: 6>.
+mutant_exit=1 (expected nonzero)
