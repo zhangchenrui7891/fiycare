@@ -51,6 +51,13 @@ int main(){
     require(x>=-.01f&&x<=24.01f&&y>=-.01f&&y<=10.01f,"Approach scale label exceeds reserved box");}
    ++rows;vertices+=mesh.size();
   }
+  for(const auto* text:{L"ARR 2   9999999 m",L"ARR INVALID",L"BRG 359   GS 1440 km/h",L"BRG ---   GS 0 km/h",L"APT 2",L"NAV / CIRCUIT",L"MAP / ARRIVAL"}){
+   const float scale=std::wstring(text).rfind(L"BRG",0)==0?.63f:std::wstring(text).rfind(L"APT",0)==0?.50f:.75f;
+   std::vector<Vertex> mesh;font.draw(mesh,text,0,0,{1,1,1},900);
+   for(const auto& v:mesh){const float x=(v.x+1)*480*scale,y=(1-v.y)*270*scale;
+    require(x>=-.01f&&x<=190.01f&&y>=-.01f&&y<=18.01f,"Arrival label exceeds NAV reserved space");}
+   ++rows;vertices+=mesh.size();
+  }
   std::cout<<"PASS actual Windows GDI font: "<<rows<<" metric primary rows, "<<vertices
            <<" glyph vertices fit 300x21 logical text bounds. No screen/GPU/HD6000 validation.\n";
   return 0;

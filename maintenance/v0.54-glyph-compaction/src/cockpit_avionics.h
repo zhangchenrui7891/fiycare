@@ -2,6 +2,7 @@
 #include "storage.h"
 #include "autopilot.h"
 #include "approach.h"
+#include "arrival_navigation.h"
 #include "flight_instruments.h"
 #include <array>
 #include "map_clip.h"
@@ -127,11 +128,34 @@ template<class Text> inline void draw(std::vector<Vertex>& out,const sim::Snapsh
  if(f.stallWarning){p.rect(103,134,93,19,{.35f,.025f,.018f},7);p.label(L"STALL",119,136,amber,.85f);}
  // NAV: heading-up map, real training route positions and active leg.
  const auto ground=instruments::groundMotion(f.vx,f.vz);
- nav.label(L"NAV / TRAINING",8,5,cyan,.75f);nav.label(L"TRK "+ground.track,197,5,white,.7f);
+ const auto arrival=sim::arrivalNavigation(state);
+ nav.label(arrival.active?(state.navigationHold?L"NAV / CIRCUIT":L"MAP / ARRIVAL"):L"NAV / TRAINING",8,5,cyan,.75f);nav.label(L"TRK "+ground.track,197,5,white,.7f);
  for(float radius:{34.f,65.f,96.f})nav.arc(150,111,radius,float(-sim::pi*.5),float(sim::pi*.5),muted);
  for(int a=-90;a<=90;a+=30){float r=float(a*sim::pi/180);nav.line(150+std::sin(r)*92,111-std::cos(r)*92,150+std::sin(r)*98,111-std::cos(r)*98,white);}
  nav.label(L"2 km",226,138,muted,.65f);nav.aircraft(150,111,white);
  constexpr double range=2000;const double sn=std::sin(f.yaw),cs=std::cos(f.yaw);
+ // Illustrative runway outlines in the same heading-up projection. Width is
+ // enlarged to at least six logical pixels so narrow runways remain legible.
+ auto project=[&](double x,double z){const double dx=x-f.x,dz=z-f.z;
+  return std::array<double,2>{150+(dx*cs-dz*sn)/range*96,111-(dx*sn+dz*cs)/range*96};
+ };
+ for(int airport=0;airport<int(std::size(sim::runways));++airport){
+  const auto& r=sim::runways[airport];
+  const double halfWidth=std::max(r.halfWidth,range*3/96);
+  const bool destination=arrival.active&&arrival.valid&&arrival.airport==airport;
+  const XMFLOAT3 color=destination?amber:XMFLOAT3{.55f,.68f,.76f};
+  const std::array<std::array<double,2>,4> corners{
+   project(r.x-halfWidth,r.z-r.halfLength),project(r.x-halfWidth,r.z+r.halfLength),
+   project(r.x+halfWidth,r.z+r.halfLength),project(r.x+halfWidth,r.z-r.halfLength)};
+  for(size_t edge=0;edge<corners.size();++edge){
+   const auto& a=corners[edge];const auto& b=corners[(edge+1)%corners.size()];
+   mapdisplay::Segment line{a[0],a[1],b[0],b[1]};
+   if(mapdisplay::clip(line,19,28,281,162))nav.line(float(line.ax),float(line.ay),float(line.bx),float(line.by),color,1.3f);
+  }
+  const auto center=project(r.x,r.z);
+  if(center[0]>=26&&center[0]<=245&&center[1]>=34&&center[1]<=150)
+   nav.label(L"APT "+whole(airport+1),float(center[0])+8,float(center[1])-6,color,.50f);
+ }
  // Draw all four legs, including the closing leg to waypoint one.
  // Clip intersecting legs even when both waypoint symbols are off-screen.
  std::array<std::array<double,2>,4> projected{};
@@ -169,8 +193,13 @@ template<class Text> inline void draw(std::vector<Vertex>& out,const sim::Snapsh
  }
  const bool valid=sim::validNavigationWaypoint(state.navigationWaypoint);
  nav.rect(0,165,300,35,black,6);
- nav.label(valid?L"WPT "+whole(state.navigationWaypoint+1)+L"   "+whole(sim::navigationDistance(state))+L" m":L"WPT INVALID",8,167,valid?magenta:amber,.75f);
- nav.label(L"XTK "+whole(sim::navigationCrossTrack(state))+L" m   GS "+ground.speed+L" km/h",8,184,cyan,.63f);
+ if(arrival.active){
+  nav.label(arrival.valid?L"ARR "+whole(arrival.airport+1)+L"   "+whole(arrival.distance)+L" m":L"ARR INVALID",8,167,amber,.75f);
+  nav.label(L"BRG "+(arrival.valid&&arrival.distance>=1?instruments::heading(arrival.bearing):L"---")+L"   GS "+ground.speed+L" km/h",8,184,cyan,.63f);
+ }else{
+  nav.label(valid?L"WPT "+whole(state.navigationWaypoint+1)+L"   "+whole(sim::navigationDistance(state))+L" m":L"WPT INVALID",8,167,valid?magenta:amber,.75f);
+  nav.label(L"XTK "+whole(sim::navigationCrossTrack(state))+L" m   GS "+ground.speed+L" km/h",8,184,cyan,.63f);
+ }
  // Engine/system display. RPM is the model's actual RPM, not a fictitious jet N1.
  engine.label(L"ENGINE / SYSTEM",8,5,cyan,.8f);
  const int engines=f.engines.count(f.aircraftId);
