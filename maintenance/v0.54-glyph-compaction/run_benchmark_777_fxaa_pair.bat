@@ -1,6 +1,7 @@
 @echo off
 setlocal
-set "EXE=%~dp0out\build\release\FlightCareerAir.exe"
+call "%~dp0tools\resolve_flight_exe.bat"
+set "EXE=%FCAIR_APP%"
 set "REPORTS=%LOCALAPPDATA%\FlightCareerAir\diagnostics\benchmark"
 if not exist "%EXE%" (
   echo EXE not found. Run build_vs.bat first.

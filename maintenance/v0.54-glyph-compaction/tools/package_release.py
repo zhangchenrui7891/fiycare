@@ -1,4 +1,4 @@
-"""Create a source-only, deterministic ZIP with safe legacy timestamps."""
+"""Create a deterministic source/resource ZIP (including an optional packaged EXE) with safe legacy timestamps."""
 import argparse
 import hashlib
 import json

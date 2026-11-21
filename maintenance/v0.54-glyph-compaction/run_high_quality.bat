@@ -1,9 +1,10 @@
 @echo off
 chcp 65001 >nul
 cd /d "%~dp0"
-if not exist out\build\release\FlightCareerAir.exe (
+call "%~dp0tools\resolve_flight_exe.bat"
+if not exist "%FCAIR_APP%" (
  echo 请先运行 build_vs.bat 编译程序。
  pause
  exit /b 1
 )
-start "" out\build\release\FlightCareerAir.exe --fullscreen --supersample
+start "" "%FCAIR_APP%" --fullscreen --supersample

@@ -1,4 +1,4 @@
-param([string]$BuildDirectory = 'out/build/windows-source-check')
+param([string]$BuildDirectory = 'out/build/windows-source-check', [switch]$StaticRuntime)
 $ErrorActionPreference = 'Stop'
 $project = Split-Path -Parent $PSScriptRoot
 Set-Location $project
@@ -6,13 +6,17 @@ New-Item -ItemType Directory -Force -Path $BuildDirectory | Out-Null
 $build = (Resolve-Path $BuildDirectory).Path
 Start-Transcript -Path (Join-Path $build 'windows-source-check.log') -Force | Out-Null
 try {
-    & cmake -S $project -B $build -G 'Visual Studio 17 2022' -A x64 -DFCAIR_WITH_ASSIMP=OFF -DFCAIR_COPY_RUNTIME_ASSETS=OFF
+    $configure = @('-S', $project, '-B', $build, '-G', 'Visual Studio 17 2022', '-A', 'x64', '-DFCAIR_WITH_ASSIMP=OFF', '-DFCAIR_COPY_RUNTIME_ASSETS=OFF')
+    if ($StaticRuntime) { $configure += '-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' }
+    & cmake @configure
     if ($LASTEXITCODE -ne 0) { throw 'Source-only configuration failed' }
     & cmake --build $build --config Release --parallel 2 --target arrival_navigation_check cockpit_cache_check engineering_check approach_check performance_window_check cockpit_input_check benchmark_check performance_segment_check model_restore_check autopilot_mode_check career_reset_check alert_focus_check map_clip_check instrument_format_check windows_glyph_check glyph_runs_check scenery_check FlightCareerAir shader_check windows_launch_check launch_options_check windows_text_check flight_instrument_check flight_instrument_layout_check autopilot_feedback_check autopilot_feedback_layout_check
     if ($LASTEXITCODE -ne 0) { throw 'Application or check compilation failed' }
     & ctest --test-dir $build -C Release --output-on-failure -R '^(arrival_airport_navigation|windows_cockpit_interior_cache|engineering_systems|training_approach_guidance|rolling_frame_statistics|cockpit_throttle_event_coalescing|benchmark_evidence_integrity|rolling_frame_configuration_boundaries|default_model_restore_transaction|cockpit_lateral_mode_transfer|career_flight_reset|alert_headline_priority|navigation_map_clipping|instrument_integer_format|windows_compact_glyph_coverage|compact_glyph_coverage|offline_scenery_geometry|hlsl_shader_compilation|windows_command_line_parsing|exact_launch_options|windows_utf8_device_log|primary_instrument_text|windows_instrument_glyph_bounds|autopilot_disconnect_feedback|windows_autopilot_notice_glyph_bounds)$'
     if ($LASTEXITCODE -ne 0) { throw 'Windows CPU checks failed' }
     if (!(Test-Path (Join-Path $build 'Release/FlightCareerAir.exe'))) { throw 'Application executable missing' }
+    & (Join-Path $PSScriptRoot 'test_windows_delivery.ps1')
+    if ($StaticRuntime) { Write-Host 'Release configured with static MSVC runtime (MultiThreaded).' }
     Write-Host 'Application compiled with Assimp OFF. Native fcmesh loading remains compiled. Runtime assets are NOT copied. No application/GPU/HD6000 execution was performed.'
 } finally {
     Stop-Transcript | Out-Null
