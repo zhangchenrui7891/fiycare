@@ -8,9 +8,10 @@ if ($cache -notmatch 'CMAKE_MSVC_RUNTIME_LIBRARY:UNINITIALIZED=MultiThreaded' -a
 if ($cache -notmatch 'FCAIR_WITH_ASSIMP:BOOL=OFF') { throw 'Compatibility build must declare importer OFF' }
 $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
 $vs = & $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
-$dev = Join-Path $vs 'Common7/Tools/VsDevCmd.bat'
-$dependencies = & $env:ComSpec /d /s /c "`"call `"$dev`" -arch=x64 -host_arch=x64 >nul && dumpbin /dependents `"$exe`"`""
-if ($LASTEXITCODE -ne 0) { throw 'PE dependency inspection failed' }
+$dumpbin = Get-ChildItem (Join-Path $vs 'VC/Tools/MSVC/*/bin/Hostx64/x64/dumpbin.exe') | Sort-Object FullName -Descending | Select-Object -First 1
+if (!$dumpbin) { throw 'dumpbin.exe not found in Visual Studio C++ tools' }
+$dependencies = & $dumpbin.FullName /dependents $exe
+if ($LASTEXITCODE -ne 0) { $dependencies | Write-Host; throw 'PE dependency inspection failed' }
 if (($dependencies -join "`n") -match '(?i)(MSVCP\d|VCRUNTIME\d|CONCRT\d|ucrtbase\.dll)') { throw 'Dynamic MSVC/UCRT runtime dependency found' }
 New-Item -ItemType Directory -Force $Destination | Out-Null
 Copy-Item $exe (Join-Path $Destination 'FlightCareerAir.exe')
