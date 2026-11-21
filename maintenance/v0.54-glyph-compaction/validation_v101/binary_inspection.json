@@ -1,0 +1,25 @@
+{
+  "source_commit": "c02207a7b77d96be60aeb438c3167daf94733a1a",
+  "workflow_run": 44864551651,
+  "artifact_id": 14690977971,
+  "artifact_sha256": "e9a0afdca822b1e1a735042914341ff0be7471e6dc9c2b8f2f070bcf23de4b6d",
+  "exe_sha256": "4a9f677afb652ca3a85f0c8496f965457f516c30797b0bbb4dfd8187c8ee81f7",
+  "exe_size": 870912,
+  "machine": "AMD64",
+  "subsystem": "Windows GUI",
+  "pe32_plus": true,
+  "imports": [
+    "d3d11.dll",
+    "d3d12.dll",
+    "d3dcompiler_47.dll",
+    "dxgi.dll",
+    "gdi32.dll",
+    "kernel32.dll",
+    "shell32.dll",
+    "user32.dll"
+  ],
+  "certificate_bytes": 0,
+  "game_executed": false,
+  "gpu_validated": false,
+  "target_hardware_validated": false
+}

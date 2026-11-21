@@ -1,0 +1,3 @@
+First Windows run 44864308467: application compile, 25/25 CPU/GDI/HLSL and actual cmd resolver checks passed. Export failed while invoking dumpbin through a nested cmd string.
+Fixed exporter to locate and invoke dumpbin.exe directly through PowerShell. Final verification run: 44864551651, source c02207a7b77d96be60aeb438c3167daf94733a1a.
+No simulator was launched in either run.

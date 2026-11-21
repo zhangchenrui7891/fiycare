@@ -1,0 +1,11 @@
+Baseline v0.100 final commit e487dc44220b7e934394c416d110494dc93d9521.
+Source changes: Windows x64 static-runtime compatibility executable workflow and provenance, shared packaged/rebuilt path resolver, existing launch scripts updated.
+Linux Release Assimp ON complete build (286 steps), 50/50 CTest passed.
+Windows compatibility profile: Assimp OFF, Release x64, MultiThreaded static MSVC runtime, runtime assets not staged in CI.
+Resolver checks execute actual cmd.exe with text fixture files; no game process is launched by those checks.
+PE/header/import/hash checks and CPU/GDI/HLSL tests are not simulator or GPU execution.
+No Boot Camp/HD6000 startup, DX11/DX12 game rendering, FPS, memory, visual acceptance or full flight validation performed.
+Final Windows workflow https://github.com/zhangchenrui7891/fiycare/actions/runs/44864551651 completed success.
+Final compiled source c02207a7b77d96be60aeb438c3167daf94733a1a; artifact 14690977971; EXE 870912 bytes.
+25/25 CTest plus four actual cmd resolver scenarios passed. Static runtime and Windows system DLL import checks passed.
+Independent PE/hash report: binary_inspection.json. No game execution performed.

@@ -1,3 +1,11 @@
+# FlightCareerAir v0.101 Windows 兼容交付
+
+完整 Windows 兼容 ZIP 包内含根目录 FlightCareerAir.exe 和 assets，解压整个目录后运行 run_compat.bat（DX11 / low），可直接开始启动点检。此 EXE 为 Assimp OFF，关闭多格式模型导入和旋转编辑；完整源码仍可使用 build_vs.bat 构建 Assimp ON。已有原生机型保留。
+
+二进制来自 Windows CI 工作流 44864551651，源码提交 c02207a7b77d96be60aeb438c3167daf94733a1a。包内 build_info.json、dependencies.txt、FlightCareerAir.exe.sha256 与 validation_v101 提供来源和检查证据。Linux 50/50、Windows 25/25 及四种实际 cmd 查找情形通过。尚未启动模拟器或进行 GPU、Boot Camp、HD6000 和完整航班验收。
+
+源码和构建流程保存在 GitHub；Windows 构建产物见 https://github.com/zhangchenrui7891/fiycare/actions/runs/44864551651 。完整说明见 WINDOWS_COMPAT_DELIVERY.md。以下保留历史版本说明。
+
 # v0.80：游戏内菜单完整点击判定
 见MENU_CLICK_GUARD.md与TODAY_REVIEW.md。源码资源包，无EXE。
 
@@ -742,3 +750,7 @@ F2 面板在低空下降时显示着陆检查。详见 [LANDING_CHECKLIST.md](LA
 
 ### v0.100 NAV 目的机场
 增加两个训练机场的跑道轮廓、APT 编号与旅客航班目的机场高亮；ARR/BRG 显示机场中心水平距离和本地方位，NAV AP 仍明确为训练回路。详见 ARRIVAL_AIRPORT_MAP.md。新增 110 组导航数据及 30 组生产显示 CPU 检查；Linux 50/50 CTest、Windows CI 主程序编译与 25/25 项检查通过（工作流 44789706783）。预览不是游戏截图；尚无 Boot Camp/HD6000 性能或完整航班验收，包内不含 EXE。
+
+
+### v0.101 Windows 兼容构建
+新增 Windows x64 Release 静态运行库 EXE 交付流程和启动路径查找。完整兼容包的 EXE 与 assets 位于根目录，运行 run_compat.bat；Assimp 导入/旋转编辑关闭，已有原生机型保留。完整源码仍可构建 Assimp ON。本机重建 EXE 优先于包内 EXE。Linux 50/50 CTest 通过，Windows 与产物证据见 WINDOWS_COMPAT_DELIVERY.md / validation_v101。尚无 Boot Camp/HD6000 图形运行、性能或完整航班验收。

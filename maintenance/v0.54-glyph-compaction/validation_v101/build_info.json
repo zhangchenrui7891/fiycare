@@ -1,0 +1,14 @@
+{
+  "version": "0.101",
+  "source_commit": "c02207a7b77d96be60aeb438c3167daf94733a1a",
+  "configuration": "Release",
+  "architecture": "x64",
+  "compiler": "MSVC Windows-2022 runner",
+  "msvc_runtime": "MultiThreaded static",
+  "assimp_importer": false,
+  "sha256": "4a9f677afb652ca3a85f0c8496f965457f516c30797b0bbb4dfd8187c8ee81f7",
+  "runtime_assets_in_ci": false,
+  "game_executed": false,
+  "gpu_validated": false,
+  "target_hardware_validated": false
+}
