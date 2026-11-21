@@ -1,3 +1,11 @@
+# FlightCareerAir v0.102 Windows 兼容包
+
+解压整个兼容 ZIP 后运行 run_compat.bat（DX11 / low）。包内 EXE 为新构建的 x64 静态运行库版本，Assimp 多格式导入/旋转编辑关闭；完整源码支持重建 Assimp ON，正式 assets 保留。
+
+Linux 50/50 CTest、Windows 25/25 CPU/GDI/HLSL 与四种 cmd 查找情形通过。本版另执行了真实 Windows 主程序：DX11 WARP 软件渲染、64×64 人工棋盘纹理、程序生成训练机，追尾/座舱各三帧与 BMP 读回通过；资源缺失时返回 1，诊断哨兵不变。这些截图在 validation_v102 中，明确标为 CI_FIXTURE，不能当作正式资源、硬件 GPU、HD6000 性能或全航段证据。
+
+精确来源见 build_info.json / smoke_summary.json / FlightCareerAir.exe.sha256。Windows 工作流：https://github.com/zhangchenrui7891/fiycare/actions/runs/44911844676 。说明见 WINDOWS_WARP_SMOKE.md。新软件截图显示低分辨率座舱仪表仍偏小且有提示条遮挡，后续继续改善。以下保留历史版本说明。
+
 # FlightCareerAir v0.101 Windows 兼容交付
 
 完整 Windows 兼容 ZIP 包内含根目录 FlightCareerAir.exe 和 assets，解压整个目录后运行 run_compat.bat（DX11 / low），可直接开始启动点检。此 EXE 为 Assimp OFF，关闭多格式模型导入和旋转编辑；完整源码仍可使用 build_vs.bat 构建 Assimp ON。已有原生机型保留。

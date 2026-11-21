@@ -1,0 +1,12 @@
+Flight Career Air v0.102 startup
+Diagnostic output isolated; live game saves disabled
+Legacy v2 career migration attempted
+DX11 adapter: Microsoft Basic Render Driver
+Optional texture b777.fctex: Could not open texture file; using neutral 777 livery
+Material textures: 6 isolated slices, 6 mip levels, 16x anisotropic filtering
+Selected DX11 software (diagnostic only)
+Shader CPU bytecode cache: requests=4 compilations=4 hits=0 failures=0 evictions=0 entries=4 (process-local; GPU resources still recreated)
+Aircraft catalog ready: 11 profiles, 0 loaded meshes (on demand)
+Smoke test: three rendered frames and BMP capture succeeded
+Reusable CPU geometry capacity bytes (not total RAM/GPU memory): 7091952
+Normal shutdown

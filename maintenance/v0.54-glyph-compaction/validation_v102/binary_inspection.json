@@ -1,0 +1,23 @@
+{
+  "source_commit": "54a2581cd27cb1f6a24db32a4685094a1721849b",
+  "workflow_run": 44911844676,
+  "exe_sha256": "4b1812fa43b2b05fb5af4cd5093d10dc67f45517f5ba29d474f8623d143c21c4",
+  "exe_size": 871424,
+  "machine": "AMD64",
+  "subsystem": "Windows GUI",
+  "imports": [
+    "d3d11.dll",
+    "d3d12.dll",
+    "d3dcompiler_47.dll",
+    "dxgi.dll",
+    "gdi32.dll",
+    "kernel32.dll",
+    "shell32.dll",
+    "user32.dll"
+  ],
+  "game_executed": true,
+  "execution_environment": "Windows CI DX11 WARP; synthetic atlas; procedural trainer",
+  "full_assets_validated": false,
+  "hardware_gpu_validated": false,
+  "target_hardware_validated": false
+}

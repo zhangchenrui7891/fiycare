@@ -1,0 +1,33 @@
+2026-11-21T14:03:42.5201435Z   FlightCareerAir.vcxproj -> D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\FlightCareerAir.exe
+2026-11-21T14:03:59.4884089Z  1/25 Test  #1: default_model_restore_transaction ........   Passed    0.01 sec
+2026-11-21T14:03:59.5052544Z  2/25 Test  #2: cockpit_lateral_mode_transfer ............   Passed    0.01 sec
+2026-11-21T14:03:59.5757594Z  3/25 Test  #3: career_flight_reset ......................   Passed    0.07 sec
+2026-11-21T14:03:59.5832430Z  4/25 Test  #4: alert_headline_priority ..................   Passed    0.01 sec
+2026-11-21T14:03:59.5922319Z  5/25 Test  #5: navigation_map_clipping ..................   Passed    0.01 sec
+2026-11-21T14:03:59.7052703Z  6/25 Test  #6: instrument_integer_format ................   Passed    0.11 sec
+2026-11-21T14:03:59.8782040Z  7/25 Test  #7: compact_glyph_coverage ...................   Passed    0.17 sec
+2026-11-21T14:04:00.0045723Z  8/25 Test  #9: offline_scenery_geometry .................   Passed    0.13 sec
+2026-11-21T14:04:00.0148491Z  9/25 Test #11: autopilot_disconnect_feedback ............   Passed    0.01 sec
+2026-11-21T14:04:00.0256188Z 10/25 Test #12: primary_instrument_text ..................   Passed    0.01 sec
+2026-11-21T14:04:00.0327936Z 11/25 Test #13: exact_launch_options .....................   Passed    0.01 sec
+2026-11-21T14:04:00.2166040Z 12/25 Test #20: engineering_systems ......................   Passed    0.18 sec
+2026-11-21T14:04:00.4746737Z 13/25 Test #26: cockpit_throttle_event_coalescing ........   Passed    0.26 sec
+2026-11-21T14:04:00.4836619Z 14/25 Test #28: training_approach_guidance ...............   Passed    0.01 sec
+2026-11-21T14:04:00.4992848Z 15/25 Test #29: arrival_airport_navigation ...............   Passed    0.02 sec
+2026-11-21T14:04:00.5109285Z 16/25 Test #32: benchmark_evidence_integrity .............   Passed    0.01 sec
+2026-11-21T14:04:00.7210002Z 17/25 Test #33: rolling_frame_statistics .................   Passed    0.21 sec
+2026-11-21T14:04:00.7282717Z 18/25 Test #34: rolling_frame_configuration_boundaries ...   Passed    0.01 sec
+2026-11-21T14:04:00.7583544Z 19/25 Test #38: windows_cockpit_interior_cache ...........   Passed    0.03 sec
+2026-11-21T14:04:00.9879724Z 20/25 Test #39: windows_compact_glyph_coverage ...........   Passed    0.23 sec
+2026-11-21T14:04:01.0574461Z 21/25 Test #40: windows_autopilot_notice_glyph_bounds ....   Passed    0.07 sec
+2026-11-21T14:04:01.0816353Z 22/25 Test #41: windows_instrument_glyph_bounds ..........   Passed    0.02 sec
+2026-11-21T14:04:01.0884452Z 23/25 Test #42: windows_utf8_device_log ..................   Passed    0.01 sec
+2026-11-21T14:04:01.0986185Z 24/25 Test #43: windows_command_line_parsing .............   Passed    0.01 sec
+2026-11-21T14:04:01.2476172Z 25/25 Test #44: hlsl_shader_compilation ..................   Passed    0.15 sec
+2026-11-21T14:04:01.2482314Z 100% tests passed, 0 tests failed out of 25
+2026-11-21T14:04:01.2483586Z Total Test time (real) =   1.81 sec
+2026-11-21T14:04:01.4008550Z PASS actual cmd resolver: missing, packaged fallback, rebuilt priority, removal fallback; paths with spaces. No game process was launched.
+2026-11-21T14:04:01.4054080Z Release configured with static MSVC runtime (MultiThreaded).
+2026-11-21T14:04:01.4063485Z Application compiled with Assimp OFF. Native fcmesh loading remains compiled. Runtime assets are NOT copied. No application/GPU/HD6000 execution was performed.
+2026-11-21T14:04:02.3004644Z Staged Windows x64 compatibility EXE and hash/provenance. No game/GPU execution performed.
+2026-11-21T14:04:04.5485181Z PASS actual Windows application: chase/cockpit each rendered three DX11 WARP frames and BMP; missing atlas exited 1 without modal wait; save sentinels unchanged. Synthetic fixture only, no target GPU/FPS/full-flight verdict.

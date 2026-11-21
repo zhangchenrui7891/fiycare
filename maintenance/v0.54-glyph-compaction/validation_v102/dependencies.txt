@@ -1,0 +1,28 @@
+Microsoft (R) COFF/PE Dumper Version 14.44.35230.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\a\fiycare\fiycare\maintenance\v0.54-glyph-compaction\out\build\windows-source-check\Release\FlightCareerAir.exe
+
+File Type: EXECUTABLE IMAGE
+
+  Image has the following dependencies:
+
+    d3d12.dll
+    d3d11.dll
+    dxgi.dll
+    D3DCOMPILER_47.dll
+    USER32.dll
+    GDI32.dll
+    SHELL32.dll
+    KERNEL32.dll
+
+  Summary
+
+        5000 .data
+        1000 .fptable
+        7000 .pdata
+       2E000 .rdata
+        1000 .reloc
+        1000 .rsrc
+       9D000 .text

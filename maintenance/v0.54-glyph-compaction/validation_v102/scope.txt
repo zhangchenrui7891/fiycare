@@ -1,0 +1,12 @@
+Baseline v0.101 final source/docs commit 9ec4c093bedd6bd8398d1c4084df0f76b751589f.
+Source commit 54a2581cd27cb1f6a24db32a4685094a1721849b.
+Linux Release Assimp ON, full build (286 steps), CTest 50/50 passed.
+Windows CI workflow https://github.com/zhangchenrui7891/fiycare/actions/runs/44911844676
+New diagnostic-no-dialog flag is gated to exact smoke/benchmark modes. Ordinary launches retain error dialogs.
+New Windows integration harness uses real GUI EXE, DX11 WARP software rasterizer, generated 64x64 checker atlas and procedural trainer 0.
+Required cases: chase/cockpit each three frames plus valid nonblank BMP and normal exit; missing atlas must log failure and exit 1 without modal wait; isolated live save sentinels must remain unchanged.
+Even successful WARP fixture checks do not validate full released assets, DX12, hardware GPU, Boot Camp/HD6000 FPS/memory, picture quality or complete flight.
+Windows workflow completed success: 25/25 CPU/GDI/HLSL, four cmd path cases, actual DX11 WARP chase/cockpit rendering and missing-atlas failure passed.
+EXE artifact 14709614534; fixture evidence artifact 14710570743.
+Binary and BMP hashes/provenance independently verified.
+Observed low-resolution issue: instrument text is small and the bottom notice obscures part of the panels.
