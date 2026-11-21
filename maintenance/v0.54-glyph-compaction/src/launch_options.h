@@ -20,6 +20,12 @@ public:
   return result;
  }
 };
+// Automated diagnostics must report failures through exit status/logs instead
+// of waiting on a modal error box. Ordinary launches retain visible errors.
+inline bool diagnosticNoDialog(const Options& options){
+ return options.has(L"--diagnostic-no-dialog")&&
+        (options.has(L"--smoke-test")||options.has(L"--benchmark"));
+}
 // Native resolution is the low-overhead default; supersampling is opt-in.
 // An explicit native override wins independent of argument order.
 inline unsigned initialRenderScale(const Options& options){

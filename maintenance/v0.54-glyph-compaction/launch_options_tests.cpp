@@ -8,7 +8,7 @@ int main(){
   const std::vector<std::wstring> flags={L"--benchmark",L"--low",L"--smoke-test",L"--airliner",
    L"--a330",L"--a350",L"--sunset",L"--no-aa",L"--night",L"--flood-off",
    L"--panel-dim",L"--surface-flight",L"--fullscreen",L"--native",L"--cockpit",
-   L"--dx11",L"--dx12",L"--warp",L"--supersample"};
+   L"--dx11",L"--dx12",L"--warp",L"--supersample",L"--diagnostic-no-dialog"};
   std::size_t cases=0;
   for(const auto& flag:flags){
    require(launch::Options({flag}).has(flag),"Exact token must match");
@@ -23,6 +23,11 @@ int main(){
     require(copy.has(other)==(other==flag),"Forcing one flag must not enable another");
    require(launch::Options({flag,flag}).has(flag),"Duplicates are harmless");
   }
+  require(!launch::diagnosticNoDialog(launch::Options({L"--diagnostic-no-dialog"})),"Ordinary launch retains modal error");
+  require(launch::diagnosticNoDialog(launch::Options({L"--smoke-test",L"--diagnostic-no-dialog"})),"Smoke automation can use exit status and logs");
+  require(launch::diagnosticNoDialog(launch::Options({L"--benchmark",L"--diagnostic-no-dialog"})),"Benchmark automation can use exit status and logs");
+  require(!launch::diagnosticNoDialog(launch::Options({L"--smoke-test-old",L"--diagnostic-no-dialog"})),"Diagnostic gating requires exact mode token");
+  require(!launch::diagnosticNoDialog(launch::Options({L"--smoke-test",L"--diagnostic-no-dialog-old"})),"Quiet failure requires exact option token");
   require(!launch::Options().has(L"--low"),"Default launch keeps ordinary quality");
   require(!launch::Options({L"--BENCHMARK"}).has(L"--benchmark"),"Flags remain case sensitive");
   const auto renderer=launch::Options({L"--benchmark",L"--dx11"}).with(L"--low");

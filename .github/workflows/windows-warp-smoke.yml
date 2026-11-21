@@ -1,0 +1,33 @@
+name: Windows DX11 WARP fixture startup checks
+on:
+  push:
+    branches: ['codex/v0.102-windows-warp-smoke']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v6
+      - shell: pwsh
+        run: ./maintenance/v0.54-glyph-compaction/tools/check_windows_source.ps1 -StaticRuntime
+      - shell: pwsh
+        run: ./maintenance/v0.54-glyph-compaction/tools/stage_windows_binary.ps1
+      - shell: pwsh
+        run: ./maintenance/v0.54-glyph-compaction/tools/test_windows_smoke.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-compat-executable
+          path: maintenance/v0.54-glyph-compaction/out/windows-compat/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-compat-delivery-evidence
+          path: maintenance/v0.54-glyph-compaction/out/build/windows-source-check/**/*.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-warp-fixture-evidence
+          path: maintenance/v0.54-glyph-compaction/out/windows-smoke/evidence/
