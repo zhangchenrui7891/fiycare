@@ -1,3 +1,13 @@
+## v0.104 · 2026-11-22 · 驾驶舱与完整构建分开
+
+基线为 v0.103 GitHub 分支和同日下午的驾驶舱源码包。上午的 Windows 检查通过了 25 项测试，并用 WARP 截图验证通知条避开仪表。下午的源码增加 F4 大字空速、高度、航向与升降率。本版保留这些改动，并将其运行代码与 HUD 回归测试一同纳入版本分支。
+
+此前 start_cockpit.bat 使用 windows-release 并强制关闭 Assimp，同目录随后执行 build_vs.bat 会沿用旧的缓存选项。现在 windows-cockpit 拥有独立构建目录 out/build/cockpit，使用原生机模、静态 MSVC 运行库、最多两个并行任务；完整构建在 out/build/release 显式开启 Assimp。已有旧缓存的完整工程重新配置时会恢复导入器。包内 run_compat.bat 可直接启动本次编译的程序。
+
+Windows Server 2022 CI 在完整版缓存放入标记，连续两次调用 start_cockpit.bat --build-only，检查标记、兼容版缓存和资源复制，随后用生成的 EXE 启动 DX11 WARP 驾驶舱。人工纹理和训练机渲染三帧，写出 BMP 并正常退出。最终 EXE 的 PE 导入表仅列出 Windows 系统 DLL。运行 https://github.com/zhangchenrui7891/fiycare/actions/runs/45010827058 ，源码 6a82939ef23081f38790ddbc13de2189ba455074。Linux C++17 Release 兼容配置构建 64 步，48/48 项 CTest 通过；带 Assimp 的完整配置生成成功，本轮未编译 Windows 全导入器配置。CPU 与软件渲染结果均不能用于估算 HD 6000 帧率。
+
+当前可用功能包括中文菜单、11 个机型配置（含 A330/A350）、可操作简化座舱、主飞行/导航/发动机仪表、离线浦东影像、航路跟踪、生涯与 FXAA。尚缺 MSFS 2024 的全球地景、实时天气和空客专用系统深度。下次优先收集相同版本、正式资源下的 Boot Camp DX11 座舱截图、平均帧率、P95 帧时间与工作集，并验证完整航班和 F4 在低分辨率下的可读性。
+
 ## v0.103 · 2026-11-22（座舱通知避让仪表）
 
 核对 v0.102（65f6b24b）工程、连续记录和实际 Windows WARP 截图。已有 C++17、DX11/DX12、11 机型、中文交互座舱、PFD/NAV/ENGINE、AGL/进近、到达地图、生涯、离线影像与 FXAA；兼容包提供 x64 静态运行库 EXE，Assimp 导入/旋转编辑关闭。上版 Linux 50/50、Windows 25/25，通过真实 WARP 追尾/座舱三帧与资源缺失检查，但没有正式资源/HD6000/完整航班验收。截图显示通知横跨低分辨率玻璃仪表。
