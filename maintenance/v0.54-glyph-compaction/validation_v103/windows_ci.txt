@@ -1,0 +1,44 @@
+2026-11-22T00:04:53.3401801Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +18958e37b6d69705f5a65f2420cfee30cda6e456:refs/remotes/origin/codex/v0.103-cockpit-notice
+2026-11-22T00:04:54.4069036Z  * [new ref]         18958e37b6d69705f5a65f2420cfee30cda6e456 -> origin/codex/v0.103-cockpit-notice
+2026-11-22T00:04:54.4109428Z [command]"C:\Program Files\Git\bin\git.exe" branch --list --remote origin/codex/v0.103-cockpit-notice
+2026-11-22T00:04:54.4492873Z   origin/codex/v0.103-cockpit-notice
+2026-11-22T00:04:54.4525301Z [command]"C:\Program Files\Git\bin\git.exe" rev-parse refs/remotes/origin/codex/v0.103-cockpit-notice
+2026-11-22T00:04:54.5494831Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force -B codex/v0.103-cockpit-notice refs/remotes/origin/codex/v0.103-cockpit-notice
+2026-11-22T00:04:54.8608651Z Switched to a new branch 'codex/v0.103-cockpit-notice'
+2026-11-22T00:04:54.8673168Z branch 'codex/v0.103-cockpit-notice' set up to track 'origin/codex/v0.103-cockpit-notice'.
+2026-11-22T00:06:34.0308315Z  1/25 Test  #1: default_model_restore_transaction ........   Passed    0.01 sec
+2026-11-22T00:06:34.0497652Z  2/25 Test  #2: cockpit_lateral_mode_transfer ............   Passed    0.01 sec
+2026-11-22T00:06:34.1265168Z  3/25 Test  #3: career_flight_reset ......................   Passed    0.08 sec
+2026-11-22T00:06:34.1346314Z  4/25 Test  #4: alert_headline_priority ..................   Passed    0.01 sec
+2026-11-22T00:06:34.1437237Z  5/25 Test  #5: navigation_map_clipping ..................   Passed    0.01 sec
+2026-11-22T00:06:34.2697190Z  6/25 Test  #6: instrument_integer_format ................   Passed    0.13 sec
+2026-11-22T00:06:34.4199699Z  7/25 Test  #7: compact_glyph_coverage ...................   Passed    0.15 sec
+2026-11-22T00:06:34.5767788Z  8/25 Test  #9: offline_scenery_geometry .................   Passed    0.16 sec
+2026-11-22T00:06:34.5851848Z  9/25 Test #11: autopilot_disconnect_feedback ............   Passed    0.01 sec
+2026-11-22T00:06:34.5947211Z 10/25 Test #12: primary_instrument_text ..................   Passed    0.01 sec
+2026-11-22T00:06:34.6017106Z 11/25 Test #13: exact_launch_options .....................   Passed    0.01 sec
+2026-11-22T00:06:34.8103854Z 12/25 Test #20: engineering_systems ......................   Passed    0.21 sec
+2026-11-22T00:06:35.1057468Z 13/25 Test #26: cockpit_throttle_event_coalescing ........   Passed    0.29 sec
+2026-11-22T00:06:35.1155048Z 14/25 Test #28: training_approach_guidance ...............   Passed    0.01 sec
+2026-11-22T00:06:35.1323278Z 15/25 Test #29: arrival_airport_navigation ...............   Passed    0.02 sec
+2026-11-22T00:06:35.1432260Z 16/25 Test #32: benchmark_evidence_integrity .............   Passed    0.01 sec
+2026-11-22T00:06:35.3500035Z 17/25 Test #33: rolling_frame_statistics .................   Passed    0.21 sec
+2026-11-22T00:06:35.3573242Z 18/25 Test #34: rolling_frame_configuration_boundaries ...   Passed    0.01 sec
+2026-11-22T00:06:35.3848268Z 19/25 Test #38: windows_cockpit_interior_cache ...........   Passed    0.03 sec
+2026-11-22T00:06:35.6499601Z 20/25 Test #39: windows_compact_glyph_coverage ...........   Passed    0.26 sec
+2026-11-22T00:06:35.6503105Z       Start 40: windows_autopilot_notice_glyph_bounds
+2026-11-22T00:06:35.7200048Z 21/25 Test #40: windows_autopilot_notice_glyph_bounds ....   Passed    0.07 sec
+2026-11-22T00:06:35.7433986Z 22/25 Test #41: windows_instrument_glyph_bounds ..........   Passed    0.02 sec
+2026-11-22T00:06:35.7502095Z 23/25 Test #42: windows_utf8_device_log ..................   Passed    0.01 sec
+2026-11-22T00:06:35.7602523Z 24/25 Test #43: windows_command_line_parsing .............   Passed    0.01 sec
+2026-11-22T00:06:35.9249681Z 25/25 Test #44: hlsl_shader_compilation ..................   Passed    0.16 sec
+2026-11-22T00:06:35.9258113Z 100% tests passed, 0 tests failed out of 25
+2026-11-22T00:06:36.1216511Z PASS actual cmd resolver: missing, packaged fallback, rebuilt priority, removal fallback; paths with spaces. No game process was launched.
+2026-11-22T00:06:37.2226874Z ##[group]Run ./maintenance/v0.54-glyph-compaction/tools/test_windows_smoke.ps1
+2026-11-22T00:06:37.2227517Z [36;1m./maintenance/v0.54-glyph-compaction/tools/test_windows_smoke.ps1[0m
+2026-11-22T00:06:41.2848712Z PASS actual fixture pixels: cockpit notice moved out of lower panel band; chase retained; no hardware/performance verdict.
+2026-11-22T00:06:41.3259728Z PASS actual Windows application: chase/cockpit each rendered three DX11 WARP frames and BMP; missing atlas exited 1 without modal wait; save sentinels unchanged. Synthetic fixture only, no target GPU/FPS/full-flight verdict.
+2026-11-22T00:06:43.3728075Z   name: windows-warp-fixture-evidence
+2026-11-22T00:06:43.3728747Z   path: maintenance/v0.54-glyph-compaction/out/windows-smoke/evidence/
+2026-11-22T00:06:44.2567428Z Artifact windows-warp-fixture-evidence.zip successfully finalized. Artifact ID 14731765310
+2026-11-22T00:06:44.2568960Z Artifact windows-warp-fixture-evidence has been successfully uploaded! Final size is 70577 bytes. Artifact ID is 14731765310

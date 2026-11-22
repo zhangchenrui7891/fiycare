@@ -1,3 +1,13 @@
+# FlightCareerAir v0.103 Windows 兼容包
+
+解压整个 ZIP 后运行 run_compat.bat（DX11 / low）。包内含 Windows x64 静态运行库 EXE、完整正式资源与源码。兼容 EXE 关闭 Assimp 多格式导入/旋转编辑，完整源码支持 Assimp ON。
+
+座舱通知从底部移至顶部警告行下方，避让默认视角的玻璃仪表；仪表字号和视角未变，低分辨率可读性仍需继续改进。
+
+Linux 50/50 CTest、Windows 25/25 检查通过。真实 EXE 的人工资源 DX11 WARP 启动、截图、资源缺失失败与存档哨兵检查通过。同场景逐像素对比确认通知迁移，两个通知区域之外及追尾均为零像素差异。没有正式资源画质、硬件 GPU、HD6000 性能或完整航班验收结论。
+
+来源与限制见 build_info.json、notice_layout_comparison.json、COCKPIT_NOTICE_LAYOUT.md 和 validation_v103。Windows 工作流：https://github.com/zhangchenrui7891/fiycare/actions/runs/44964857173 。以下为历史版本说明。
+
 # FlightCareerAir v0.102 Windows 兼容包
 
 解压整个兼容 ZIP 后运行 run_compat.bat（DX11 / low）。包内 EXE 为新构建的 x64 静态运行库版本，Assimp 多格式导入/旋转编辑关闭；完整源码支持重建 Assimp ON，正式 assets 保留。

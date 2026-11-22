@@ -1,0 +1,17 @@
+{
+  "version": "0.103",
+  "source_commit": "18958e37b6d69705f5a65f2420cfee30cda6e456",
+  "configuration": "Release",
+  "architecture": "x64",
+  "compiler": "MSVC Windows-2022 runner",
+  "msvc_runtime": "MultiThreaded static",
+  "assimp_importer": false,
+  "sha256": "becf1d1531d422dccbc6471968811b9cffe0e5a85b9b487c8640241d7154dbc4",
+  "runtime_assets_in_ci": false,
+  "game_executed": true,
+  "gpu_validated": false,
+  "target_hardware_validated": false,
+  "cockpit_notice_layout_verified": true,
+  "game_execution_environment": "Windows CI DX11 WARP; synthetic atlas; procedural trainer",
+  "full_assets_validated": false
+}

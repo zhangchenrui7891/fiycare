@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/workspace/scratch/f28b7c9ab582/fca-v103/maintenance/v0.54-glyph-compaction/tools/check_notice_pixels.py", line 81, in <module>
+    main()
+  File "/workspace/scratch/f28b7c9ab582/fca-v103/maintenance/v0.54-glyph-compaction/tools/check_notice_pixels.py", line 66, in main
+    raise ValueError('Cockpit notice was not visibly relocated from the panel band to the upper band')
+ValueError: Cockpit notice was not visibly relocated from the panel band to the upper band
+unchanged_baseline_exit=1 (expected nonzero)

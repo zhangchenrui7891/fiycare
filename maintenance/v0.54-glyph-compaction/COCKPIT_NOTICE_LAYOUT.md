@@ -9,3 +9,9 @@ v0.102 的真实 Windows DX11 WARP 截图显示，位于逻辑 y=425–451 的�
 Windows 流程保留追尾/座舱各三帧、BMP 读回、必需资源缺失退出和存档哨兵检查，随后才执行布局比较。两张当前原始 BMP、基线、像素统计、日志及 EXE 来源将记录于 validation_v103。实际检查结果以本轮工作流和连续记录为准。
 
 完整兼容包继续提供正式资源和静态运行库 Windows x64 EXE；Assimp 导入/旋转编辑关闭，完整源码可重建 Assimp ON。下一步改进低分辨率仪表视角/字号，并在 Boot Camp Windows 10 x64 点检正常飞行、保存失败、失速/断电、环视及菜单切换，采集 DX11 P95/工作集和完整航班证据。当前无目标机验收，与 MSFS2024 的成熟航电、气动、真实机场、天气和成品体验仍有明显差距。
+
+## 本轮实际结果（2026-11-22）
+
+Windows 工作流 44964857173 已成功：25/25 项 CPU/GDI/HLSL、四种 cmd 路径检查和真实 EXE 三个 WARP 场景通过。相同 fixture 的 640×360 图片比较中，座舱旧通知带变化 11232 像素、新通知带变化 10608 像素、两带之外变化 0 像素，追尾变化 0 像素；旧图对照被正确拒绝。追尾/座舱各三帧正常退出，缺失 atlas 返回 1，四种存档哨兵保持。Linux Release Assimp ON 完整构建 286 步，50/50 CTest 通过。
+
+二进制源码提交 18958e37b6d69705f5a65f2420cfee30cda6e456；Windows 工作流 https://github.com/zhangchenrui7891/fiycare/actions/runs/44964857173 。原始 CI 截图、统计和日志见 validation_v103/CI_FIXTURE_WARP_EVIDENCE.zip。独立检查 EXE 为 871424 字节 AMD64 GUI PE，静态 CRT，哈希与 build_info 一致。WARP 使用人工纹理和程序训练机，未验证完整正式资源、目标机、帧率、内存或完整航班。

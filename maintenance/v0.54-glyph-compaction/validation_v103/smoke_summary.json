@@ -1,0 +1,68 @@
+{
+  "source_commit": "18958e37b6d69705f5a65f2420cfee30cda6e456",
+  "game_executed": true,
+  "environment": "Windows CI DX11 WARP software",
+  "fixture_atlas": "generated 64x64 checker",
+  "aircraft": "procedural trainer 0",
+  "full_assets_validated": false,
+  "hardware_gpu_validated": false,
+  "target_hardware_validated": false,
+  "performance_verdict": "NOT_EVALUATED",
+  "notice_layout_comparison": {
+    "baseline": "v0.102 Windows DX11 WARP synthetic fixture",
+    "current": "Windows DX11 WARP synthetic fixture",
+    "resolution": [
+      640,
+      360
+    ],
+    "notice_relocation_passed": true,
+    "performance_verdict": "NOT_EVALUATED",
+    "target_hardware_validated": false,
+    "comparisons": {
+      "chase": {
+        "old_notice_band_changed_pixels": 0,
+        "upper_notice_band_changed_pixels": 0,
+        "outside_notice_bands_changed_pixels": 0,
+        "total_changed_pixels": 0,
+        "baseline_bmp_sha256": "785cc49b5c0455bb3607d9e51e4a6e413bcb495dfa7923481d967a7c5126e5b6",
+        "current_bmp_sha256": "785cc49b5c0455bb3607d9e51e4a6e413bcb495dfa7923481d967a7c5126e5b6"
+      },
+      "cockpit": {
+        "old_notice_band_changed_pixels": 11232,
+        "upper_notice_band_changed_pixels": 10608,
+        "outside_notice_bands_changed_pixels": 0,
+        "total_changed_pixels": 21840,
+        "baseline_bmp_sha256": "6c5e22d7ee249aa3c0b439b57d88de2af591165d6321be3d3f1b88f230e2e579",
+        "current_bmp_sha256": "53e0c0d4056f4066609b2884c9c9b1ca62d69bc1bbb21e4bdf449680aea95dec"
+      }
+    }
+  },
+  "cases": [
+    {
+      "case": "chase",
+      "exit_code": 0,
+      "rendered_frames": 3,
+      "width": 640,
+      "height": 360,
+      "sampled_colors": 381,
+      "bmp_sha256": "785cc49b5c0455bb3607d9e51e4a6e413bcb495dfa7923481d967a7c5126e5b6",
+      "live_saves_unchanged": true
+    },
+    {
+      "case": "cockpit",
+      "exit_code": 0,
+      "rendered_frames": 3,
+      "width": 640,
+      "height": 360,
+      "sampled_colors": 239,
+      "bmp_sha256": "53e0c0d4056f4066609b2884c9c9b1ca62d69bc1bbb21e4bdf449680aea95dec",
+      "live_saves_unchanged": true
+    },
+    {
+      "case": "missing-atlas",
+      "exit_code": 1,
+      "expected_failure": true,
+      "live_saves_unchanged": true
+    }
+  ]
+}

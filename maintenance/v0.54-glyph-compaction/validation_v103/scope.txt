@@ -1,0 +1,10 @@
+Baseline v0.102 final commit 65f6b24b1e9d7094ee910a8552e1111d9e620fa5.
+Source commit 18958e37b6d69705f5a65f2420cfee30cda6e456.
+Linux Release Assimp ON, full build 286 steps, 50/50 CTest passed.
+Cockpit notification moved from logical y=425 to y=46 (warning row ends 38); chase/walking use the previous lower band. Same text, lifetime and geometry count.
+Pixel comparator rejects unchanged v0.102 screenshots. Actual comparison passed: cockpit old band 11232 changed pixels; upper band 10608; outside 0; chase 0. Unchanged baseline rejected.
+Windows workflow https://github.com/zhangchenrui7891/fiycare/actions/runs/44964857173
+Fixture uses 64x64 synthetic atlas and procedural trainer, DX11 WARP software. No hardware GPU, formal-assets picture quality, HD6000 FPS/memory or full-flight verdict.
+Instrument size and arbitrary panned-view readability remain outside this change.
+Windows actual outcome: SUCCESS; 25/25 CPU/GDI/HLSL tests, four cmd resolver cases, three real EXE WARP scenarios passed; save sentinels unchanged. EXE AMD64 GUI PE 871424 bytes; SHA verified.
+performance_verdict=NOT_EVALUATED; gpu_validated=false; full_assets_validated=false; target_hardware_validated=false.

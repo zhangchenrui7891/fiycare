@@ -1,0 +1,29 @@
+{
+  "baseline": "v0.102 Windows DX11 WARP synthetic fixture",
+  "current": "Windows DX11 WARP synthetic fixture",
+  "resolution": [
+    640,
+    360
+  ],
+  "notice_relocation_passed": true,
+  "performance_verdict": "NOT_EVALUATED",
+  "target_hardware_validated": false,
+  "comparisons": {
+    "chase": {
+      "old_notice_band_changed_pixels": 0,
+      "upper_notice_band_changed_pixels": 0,
+      "outside_notice_bands_changed_pixels": 0,
+      "total_changed_pixels": 0,
+      "baseline_bmp_sha256": "785cc49b5c0455bb3607d9e51e4a6e413bcb495dfa7923481d967a7c5126e5b6",
+      "current_bmp_sha256": "785cc49b5c0455bb3607d9e51e4a6e413bcb495dfa7923481d967a7c5126e5b6"
+    },
+    "cockpit": {
+      "old_notice_band_changed_pixels": 11232,
+      "upper_notice_band_changed_pixels": 10608,
+      "outside_notice_bands_changed_pixels": 0,
+      "total_changed_pixels": 21840,
+      "baseline_bmp_sha256": "6c5e22d7ee249aa3c0b439b57d88de2af591165d6321be3d3f1b88f230e2e579",
+      "current_bmp_sha256": "53e0c0d4056f4066609b2884c9c9b1ca62d69bc1bbb21e4bdf449680aea95dec"
+    }
+  }
+}
