@@ -1,0 +1,87 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 22,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "windows-release",
+      "displayName": "Windows x64 Release",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "FCAIR_WITH_ASSIMP": "ON"
+      },
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "windows-cockpit",
+      "displayName": "Windows x64 cockpit compatibility",
+      "inherits": "windows-release",
+      "binaryDir": "${sourceDir}/out/build/cockpit",
+      "cacheVariables": {
+        "FCAIR_WITH_ASSIMP": "OFF",
+        "FCAIR_COPY_RUNTIME_ASSETS": "ON"
+      }
+    },
+    {
+      "name": "portable-tests",
+      "displayName": "Portable physics tests",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/out/build/tests",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      },
+      "condition": {
+        "type": "notEquals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "windows-release",
+      "configurePreset": "windows-release"
+    },
+    {
+      "name": "portable-tests",
+      "configurePreset": "portable-tests"
+    },
+    {
+      "name": "windows-cockpit",
+      "configurePreset": "windows-cockpit",
+      "targets": [
+        "FlightCareerAir"
+      ],
+      "jobs": 2
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "windows-release",
+      "configurePreset": "windows-release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "portable-tests",
+      "configurePreset": "portable-tests",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}
