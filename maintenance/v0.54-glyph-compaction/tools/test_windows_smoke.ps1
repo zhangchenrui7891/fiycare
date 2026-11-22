@@ -76,13 +76,19 @@ try {
         Copy-Item $captures[0].FullName $capture -Force
         $cases += [ordered]@{case=$camera;exit_code=$exitCode;rendered_frames=3;width=$width;height=$height;sampled_colors=$colors.Count;bmp_sha256=(Get-FileHash $capture).Hash.ToLowerInvariant();live_saves_unchanged=$true}
     }
-    $summary = [ordered]@{source_commit=$env:GITHUB_SHA;game_executed=$true;environment='Windows CI DX11 WARP software';fixture_atlas='generated 64x64 checker';aircraft='procedural trainer 0';full_assets_validated=$false;hardware_gpu_validated=$false;target_hardware_validated=$false;performance_verdict='NOT_EVALUATED';cases=$cases}
+    $comparisonPath = Join-Path $evidence 'notice_layout_comparison.json'
+    & python (Join-Path $PSScriptRoot 'check_notice_pixels.py') --baseline (Join-Path $project 'validation_v102/CI_FIXTURE_WARP_EVIDENCE.zip') --current $evidence --output $comparisonPath
+    if ($LASTEXITCODE -ne 0) { throw 'Actual fixture notification layout comparison failed' }
+    $comparison = Get-Content $comparisonPath -Raw | ConvertFrom-Json
+    $summary = [ordered]@{source_commit=$env:GITHUB_SHA;game_executed=$true;environment='Windows CI DX11 WARP software';fixture_atlas='generated 64x64 checker';aircraft='procedural trainer 0';full_assets_validated=$false;hardware_gpu_validated=$false;target_hardware_validated=$false;performance_verdict='NOT_EVALUATED';notice_layout_comparison=$comparison;cases=$cases}
     $summary | ConvertTo-Json -Depth 6 | Set-Content -Encoding utf8 (Join-Path $evidence 'smoke_summary.json')
     $destination = Split-Path $sourceExe
     Copy-Item (Join-Path $evidence 'smoke_summary.json') (Join-Path $destination 'smoke_summary.json') -Force
     $infoPath = Join-Path $destination 'build_info.json'
     $info = Get-Content $infoPath -Raw | ConvertFrom-Json
+    Copy-Item $comparisonPath (Join-Path $destination 'notice_layout_comparison.json') -Force
     $info.game_executed = $true
+    $info | Add-Member -NotePropertyName cockpit_notice_layout_verified -NotePropertyValue $true -Force
     $info | Add-Member -NotePropertyName game_execution_environment -NotePropertyValue 'Windows CI DX11 WARP; synthetic atlas; procedural trainer' -Force
     $info | Add-Member -NotePropertyName full_assets_validated -NotePropertyValue $false -Force
     $info | ConvertTo-Json -Depth 6 | Set-Content -Encoding utf8 $infoPath

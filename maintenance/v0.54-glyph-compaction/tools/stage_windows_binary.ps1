@@ -17,7 +17,7 @@ New-Item -ItemType Directory -Force $Destination | Out-Null
 Copy-Item $exe (Join-Path $Destination 'FlightCareerAir.exe')
 $dependencies | Set-Content -Encoding utf8 (Join-Path $Destination 'dependencies.txt')
 [ordered]@{
-    version = '0.102'; source_commit = $env:GITHUB_SHA; configuration = 'Release'; architecture = 'x64';
+    version = '0.103'; source_commit = $env:GITHUB_SHA; configuration = 'Release'; architecture = 'x64';
     compiler = 'MSVC Windows-2022 runner'; msvc_runtime = 'MultiThreaded static'; assimp_importer = $false;
     sha256 = (Get-FileHash -Algorithm SHA256 $exe).Hash.ToLowerInvariant();
     runtime_assets_in_ci = $false; game_executed = $false; gpu_validated = $false; target_hardware_validated = $false

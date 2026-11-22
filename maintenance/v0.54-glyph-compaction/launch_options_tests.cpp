@@ -43,7 +43,7 @@ int main(){
    require(low.width==640&&low.height==360,"Low extent independent of scale");
   }
   const auto zero=launch::renderExtent(0,0,1,false);require(zero.width==1&&zero.height==1,"Zero client clamped");
-  std::cout<<"PASS launch options: 19 flags, "<<cases<<" misleading tokens, forcing/copy and backend checks. Tokenized CPU inputs only.\n";
+  std::cout<<"PASS launch options: "<<flags.size()<<" flags, "<<cases<<" misleading tokens, forcing/copy and backend checks. Tokenized CPU inputs only.\n";
   return 0;
  }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}
 }
