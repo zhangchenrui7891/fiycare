@@ -1,6 +1,6 @@
 @echo off
 setlocal
-call "%~dp0tools\resolve_flight_exe.bat"
+call "%~dp0tools\resolve_flight_exe.bat" cockpit
 set "EXE=%FCAIR_APP%"
 set "REPORTS=%LOCALAPPDATA%\FlightCareerAir\diagnostics\benchmark"
 if not exist "%EXE%" (

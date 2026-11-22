@@ -1,0 +1,22 @@
+name: Windows launch selection
+on:
+  push:
+    branches: ['codex/v0.105-launch-selection']
+    paths-ignore: ['**/*.md']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  launch:
+    runs-on: windows-2022
+    defaults:
+      run:
+        working-directory: maintenance/v0.54-glyph-compaction
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check every executable combination
+        shell: pwsh
+        run: ./tools/test_windows_delivery.ps1
+      - name: Exercise the actual launcher and benchmark scripts
+        shell: powershell
+        run: ./tools/test_compat_entrypoints.ps1

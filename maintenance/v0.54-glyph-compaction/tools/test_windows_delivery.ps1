@@ -7,30 +7,40 @@ try {
     $driver = Join-Path $fixture 'probe.bat'
     @'
 @echo off
-call "%~dp0tools\resolve_flight_exe.bat"
-if errorlevel 1 exit /b 7
+set "FCAIR_APP=stale"
+call "%~dp0tools\resolve_flight_exe.bat" %1
+if errorlevel 1 (
+  if defined FCAIR_APP exit /b 9
+  exit /b 7
+)
 if not exist "%FCAIR_APP%" exit /b 8
 >"%~dp0selected.txt" echo %FCAIR_APP%
 '@ | Set-Content -Encoding ascii $driver
-    function Probe([int]$expectedExit, [string]$expectedPath) {
-        & $env:ComSpec /d /c "`"$driver`""
-        if ($LASTEXITCODE -ne $expectedExit) { throw "Resolver exit: expected $expectedExit got $LASTEXITCODE" }
-        if ($expectedExit -eq 0) {
-            $actual = (Get-Content (Join-Path $fixture 'selected.txt') -Raw).Trim()
-            if ([IO.Path]::GetFullPath($actual) -ne [IO.Path]::GetFullPath($expectedPath)) { throw 'Wrong executable selected' }
+    $paths = @(
+        (Join-Path $fixture 'FlightCareerAir.exe')
+        (Join-Path $fixture 'out/build/release/FlightCareerAir.exe')
+        (Join-Path $fixture 'out/build/cockpit/FlightCareerAir.exe')
+    )
+    foreach ($file in $paths) { New-Item -ItemType Directory -Force (Split-Path $file) | Out-Null }
+    foreach ($mask in 0..7) {
+        for ($i=0; $i -lt 3; $i++) {
+            if ($mask -band (1 -shl $i)) { Set-Content -Encoding ascii $paths[$i] 'resolver fixture' }
+            elseif (Test-Path $paths[$i]) { Remove-Item $paths[$i] }
+        }
+        foreach ($mode in @('','cockpit')) {
+            $order = if ($mode) { 2,1,0 } else { 1,2,0 }
+            $expected = $order | Where-Object { Test-Path $paths[$_] } | Select-Object -First 1
+            & $env:ComSpec /d /c "call `"$driver`" $mode"
+            if ($null -eq $expected) {
+                if ($LASTEXITCODE -ne 7) { throw "Missing EXE: $LASTEXITCODE" }
+            } else {
+                if ($LASTEXITCODE -ne 0) { throw "Resolver failed for $mask/$mode" }
+                $actual = (Get-Content (Join-Path $fixture 'selected.txt') -Raw).Trim()
+                if ([IO.Path]::GetFullPath($actual) -ne $paths[$expected]) { throw "Wrong EXE for $mask/$mode" }
+            }
         }
     }
-    Probe 7 ''
-    $packaged = Join-Path $fixture 'FlightCareerAir.exe'
-    Set-Content -Encoding ascii $packaged 'fixture, not executable'
-    Probe 0 $packaged
-    $rebuilt = Join-Path $fixture 'out/build/release/FlightCareerAir.exe'
-    New-Item -ItemType Directory -Force (Split-Path $rebuilt) | Out-Null
-    Set-Content -Encoding ascii $rebuilt 'fixture, not executable'
-    Probe 0 $rebuilt
-    Remove-Item $rebuilt
-    Probe 0 $packaged
-    Write-Host 'PASS actual cmd resolver: missing, packaged fallback, rebuilt priority, removal fallback; paths with spaces. No game process was launched.'
+    Write-Host 'PASS: 16 actual cmd resolver cases; three locations, two priorities, stale value cleared, paths with spaces.'
 } finally {
     Remove-Item -Recurse -Force $fixture -ErrorAction SilentlyContinue
 }
