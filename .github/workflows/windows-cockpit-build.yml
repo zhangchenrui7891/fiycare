@@ -39,6 +39,11 @@ jobs:
           if ((Get-Content out/build/release/CMakeCache.txt -Raw).Trim() -cne 'FCAIR_WITH_ASSIMP:BOOL=ON') { throw 'Full-build cache changed' }
           $dir = (Resolve-Path out/build/cockpit).Path
           if ((Get-FileHash assets/atlas.fctex).Hash -ne (Get-FileHash "$dir/assets/atlas.fctex").Hash) { throw 'Staged atlas mismatch' }
+          $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
+          $vs = & $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          $dump = Get-ChildItem "$vs/VC/Tools/MSVC/*/bin/Hostx64/x64/dumpbin.exe" | Sort-Object FullName -Descending | Select-Object -First 1
+          $deps = & $dump.FullName /dependents "$dir/FlightCareerAir.exe"
+          if ($LASTEXITCODE -ne 0 -or ($deps -join ' ') -match '(?i)MSVCP[0-9]|VCRUNTIME[0-9]|ucrtbase.dll|api-ms-win-crt') { throw 'Dynamic runtime dependency' }
           $env:LOCALAPPDATA = "$env:RUNNER_TEMP/fca104-profile"
           $p = Start-Process "$dir/FlightCareerAir.exe" -WorkingDirectory $dir -ArgumentList '--dx11 --low --cockpit --warp --smoke-test --diagnostic-no-dialog' -PassThru
           if (!$p.WaitForExit(60000)) { $p.Kill(); throw 'Startup timeout' }

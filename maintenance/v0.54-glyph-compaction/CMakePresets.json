@@ -32,7 +32,8 @@
       "binaryDir": "${sourceDir}/out/build/cockpit",
       "cacheVariables": {
         "FCAIR_WITH_ASSIMP": "OFF",
-        "FCAIR_COPY_RUNTIME_ASSETS": "ON"
+        "FCAIR_COPY_RUNTIME_ASSETS": "ON",
+        "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded"
       }
     },
     {

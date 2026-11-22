@@ -33,7 +33,7 @@ namespace ui{enum class Page{None,Pause};}
 sim::Snapshot state;auto& flight=state.flight;
 struct Renderer{const char* name(){return "DX12";}} rendererValue,*renderer=&rendererValue;
 struct Stats{double fps=23,p95Ms=43.2;}frameStats;
-std::vector<Vertex> hud;int camera=1;bool walking=false,paused=false,powerSaver=false;
+std::vector<Vertex> hud;int camera=1;bool largeCockpitReadout=false,walking=false,paused=false,powerSaver=false;
 ui::Page menuPage=ui::Page::None;sim::AlertManager flightAlerts;std::wstring notice,lastOverlayNotice,saveError;
 double overlayNoticeUntil=0,wallElapsed=0;std::map<int,int> customModels;
 void drawMenu(std::vector<Vertex>&,ui::Page,const sim::Snapshot&,bool,const std::wstring&){}
@@ -45,6 +45,10 @@ void require(bool ok,const char* why){if(!ok)throw std::runtime_error(why);}
 bool has(const std::wstring& token){for(const auto& l:labels)if(l.text.find(token)!=std::wstring::npos)return true;return false;}
 int main(){
  frame();require(labels.size()==2&&!has(L"IAS"),"Normal cockpit shows only help and attribution");
+ largeCockpitReadout=true;frame();require(has(L"IAS")&&has(L"VS "),"Large cockpit readout");
+ state.avionics.master=false;frame();require(!has(L"IAS")&&has(L"航电断电"),"Power loss blanks large readout");
+ state.avionics.master=true;walking=true;frame();require(!has(L"IAS"),"Walking hides readout");
+ walking=false;largeCockpitReadout=false;
  camera=0;frame();require(has(L"IAS")&&has(L"ALT")&&labels.size()==3,"External view has one compact flight row");
  camera=1;notice=L"AP DISC";wallElapsed=1;frame();require(has(notice),"Changed event is visible");
  wallElapsed=7;frame();require(!has(notice),"Event expires after five seconds");
