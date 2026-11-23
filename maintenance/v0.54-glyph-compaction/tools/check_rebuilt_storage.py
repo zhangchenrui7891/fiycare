@@ -15,7 +15,7 @@ start = main.index('  auto save=[&](){')
 save = main[start:main.index('  SetProcessDPIAware();', start)]
 start = main.index('  auto saveTracks=[&](){')
 tracks = main[start:main.index('\n', start)]
-for wiring in ('const runfiles::RunFiles runFiles(dataFolder(),benchmark,smoke,benchmarkPreset.outputSubfolder,fxaaRequested);',
+for wiring in ('const runfiles::RunFiles runFiles(dataFolder(),benchmark,smoke,benchmarkPreset.outputSubfolder,fxaaRequested,approachPractice);',
                'folder=runFiles.folder();', 'autoSave>=30',
                'case ui::Save:if(trySave())notice=',
                'if(!smoke&&!benchmark&&!exitApproved&&!trySave())'):

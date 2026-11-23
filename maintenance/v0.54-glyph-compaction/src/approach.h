@@ -13,6 +13,30 @@ struct ApproachGuidance {
 // Flat-runway training geometry, NOT a radio receiver, certified ILS or autoland.
 // The chosen 50ft is idealized wheel clearance at the threshold, not antenna TCH.
 inline constexpr double trainingThresholdClearance=15.24;
+// Repeatable starting point for the playable Pudong final-approach exercise.
+inline Snapshot pudongA330Final(){
+ Snapshot state;
+ auto& flight=state.flight;
+ flight.configure(2);
+ constexpr double range=6000.0;
+ const double slope=std::tan(3*pi/180);
+ const auto& runway=runways[0];
+ flight.x=runway.x;
+ flight.z=runway.z-runway.halfLength-range;
+ flight.y=flight.spec().gearHeight+trainingThresholdClearance+slope*range;
+ flight.vz=80;
+ flight.vy=-flight.vz*slope;
+ flight.pitch=2*pi/180;
+ flight.flap=1;
+ flight.throttle=.35;
+ flight.rpm=700+1900*flight.throttle;
+ flight.engines.update(flight.aircraftId,0,flight.engine,flight.throttle,flight.fuel,flight.condition,flight.rpm);
+ state.career.mission=2;
+ state.career.stage=1;
+ state.career.departureRunway=1;
+ state.career.arrivalRunway=0;
+ return state;
+}
 inline constexpr double trainingInboundMinCosine=.5; // 60-degree acquisition cone.
 inline constexpr double trainingMinTrackSpeed=5.0; // m/s
 inline ApproachGuidance approachGuidance(const Flight& f,int selectedRunway=-1){

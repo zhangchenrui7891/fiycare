@@ -1,4 +1,5 @@
 #include "src/approach.h"
+#include "src/run_files.h"
 #include <iostream>
 #include <limits>
 #include <sstream>
@@ -148,7 +149,18 @@ void displayDeflections(){
  std::cout<<"PFD approach deflection signs, distance sensitivity, clamps and invalid inputs passed. Training geometry only.\n";
 }
 int main(){
- try{displayDeflections();legacyDefects();bothAirportsAndEnds();selectionPowerAndPersistence();groundTrackAcquisition();validityAndContinuity();
+ try{
+  auto training=sim::pudongA330Final();
+  const auto guidance=sim::approachGuidance(training);
+  require(training.flight.aircraftId==2&&guidance.valid&&guidance.runwayIndex==0,"A330 on selected PVG final");
+  close(guidance.distance,6000,"Distance to threshold");
+  close(guidance.localizer,0,"Centered localizer");close(guidance.glideslope,0,"Centered glidepath");
+  require(training.flight.gear&&training.flight.flap==1&&!training.parkingBrake&&training.flight.engines.averageRpm>1000,"Landing configuration and engines");
+  for(int i=0;i<500;++i)training.flight.step(.01,{});
+  require(!training.flight.crashed&&!training.flight.grounded()&&training.flight.z>sim::pudongA330Final().flight.z+300,"Five seconds of live flight physics");
+  const runfiles::RunFiles practice("profile",false,false,"",true,true);
+  require(!practice.gameSavesEnabled()&&practice.folder()==std::filesystem::path("profile")/"practice"/"a330-final","Practice is isolated from career files");
+  displayDeflections();legacyDefects();bothAirportsAndEnds();selectionPowerAndPersistence();groundTrackAcquisition();validityAndContinuity();
   std::cout<<"Training approach CPU geometry passed; not Windows, radio ILS, certified procedure or autoland validation.\n";
  }catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 1;}
 }
