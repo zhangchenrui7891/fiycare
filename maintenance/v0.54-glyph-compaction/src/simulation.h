@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cmath>
 #include <string>
+#include <optional>
 namespace sim {
 struct Controls {double pitch=0,roll=0,yaw=0,throttle=0;bool brake=false,parkingBrake=false;};
 struct Flight {
@@ -35,8 +36,9 @@ struct Flight {
  void configure(int id){aircraftId=std::clamp(id,0,aircraftCount-1);y=spec().gearHeight;z=spec().spawnZ;passengers=aircraftId==2?180:aircraftId==3?220:aircraftId==1?50:aircraftId>=4?int(spec().seats*2/3):0;}
  bool grounded()const{return y<=terrain(x,z)+spec().gearHeight+.01;}
  void crash(const char* why){crashed=true;crashReason=why;}
- void step(double dt,const Controls& c){
-  if(crashed||!std::isfinite(dt)||dt<=0)return;
+ // Returns the signed vertical speed at a new wheel contact, before the ground response.
+ std::optional<double> step(double dt,const Controls& c){
+  if(crashed||!std::isfinite(dt)||dt<=0)return std::nullopt;
   dt=std::min(dt,.02);time+=dt;const auto& model=spec();
   throttle=std::clamp(throttle+c.throttle*dt*.5,0.0,1.0);
   const double v=airspeed(),authority=std::clamp(v/(aircraftId>0?60.0:35.0),.12,1.2);
@@ -93,7 +95,7 @@ struct Flight {
     if(v<model.rotationSpeed*.85)bodyForceMoment.moment.x+=pitch*inertia.x*8-omega.x*inertia.x*2;
    }
    if(!surfaceResult.finite()||!rotation.integrate(bodyForceMoment.moment,inertia,dt)){
-    crash("分翼面模型数值超出包线");return;
+    crash("分翼面模型数值超出包线");return std::nullopt;
    }
    totalForce=orientation.rotate(bodyForceMoment.force);
    const auto attitude=rotation.orientation.euler();pitch=attitude.x;roll=attitude.y;yaw=attitude.z;
@@ -109,12 +111,15 @@ struct Flight {
   V3 acceleration=totalForce*(1/mass)+V3{0,-9.81,0};
   if(c.parkingBrake&&grounded()&&speed()<.5){vx=vz=0;acceleration.x=acceleration.z=0;}
   vx+=acceleration.x*dt;vy+=acceleration.y*dt;vz+=acceleration.z*dt;
+  const double oldX=x,oldY=y,oldZ=z;
   x+=vx*dt;y+=vy*dt;z+=vz*dt;
   const double floor=terrain(x,z)+model.gearHeight;
   load=liftForce/(mass*9.81);
   const double flexTarget=std::clamp(load*.09,-.15,.3);
   flexRate+=(35*(flexTarget-wingFlex)-9*flexRate)*dt;wingFlex+=flexRate*dt;
+  std::optional<double> impactVy;
   if(y<=floor){
+   if(oldY>terrain(oldX,oldZ)+model.gearHeight)impactVy=vy;
    if(vy<-5)crash("接地下降率过大");
    else if(!gear&&speed()>3)crash("未放起落架着陆");
    else if(std::abs(roll)>.3&&speed()>5)crash("坡度过大，机翼触地");
@@ -127,6 +132,7 @@ struct Flight {
    const double damp=1-std::exp(-dt*2);
    vx-=side*std::cos(yaw)*damp;vz+=side*std::sin(yaw)*damp;
   }
+  return impactVy;
  }
 };
 }

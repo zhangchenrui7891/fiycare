@@ -125,7 +125,7 @@ void help(HWND window){
   L"存档/照片/日志：%LOCALAPPDATA%\\FlightCareerAir\n"
   L"诊断输出另存：diagnostics\\benchmark 或 diagnostics\\smoke；不保存游戏生涯。\n"
   L"DX12初始化失败会自动尝试DX11；可用--dx11强制兼容模式。",
-  L"飞行生涯 v0.106 · 中文操作说明",MB_OK);
+  L"飞行生涯 v0.107 · 中文操作说明",MB_OK);
 }
 int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
  std::filesystem::path folder;bool quietDiagnosticFailure=false;
@@ -137,7 +137,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   const bool fxaaRequested=!args.has(L"--no-aa");
   const runfiles::RunFiles runFiles(dataFolder(),benchmark,smoke,benchmarkPreset.outputSubfolder,fxaaRequested,approachPractice);
   folder=runFiles.folder();std::filesystem::create_directories(folder);
-  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.106 startup");
+  diagnostics.open(folder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.107 startup");
   if(benchmark){
    std::filesystem::remove(folder/L"performance_summary.txt");
    std::filesystem::remove(folder/L"benchmark_final.bmp");
@@ -179,7 +179,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   const DWORD style=WS_OVERLAPPEDWINDOW;
   WNDCLASSW wc{};wc.lpfnWndProc=windowProc;wc.hInstance=instance;wc.lpszClassName=L"FlightCareerAir";wc.hCursor=LoadCursor(nullptr,IDC_ARROW);if(!RegisterClassW(&wc))throw std::runtime_error("Window registration failed");
   RECT bounds{0,0,low?640:1600,low?360:900};HMENU nativeMenu=createChineseMenu();AdjustWindowRect(&bounds,style,TRUE);
-  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.106 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
+  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.107 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
   if(!window)throw std::runtime_error("Window creation failed");ShowWindow(window,SW_SHOW);
   if(args.has(L"--fullscreen"))toggleFullscreen(window);
   renderScale=launch::initialRenderScale(args);
@@ -477,11 +477,11 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
      flight.payload=career.mission==1?250:(career.mission==2?150:0);flight.condition=career.maintenance;
      sim::Controls controls;controls.pitch=down[VK_DOWN]-down[VK_UP];controls.roll=down[VK_RIGHT]-down[VK_LEFT];controls.yaw=down['D']-down['A'];controls.throttle=down['W']-down['S'];controls.brake=down[VK_SPACE]||state.parkingBrake;controls.parkingBrake=state.parkingBrake;
      for(int stepIndex=0;stepIndex<physicsSteps;++stepIndex){
-      const bool wasGrounded=flight.grounded();const double impactVy=flight.vy,impactRoll=flight.roll,impactYaw=flight.yaw;
+      const bool wasGrounded=flight.grounded();
       const auto autopilotBefore=sim::autopilotModes(state);
       sim::Controls commanded=controls;
       sim::updateAutopilot(state,commanded);
-      flight.step(.01,commanded);
+      const auto impactVy=flight.step(.01,commanded);
       renderHistory.push(flight);
       state.avionics.step(.01,flight);
       if(!state.avionics.powered(flight))state.headingHold=state.altitudeHold=state.navigationHold=false;
@@ -493,10 +493,19 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
        if(aeroSamples%100==0)aeroLog.flush();
       }
       if(wasGrounded&&!flight.grounded()&&career.mission==2&&career.stage==1)career.arrivalLandingScore=-1;
-      if(!wasGrounded&&flight.grounded()){
-       lastLanding=sim::assessLanding(flight,impactVy,impactRoll,impactYaw);
+      if(impactVy){
+       lastLanding=sim::assessLanding(flight,*impactVy,flight.roll,flight.yaw);
        career.recordTouchdown(flight,lastLanding);
-       if(lastLanding.valid)notice=L"着陆评分 "+std::to_wstring(lastLanding.score)+L"分 · "+sim::landingGrade(lastLanding.score)+L"（下降率 "+std::to_wstring(int(std::lround(lastLanding.sinkRate)))+L"m/s）";
+       if(approachPractice){
+        std::ostringstream contact;
+        contact.imbue(std::locale::classic());
+        contact<<std::fixed<<std::setprecision(2)<<"Practice touchdown: vy_mps="<<*impactVy
+               <<" x_m="<<flight.x<<" z_m="<<flight.z<<" scored="<<lastLanding.valid;
+        if(lastLanding.valid)contact<<" score="<<lastLanding.score<<" centerline_m="<<lastLanding.centerlineError;
+        else if(flight.crashed)contact<<" crash="<<flight.crashReason;
+        logLine(contact.str());
+       }
+       if(lastLanding.valid)notice=L"着陆评分 "+std::to_wstring(lastLanding.score)+L"分 · "+sim::landingGrade(lastLanding.score)+L"（垂直速度 "+instruments::verticalSpeed(-lastLanding.sinkRate)+L"m/s）";
       }
       int before=career.completed,beforeCredits=career.credits;career.update(flight,.01);
       if(career.completed>before&&career.mission==2){
@@ -624,7 +633,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
    if(benchmark&&timing::benchmarkFinished(benchmarkStarted,benchmarkSamples)){
     const auto workingSet=timing::readProcessWorkingSet();
     std::ofstream summary(folder/L"performance_summary.txt",std::ios::trunc);
-    const auto result=timing::writeBenchmarkSummary(summary,"v0.106",renderer->name(),fxaaRequested,powerSaver,benchmarkSamples,benchmarkPreset,workingSet);
+    const auto result=timing::writeBenchmarkSummary(summary,"v0.107",renderer->name(),fxaaRequested,powerSaver,benchmarkSamples,benchmarkPreset,workingSet);
     summary.flush();if(!summary)logLine("Benchmark summary write failed; no report file success claimed");
     pendingPhoto=folder/L"benchmark_final.bmp";renderer->draw(mesh,hud,XMMatrixLookToLH(XMVectorZero(),viewDirection,up)*reversedPerspective(activeFov,cockpit::viewportAspect,presentation::worldNear,presentation::worldFar),daylight,pendingPhoto,cabin,cabinView,frameGeometry.indexedScene);pendingPhoto.clear();
     logLine(result.complete?"Benchmark completed with valid full-run statistics":"Benchmark ended without a valid performance verdict; inspect summary status/counts");DestroyWindow(window);

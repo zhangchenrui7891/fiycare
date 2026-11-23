@@ -148,8 +148,48 @@ void displayDeflections(){
  g.valid=true;g.distance=-1;require(!sim::approachDeflection(g).valid,"Negative threshold distance rejected");
  std::cout<<"PFD approach deflection signs, distance sensitivity, clamps and invalid inputs passed. Training geometry only.\n";
 }
+void touchdownRegression(){
+ // Inside the taxi tolerance but still clear of the surface: do not score yet.
+ sim::Flight low;
+ low.configure(2);
+ low.y+=.008;low.vy=-.1;
+ require(low.grounded(),"Fixture must start inside the old grounded tolerance");
+ require(!low.step(.01,{}),"Approaching the floor is not a touchdown");
+ std::optional<double> impact;
+ for(int i=0;i<20&&!impact;++i)impact=low.step(.01,{});
+ require(impact&&*impact<-.1&&low.vy==0,"Report the integrated sink rate before ground clamping");
+ for(int i=0;i<100;++i)require(!low.step(.01,{}),"No duplicate contact while parked");
+
+ sim::Flight hard;
+ hard.configure(2);hard.y+=.008;hard.vy=-6;
+ const auto hardImpact=hard.step(.01,{});
+ require(hardImpact&&hard.crashed&&!sim::assessLanding(hard,*hardImpact,hard.roll,hard.yaw).valid,
+         "Crash and scoring use the same impact");
+
+ auto practice=sim::pudongA330Final();
+ auto& flight=practice.flight;
+ int contacts=0;
+ for(int i=0;i<15000&&!practice.career.completed;++i){
+  sim::Controls input;
+  if(contacts){flight.throttle=0;input.brake=true;}
+  const auto hit=flight.step(.01,input);
+  if(hit){
+   ++contacts;
+   const auto result=sim::assessLanding(flight,*hit,flight.roll,flight.yaw);
+   require(result.valid&&result.sinkRate>0&&result.score>0,"A330 runway contact scored");
+   practice.career.recordTouchdown(flight,result);
+   std::cout<<"A330 model touchdown: t="<<(i+1)*.01<<" s, signed vy="<<*hit
+            <<" m/s, runway z="<<flight.z<<" m, score="<<result.score<<"\n";
+  }
+  practice.career.update(flight,.01);
+ }
+ require(contacts==1&&!flight.crashed&&practice.career.parked(flight)&&practice.career.completed==1
+         &&practice.career.arrivalLandingScore>0,"One contact, arrival score retained at stop");
+}
+
 int main(){
  try{
+  touchdownRegression();
   auto training=sim::pudongA330Final();
   const auto guidance=sim::approachGuidance(training);
   require(training.flight.aircraftId==2&&guidance.valid&&guidance.runwayIndex==0,"A330 on selected PVG final");
