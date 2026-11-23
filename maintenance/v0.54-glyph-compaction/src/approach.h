@@ -26,9 +26,11 @@ inline Snapshot pudongA330Final(){
  flight.y=flight.spec().gearHeight+trainingThresholdClearance+slope*range;
  flight.vz=80;
  flight.vy=-flight.vz*slope;
- flight.pitch=2*pi/180;
- flight.flap=1;
- flight.throttle=.35;
+ // Trim for this game's assisted flight model at the exercise weight.
+ flight.pitch=-.6*pi/180;
+ flight.flap=.5;
+ flight.payload=150;
+ flight.throttle=.09;
  flight.rpm=700+1900*flight.throttle;
  flight.engines.update(flight.aircraftId,0,flight.engine,flight.throttle,flight.fuel,flight.condition,flight.rpm);
  state.career.mission=2;

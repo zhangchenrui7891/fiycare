@@ -155,9 +155,17 @@ int main(){
   require(training.flight.aircraftId==2&&guidance.valid&&guidance.runwayIndex==0,"A330 on selected PVG final");
   close(guidance.distance,6000,"Distance to threshold");
   close(guidance.localizer,0,"Centered localizer");close(guidance.glideslope,0,"Centered glidepath");
-  require(training.flight.gear&&training.flight.flap==1&&!training.parkingBrake&&training.flight.engines.averageRpm>1000,"Landing configuration and engines");
-  for(int i=0;i<500;++i)training.flight.step(.01,{});
-  require(!training.flight.crashed&&!training.flight.grounded()&&training.flight.z>sim::pudongA330Final().flight.z+300,"Five seconds of live flight physics");
+  require(training.flight.gear&&training.flight.flap==.5&&!training.parkingBrake&&training.flight.engines.totalThrust>0,"Landing configuration and engines");
+  double maxPathError=0;
+  for(int i=0;i<6000;++i){
+   training.flight.step(.01,{});
+   const auto current=sim::approachGuidance(training);
+   require(current.valid&&!training.flight.stallWarning,"Practice guidance and stall margin during descent");
+   maxPathError=std::max(maxPathError,std::abs(current.glideslope));
+  }
+  require(maxPathError<8,"Neutral controls stay near the training glidepath for sixty seconds");
+  std::cout<<"A330 virtual 60s: maximum vertical path error "<<maxPathError<<" m; threshold distance "<<sim::approachGuidance(training).distance<<" m. CPU only.\n";
+  require(!training.flight.crashed&&!training.flight.grounded()&&training.flight.z>sim::pudongA330Final().flight.z+4500,"Sixty seconds of live flight physics");
   const runfiles::RunFiles practice("profile",false,false,"",true,true);
   require(!practice.gameSavesEnabled()&&practice.folder()==std::filesystem::path("profile")/"practice"/"a330-final","Practice is isolated from career files");
   displayDeflections();legacyDefects();bothAirportsAndEnds();selectionPowerAndPersistence();groundTrackAcquisition();validityAndContinuity();

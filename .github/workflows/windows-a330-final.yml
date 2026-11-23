@@ -25,6 +25,8 @@ jobs:
             $w.Write([uint32]64)
             $w.Write([byte[]](1..16384 | ForEach-Object { 160 }))
           } finally { $w.Dispose() }
+          python -c "import struct,pathlib; pts=[(-1,0,0),(1,0,0),(0,0,2)]; pathlib.Path('assets/a330.fcmesh').write_bytes(b'FCMESH07'+struct.pack('<III',3,12,1)+b''.join(struct.pack('<12f',*p,1,1,1,0,0,0,0,1,0) for p in pts)+bytes(1))"
+          if ($LASTEXITCODE -ne 0) { throw 'Failed to generate A330 fixture mesh' }
           Set-Content out/build/release/CMakeCache.txt 'FCAIR_WITH_ASSIMP:BOOL=ON'
       - name: Run user-facing build entry twice
         shell: cmd
@@ -47,7 +49,7 @@ jobs:
           $env:LOCALAPPDATA = "$env:RUNNER_TEMP/fca106-profile"
           $p = Start-Process "$dir/FlightCareerAir.exe" -WorkingDirectory $dir -ArgumentList '--dx11 --low --practice-a330-final --warp --smoke-test --diagnostic-no-dialog' -PassThru
           if (!$p.WaitForExit(60000)) { $p.Kill(); throw 'Startup timeout' }
-          if ($p.ExitCode -ne 0) { throw "Startup failed ($($p.ExitCode))" }
+          if ($p.ExitCode -ne 0) { Get-Content "$env:LOCALAPPDATA/FlightCareerAir/diagnostics/smoke/startup.log"; throw "Startup failed ($($p.ExitCode))" }
           $folder = "$env:LOCALAPPDATA/FlightCareerAir/diagnostics/smoke"
           $log = Get-Content "$folder/startup.log" -Raw
           if ($log -notmatch 'Selected DX11 software' -or $log -notmatch 'three rendered frames and BMP capture succeeded' -or $log -notmatch 'Normal shutdown') { throw 'Incomplete render' }
