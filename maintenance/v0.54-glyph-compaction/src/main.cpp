@@ -595,10 +595,10 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
       const auto air=sim::airData(flight,state.avionics.qnh);
       const auto primary=instruments::primary(air.ias,air.altitude,air.verticalSpeed,flight.yaw);
       const auto agl=instruments::aboveGround(flight.y,sim::terrain(flight.x,flight.z));
-      screenQuad(hud,12,116,332,agl.empty()?54.f:77.f,{.018f,.028f,.038f});
-      chineseFont().draw(hud,primary.speedAltitude,20,121,{.91f,.97f,1},316);
-      chineseFont().draw(hud,primary.headingVertical,20,144,{.91f,.97f,1},316);
-      if(!agl.empty())chineseFont().draw(hud,L"AGL "+agl+L" m",20,167,{.55f,1,.72f},316);
+      screenQuad(hud,12,111,agl.empty()?332.f:484.f,44,{.018f,.028f,.038f});
+      chineseFont().draw(hud,primary.speedAltitude,20,112,{.91f,.97f,1},316);
+      chineseFont().draw(hud,primary.headingVertical,20,134,{.91f,.97f,1},316);
+      if(!agl.empty())chineseFont().draw(hud,L"AGL "+agl+L" m",344,112,{.55f,1,.72f},144);
      }
     }
     else if(!walking){

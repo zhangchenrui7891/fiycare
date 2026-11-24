@@ -55,7 +55,7 @@ int main(){
  flight.y=elevation+750.1;frame();require(!has(L"AGL")&&has(L"IAS"),"High altitude keeps two rows");
  flight.y=elevation-1;frame();require(has(L"AGL --- m"),"Invalid height does not indicate touchdown");
  flight.y=elevation+2;frame();require(has(L"AGL 2 m"),"Ground reference point keeps gear offset");
- for(const auto& l:labels)if(l.text==L"AGL 2 m")require(l.x==20&&l.y==167,"Dedicated third row");
+ for(const auto& l:labels)if(l.text==L"AGL 2 m")require(l.x==344&&l.y==112,"Dedicated AGL column");
  camera=0;frame();require(!has(L"AGL"),"No AGL overlay in chase view");camera=1;
  menuPage=ui::Page::Pause;frame();require(!has(L"AGL"),"No AGL over menu");menuPage=ui::Page::None;
  flight.crashed=true;frame();require(!has(L"AGL"),"No AGL after crash");flight.crashed=false;
