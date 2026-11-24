@@ -112,7 +112,7 @@ void help(HWND window){
   L"驾驶舱：鼠标点击开关，拖动右侧油门杆；V停留刹车。\n"
   L"切回窗口、关闭对话框或调整窗口后，原来按住的键需松开再按。\n"
   L"单次动作保留两帧间短按；同一键一帧内多次短按合并一次。\n"
-  L"驾驶舱 F4：切换大字空速、高度、航向和升降率。\n"
+  L"驾驶舱 F4：切换大字飞行仪表，低空加显离地高度 AGL。\n"
   L"F2工程面板；F3力矢量；F6/F7左右发失效；F8复位；F9切分翼面模式；Backspace确认警告。\n"
   L"Q电池；M发电机；Y航电。Home/End气压；PageUp/Down配平；U开关8m/s横风。\n"
   L"J：仪表亮度循环；O：座舱泛光灯，也可点击仪表台左右旋钮。\n"
@@ -125,7 +125,7 @@ void help(HWND window){
   L"存档/照片/日志：%LOCALAPPDATA%\\FlightCareerAir\n"
   L"诊断输出另存：diagnostics\\benchmark 或 diagnostics\\smoke；不保存游戏生涯。\n"
   L"DX12初始化失败会自动尝试DX11；可用--dx11强制兼容模式。",
-  L"飞行生涯 v0.109 · 中文操作说明",MB_OK);
+  L"飞行生涯 v0.110 · 中文操作说明",MB_OK);
 }
 int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
  std::filesystem::path folder,logFolder;bool quietDiagnosticFailure=false;
@@ -139,7 +139,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   folder=runFiles.folder();std::filesystem::create_directories(folder);
   logFolder=folder;
   if(approachPractice&&!smoke)logFolder=runfiles::createPracticeSession(folder,std::time(nullptr));
-  diagnostics.open(logFolder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.109 startup");
+  diagnostics.open(logFolder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.110 startup");
   if(benchmark){
    std::filesystem::remove(folder/L"performance_summary.txt");
    std::filesystem::remove(folder/L"benchmark_final.bmp");
@@ -181,7 +181,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   const DWORD style=WS_OVERLAPPEDWINDOW;
   WNDCLASSW wc{};wc.lpfnWndProc=windowProc;wc.hInstance=instance;wc.lpszClassName=L"FlightCareerAir";wc.hCursor=LoadCursor(nullptr,IDC_ARROW);if(!RegisterClassW(&wc))throw std::runtime_error("Window registration failed");
   RECT bounds{0,0,low?640:1600,low?360:900};HMENU nativeMenu=createChineseMenu();AdjustWindowRect(&bounds,style,TRUE);
-  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.109 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
+  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.110 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
   if(!window)throw std::runtime_error("Window creation failed");ShowWindow(window,SW_SHOW);
   if(args.has(L"--fullscreen"))toggleFullscreen(window);
   renderScale=launch::initialRenderScale(args);
@@ -205,7 +205,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   auto saveTracks=[&](){if(!runFiles.gameSavesEnabled())return;auto temp=folder/L"tracks.tmp",dest=folder/L"tracks.txt";{std::ofstream out(temp);for(auto m:marks)out<<m.x<<' '<<m.z<<'\n';out.flush();if(!out)throw std::runtime_error("Track save write failed");out.close();if(!out)throw std::runtime_error("Track save close failed");}if(!MoveFileExW(temp.c_str(),dest.c_str(),MOVEFILE_REPLACE_EXISTING|MOVEFILE_WRITE_THROUGH))throw std::runtime_error("Track save commit failed");};
   if(benchmark&&benchmarkPreset.camera==0&&aircraftModels.find(benchmarkPreset.aircraftId)==aircraftModels.end())
    throw std::runtime_error("777 chase benchmark requires a loadable assets/b777.fcmesh");
-  bool largeCockpitReadout=false;
+  bool largeCockpitReadout=approachPractice;
   int camera=smoke?0:1;
   if(benchmark)camera=benchmarkPreset.camera;
   else if(approachPractice||(smoke&&args.has(L"--cockpit")))camera=1;
@@ -594,9 +594,11 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
      if(largeCockpitReadout&&!flight.crashed&&state.avionics.powered(flight)){
       const auto air=sim::airData(flight,state.avionics.qnh);
       const auto primary=instruments::primary(air.ias,air.altitude,air.verticalSpeed,flight.yaw);
-      screenQuad(hud,12,116,332,54,{.018f,.028f,.038f});
+      const auto agl=instruments::aboveGround(flight.y,sim::terrain(flight.x,flight.z));
+      screenQuad(hud,12,116,332,agl.empty()?54.f:77.f,{.018f,.028f,.038f});
       chineseFont().draw(hud,primary.speedAltitude,20,121,{.91f,.97f,1},316);
       chineseFont().draw(hud,primary.headingVertical,20,144,{.91f,.97f,1},316);
+      if(!agl.empty())chineseFont().draw(hud,L"AGL "+agl+L" m",20,167,{.55f,1,.72f},316);
      }
     }
     else if(!walking){
@@ -644,7 +646,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
    if(benchmark&&timing::benchmarkFinished(benchmarkStarted,benchmarkSamples)){
     const auto workingSet=timing::readProcessWorkingSet();
     std::ofstream summary(folder/L"performance_summary.txt",std::ios::trunc);
-    const auto result=timing::writeBenchmarkSummary(summary,"v0.109",renderer->name(),fxaaRequested,powerSaver,benchmarkSamples,benchmarkPreset,workingSet);
+    const auto result=timing::writeBenchmarkSummary(summary,"v0.110",renderer->name(),fxaaRequested,powerSaver,benchmarkSamples,benchmarkPreset,workingSet);
     summary.flush();if(!summary)logLine("Benchmark summary write failed; no report file success claimed");
     pendingPhoto=folder/L"benchmark_final.bmp";renderer->draw(mesh,hud,XMMatrixLookToLH(XMVectorZero(),viewDirection,up)*reversedPerspective(activeFov,cockpit::viewportAspect,presentation::worldNear,presentation::worldFar),daylight,pendingPhoto,cabin,cabinView,frameGeometry.indexedScene);pendingPhoto.clear();
     logLine(result.complete?"Benchmark completed with valid full-run statistics":"Benchmark ended without a valid performance verdict; inspect summary status/counts");DestroyWindow(window);

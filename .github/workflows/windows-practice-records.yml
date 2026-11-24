@@ -1,7 +1,7 @@
 name: A330 practice session recordings
 on:
   push:
-    branches: ['codex/v0.108-practice-records', 'codex/v0.109-frame-summary']
+    branches: ['codex/v0.108-practice-records', 'codex/v0.109-frame-summary', 'codex/v0.110-approach-agl']
     paths-ignore: ['**/*.md']
   workflow_dispatch:
 permissions:

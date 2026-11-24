@@ -46,7 +46,21 @@ bool has(const std::wstring& token){for(const auto& l:labels)if(l.text.find(toke
 int main(){
  frame();require(labels.size()==2&&!has(L"IAS"),"Normal cockpit shows only help and attribution");
  largeCockpitReadout=true;frame();require(has(L"IAS")&&has(L"VS "),"Large cockpit readout");
- state.avionics.master=false;frame();require(!has(L"IAS")&&has(L"航电断电"),"Power loss blanks large readout");
+ const double elevation=sim::terrain(flight.x,flight.z);
+ const double initialY=flight.y;
+ flight.y=elevation+334.;frame();require(has(L"AGL 334 m"),"Final approach geometric height");
+ state.avionics.qnh+=10;frame();require(has(L"AGL 334 m"),"AGL is independent of pressure");
+ state.avionics.qnh-=10;
+ flight.y=elevation+750;frame();require(has(L"AGL 750 m"),"Ceiling inclusive");
+ flight.y=elevation+750.1;frame();require(!has(L"AGL")&&has(L"IAS"),"High altitude keeps two rows");
+ flight.y=elevation-1;frame();require(has(L"AGL --- m"),"Invalid height does not indicate touchdown");
+ flight.y=elevation+2;frame();require(has(L"AGL 2 m"),"Ground reference point keeps gear offset");
+ for(const auto& l:labels)if(l.text==L"AGL 2 m")require(l.x==20&&l.y==167,"Dedicated third row");
+ camera=0;frame();require(!has(L"AGL"),"No AGL overlay in chase view");camera=1;
+ menuPage=ui::Page::Pause;frame();require(!has(L"AGL"),"No AGL over menu");menuPage=ui::Page::None;
+ flight.crashed=true;frame();require(!has(L"AGL"),"No AGL after crash");flight.crashed=false;
+ flight.y=initialY;
+ state.avionics.master=false;frame();require(!has(L"AGL")&&!has(L"IAS")&&has(L"航电断电"),"Power loss blanks large readout");
  state.avionics.master=true;walking=true;frame();require(!has(L"IAS"),"Walking hides readout");
  walking=false;largeCockpitReadout=false;
  camera=0;frame();require(has(L"IAS")&&has(L"ALT")&&labels.size()==3,"External view has one compact flight row");
