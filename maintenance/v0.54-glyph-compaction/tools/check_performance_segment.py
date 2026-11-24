@@ -7,7 +7,7 @@ sampling=main[main.index('   if(measured&&previousMeasured)'):main.index('   if(
 boundary='\n'.join(line.strip() for line in main.splitlines() if any(key in line for key in (
     'const auto frameExtent=', 'const timing::FrameContext frameContext{', 'if(frameContextGate.changed(frameContext))')))
 if boundary:
-    assert main.index('switch(cmd)') < main.index('const timing::FrameContext frameContext{') < main.index('const auto frameStats=') < main.index('if(reportTime>=5&&perf)')
+    assert main.index('switch(cmd)') < main.index('const timing::FrameContext frameContext{') < main.index('const auto frameStats=') < main.index('if(reportDue)')
 code=r'''
 #include "performance.h"
 #include "launch_options.h"
