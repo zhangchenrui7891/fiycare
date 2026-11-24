@@ -1,0 +1,101 @@
+name: A330 practice session recordings
+on:
+  push:
+    branches: ['codex/v0.108-practice-records']
+    paths-ignore: ['**/*.md']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-2022
+    defaults:
+      run:
+        working-directory: maintenance/v0.54-glyph-compaction
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up a synthetic atlas and a full-build cache sentinel
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force assets,out/build/release | Out-Null
+          $w = [IO.BinaryWriter]::new([IO.File]::Create("$pwd/assets/atlas.fctex"))
+          try {
+            $w.Write([Text.Encoding]::ASCII.GetBytes('FCTEX005'))
+            $w.Write([uint32]64)
+            $w.Write([uint32]64)
+            $w.Write([byte[]](1..16384 | ForEach-Object { 160 }))
+          } finally { $w.Dispose() }
+          python -c "import struct,pathlib; pts=[(-1,0,0),(1,0,0),(0,0,2)]; pathlib.Path('assets/a330.fcmesh').write_bytes(b'FCMESH07'+struct.pack('<III',3,12,1)+b''.join(struct.pack('<12f',*p,1,1,1,0,0,0,0,1,0) for p in pts)+bytes(1))"
+          if ($LASTEXITCODE -ne 0) { throw 'Failed to generate A330 fixture mesh' }
+          Set-Content out/build/release/CMakeCache.txt 'FCAIR_WITH_ASSIMP:BOOL=ON'
+      - name: Run user-facing build entry twice
+        shell: cmd
+        run: |
+          call start_cockpit.bat --build-only || exit /b 1
+          call start_cockpit.bat --build-only || exit /b 1
+      - name: Run contact and rollout regression with MSVC
+        shell: pwsh
+        run: |
+          cmake -S . -B out/contact-tests -G "Visual Studio 17 2022" -A x64 -DFCAIR_WITH_ASSIMP=OFF
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          cmake --build out/contact-tests --config Release --target approach_check
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          & ./out/contact-tests/Release/approach_check.exe
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          & ./out/contact-tests/Release/approach_check.exe --session-test "$env:RUNNER_TEMP/session collision"
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+      - name: Verify isolation and launch the staged cockpit
+        shell: pwsh
+        run: |
+          $cache = Get-Content out/build/cockpit/CMakeCache.txt -Raw
+          if ($cache -notmatch 'FCAIR_WITH_ASSIMP:BOOL=OFF') { throw 'Incorrect cockpit cache' }
+          if ((Get-Content out/build/release/CMakeCache.txt -Raw).Trim() -cne 'FCAIR_WITH_ASSIMP:BOOL=ON') { throw 'Full-build cache changed' }
+          $dir = (Resolve-Path out/build/cockpit).Path
+          if ((Get-FileHash assets/atlas.fctex).Hash -ne (Get-FileHash "$dir/assets/atlas.fctex").Hash) { throw 'Staged atlas mismatch' }
+          $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
+          $vs = & $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          $dump = Get-ChildItem "$vs/VC/Tools/MSVC/*/bin/Hostx64/x64/dumpbin.exe" | Sort-Object FullName -Descending | Select-Object -First 1
+          $deps = & $dump.FullName /dependents "$dir/FlightCareerAir.exe"
+          if ($LASTEXITCODE -ne 0 -or ($deps -join ' ') -match '(?i)MSVCP[0-9]|VCRUNTIME[0-9]|ucrtbase.dll|api-ms-win-crt') { throw 'Dynamic runtime dependency' }
+          $env:LOCALAPPDATA = "$env:RUNNER_TEMP/fca106-profile"
+          $p = Start-Process "$dir/FlightCareerAir.exe" -WorkingDirectory $dir -ArgumentList '--dx11 --low --practice-a330-final --warp --smoke-test --diagnostic-no-dialog' -PassThru
+          if (!$p.WaitForExit(60000)) { $p.Kill(); throw 'Startup timeout' }
+          if ($p.ExitCode -ne 0) { Get-Content "$env:LOCALAPPDATA/FlightCareerAir/diagnostics/smoke/startup.log"; throw "Startup failed ($($p.ExitCode))" }
+          $folder = "$env:LOCALAPPDATA/FlightCareerAir/diagnostics/smoke"
+          $log = Get-Content "$folder/startup.log" -Raw
+          if ($log -notmatch 'Selected DX11 software' -or $log -notmatch 'three rendered frames and BMP capture succeeded' -or $log -notmatch 'Normal shutdown') { throw 'Incomplete render' }
+          if ($log -notmatch 'A330 final practice: PVG runway 0, range 6000 m, cockpit') { throw 'Practice scene not selected' }
+          $shots = @(Get-ChildItem $folder -Filter 'smoke_DX11_2_noon_*_cockpit_fxaa.bmp')
+          if ($shots.Count -ne 1) { throw 'Expected A330 cockpit capture' }
+          Copy-Item "$folder/*" "$dir/" -Recurse -Force
+      - name: Verify ordinary practice launches keep separate logs
+        shell: pwsh
+        run: |
+          $env:LOCALAPPDATA = "$env:RUNNER_TEMP/fca108-practice"
+          $dir = (Resolve-Path out/build/cockpit).Path
+          $base = "$env:LOCALAPPDATA/FlightCareerAir/practice/a330-final"
+          New-Item -ItemType Directory -Force $base | Out-Null
+          Set-Content "$base/startup.log" 'previous release sentinel'
+          $procs = @()
+          try {
+            foreach ($i in 1..2) {
+              $procs += Start-Process "$dir/FlightCareerAir.exe" -WorkingDirectory $dir -ArgumentList '--dx11 --low --practice-a330-final' -PassThru
+            }
+            $deadline = [DateTime]::UtcNow.AddSeconds(30)
+            do {
+              Start-Sleep -Milliseconds 200
+              $logs = @(Get-ChildItem "$base/sessions/*/startup.log" -ErrorAction SilentlyContinue | Where-Object { Select-String -Quiet -Path $_.FullName -Pattern 'A330 final practice: PVG runway 0' })
+            } until ($logs.Count -eq 2 -or [DateTime]::UtcNow -gt $deadline)
+            if ($logs.Count -ne 2) { throw 'Two normal launches did not produce independent practice logs' }
+            if ((Get-Content "$base/startup.log") -ne 'previous release sentinel') { throw 'Legacy log overwritten' }
+            Write-Host 'Two normal EXE processes reached practice initialization in separate folders. No hardware verdict.'
+          } finally {
+            foreach ($proc in $procs) { if (!$proc.HasExited) { $proc.Kill(); $proc.WaitForExit() } }
+          }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cockpit-windows-check
+          path: |
+            maintenance/v0.54-glyph-compaction/out/build/cockpit/FlightCareerAir.exe
+            maintenance/v0.54-glyph-compaction/out/build/cockpit/startup.log
+            maintenance/v0.54-glyph-compaction/out/build/cockpit/*.bmp

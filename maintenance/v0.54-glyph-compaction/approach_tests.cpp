@@ -1,6 +1,7 @@
 #include "src/approach.h"
 #include "src/run_files.h"
 #include <iostream>
+#include <fstream>
 #include <limits>
 #include <sstream>
 #include <stdexcept>
@@ -187,8 +188,25 @@ void touchdownRegression(){
          &&practice.career.arrivalLandingScore>0,"One contact, arrival score retained at stop");
 }
 
-int main(){
+void sessionCollision(const std::filesystem::path& root){
+ constexpr std::time_t midnight=1704067200;
+ const auto first=runfiles::createPracticeSession(root,midnight);
+ std::ofstream(first/"startup.log")<<"first";
+ const auto second=runfiles::createPracticeSession(root,midnight);
+ const auto third=runfiles::createPracticeSession(root,midnight);
+ std::string retained;
+ std::ifstream(first/"startup.log")>>retained;
+ require(first.filename()=="2024-01-01_00-00-00Z"&&second.filename()=="2024-01-01_00-00-00Z-1"
+         &&third.filename()=="2024-01-01_00-00-00Z-2"&&retained=="first",
+         "Colliding session times must keep the prior recording");
+}
+int main(int argc,char** argv){
  try{
+  if(argc==3&&std::string(argv[1])=="--session-test"){
+   sessionCollision(argv[2]);
+   std::cout<<"Three sessions at the same UTC second retained independent output.\n";
+   return 0;
+  }
   touchdownRegression();
   auto training=sim::pudongA330Final();
   const auto guidance=sim::approachGuidance(training);
