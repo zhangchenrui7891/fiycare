@@ -18,6 +18,20 @@ try {
         if (!$s.Contains($expected)) {throw "Missing $expected in $s"}
     }
     if($s -match '999|888'){throw 'Incorrect context'}
+    Write-Output $s
+    $original=$env:LOCALAPPDATA
+    try {
+        $env:LOCALAPPDATA=$folder
+        $session=Join-Path $folder 'FlightCareerAir\practice\a330-final\sessions\session with spaces'
+        New-Item $session -ItemType Directory -Force | Out-Null
+        Copy-Item (Join-Path $folder 'startup.log'),(Join-Path $folder 'performance.csv') $session
+        Push-Location (Split-Path $PSScriptRoot)
+        try {
+            $actual=cmd.exe /d /c 'chcp 65001 >nul && call report_a330_final.bat <nul'
+            if ($LASTEXITCODE -ne 0 -or ($actual -join "`n") -notmatch 'P95 51 ms') {throw 'Double-click entry failed'}
+        } finally {Pop-Location}
+    } finally {$env:LOCALAPPDATA=$original}
+
     Remove-Item (Join-Path $folder 'performance.csv')
     $s=(& $report $folder) -join "`n"
     if ($s -match ' FPS' -or !$s.Contains('62 分')) {throw 'Missing CSV handling'}
