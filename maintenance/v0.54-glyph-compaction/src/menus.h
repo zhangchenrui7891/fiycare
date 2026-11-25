@@ -2,6 +2,8 @@
 #include "chinese_text.h"
 #include "ui_state.h"
 #include <deque>
+#include <optional>
+#include <tuple>
 struct MenuButton{int command;float x,y,w,h;std::wstring label;};
 inline std::deque<int> menuCommands;
 inline std::vector<MenuButton> clickableButtons;
@@ -24,14 +26,28 @@ inline HMENU createChineseMenu(){
  AppendMenuW(settings,MF_STRING,ui::LightingPage,L"亮度与光影...");
  AppendMenuW(root,MF_POPUP,(UINT_PTR)game,L"游戏");AppendMenuW(root,MF_POPUP,(UINT_PTR)aircraft,L"飞机与乘客");AppendMenuW(root,MF_POPUP,(UINT_PTR)mission,L"任务");AppendMenuW(root,MF_POPUP,(UINT_PTR)settings,L"设置");AppendMenuW(root,MF_STRING,ui::Help,L"中文说明");return root;
 }
-inline void updateChineseMenu(HMENU menu,const sim::Flight& f,bool powerSaver){
- for(int command:{ui::A319,ui::A321,ui::B7879,ui::B777})CheckMenuItem(menu,command,MF_BYCOMMAND|(f.aircraftId==ui::aircraftIdForCommand(command)?MF_CHECKED:MF_UNCHECKED));
- CheckMenuItem(menu,ui::Trainer,MF_BYCOMMAND|(f.aircraftId==0?MF_CHECKED:MF_UNCHECKED));CheckMenuItem(menu,ui::Airliner,MF_BYCOMMAND|(f.aircraftId==1?MF_CHECKED:MF_UNCHECKED));
- CheckMenuItem(menu,ui::A330,MF_BYCOMMAND|(f.aircraftId==2?MF_CHECKED:MF_UNCHECKED));CheckMenuItem(menu,ui::A350,MF_BYCOMMAND|(f.aircraftId==3?MF_CHECKED:MF_UNCHECKED));
- CheckMenuItem(menu,ui::A320,MF_BYCOMMAND|(f.aircraftId==4?MF_CHECKED:MF_UNCHECKED));CheckMenuItem(menu,ui::B737,MF_BYCOMMAND|(f.aircraftId==5?MF_CHECKED:MF_UNCHECKED));CheckMenuItem(menu,ui::B787,MF_BYCOMMAND|(f.aircraftId==6?MF_CHECKED:MF_UNCHECKED));
- CheckMenuItem(menu,ui::TerrainSatellite,MF_BYCOMMAND|(sim::worldMode.load()==1?MF_CHECKED:MF_UNCHECKED));CheckMenuItem(menu,ui::TerrainMountains,MF_BYCOMMAND|(sim::worldMode.load()==0?MF_CHECKED:MF_UNCHECKED));
- CheckMenuItem(menu,ui::PowerSaver,MF_BYCOMMAND|(powerSaver?MF_CHECKED:MF_UNCHECKED));CheckMenuItem(menu,ui::Assist,MF_BYCOMMAND|(f.assist?MF_CHECKED:MF_UNCHECKED));
-}
+// Each native menu owns its last successfully applied checkmark state.
+struct NativeMenuChecks {
+ std::optional<std::tuple<int,int,bool,bool>> applied;
+ void update(HMENU menu,const sim::Flight& flight,bool powerSaver){
+  const int terrain=sim::worldMode.load();
+  const auto current=std::make_tuple(flight.aircraftId,terrain,powerSaver,flight.assist);
+  if(applied==current)return;
+  bool complete=true;
+  auto check=[&](int command,bool selected){
+   if(CheckMenuItem(menu,command,MF_BYCOMMAND|(selected?MF_CHECKED:MF_UNCHECKED))==UINT(-1))complete=false;
+  };
+  for(int command:{ui::Trainer,ui::Airliner,ui::A330,ui::A350,ui::A320,ui::B737,
+                   ui::B787,ui::A319,ui::A321,ui::B7879,ui::B777})
+   check(command,flight.aircraftId==ui::aircraftIdForCommand(command));
+  check(ui::TerrainSatellite,terrain==1);
+  check(ui::TerrainMountains,terrain==0);
+  check(ui::PowerSaver,powerSaver);
+  check(ui::Assist,flight.assist);
+  if(complete)applied=current;
+  else applied.reset();
+ }
+};
 inline void drawMenu(std::vector<Vertex>& out,ui::Page page,const sim::Snapshot& state,bool powerSaver,const std::wstring& notice){
  clickableButtons.clear();if(page==ui::Page::None)return;
  screenQuad(out,180,100,600,415,{.025f,.045f,.07f});screenQuad(out,180,100,600,3,{.2f,.7f,.85f});
@@ -45,7 +61,7 @@ inline void drawMenu(std::vector<Vertex>& out,ui::Page page,const sim::Snapshot&
   screenQuad(out,180,100,600,3,{.34f,.83f,.72f});
   font.draw(out,L"FLIGHTCAREER AIR",210,116,{.45f,.86f,.78f},330);
   font.draw(out,paused?L"飞行暂停":L"飞行简报",210,140,{.95f,.98f,1.f},330);
-  font.draw(out,L"v0.110",702,120,{.64f,.75f,.83f},52);
+  font.draw(out,L"v0.112",702,120,{.64f,.75f,.83f},52);
 
   screenQuad(out,508,191,242,235,{.049f,.082f,.11f});
   screenQuad(out,508,191,2,235,{.18f,.48f,.50f});

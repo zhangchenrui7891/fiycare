@@ -1,7 +1,7 @@
 name: A330 practice session recordings
 on:
   push:
-    branches: ['codex/v0.108-practice-records', 'codex/v0.109-frame-summary', 'codex/v0.110-approach-agl', 'codex/v0.111-practice-report']
+    branches: ['codex/v0.108-practice-records', 'codex/v0.109-frame-summary', 'codex/v0.110-approach-agl', 'codex/v0.111-practice-report', 'codex/v0.112-menu-checks']
     paths-ignore: ['**/*.md']
   workflow_dispatch:
 permissions:
@@ -36,6 +36,12 @@ jobs:
         run: |
           call start_cockpit.bat --build-only || exit /b 1
           call start_cockpit.bat --build-only || exit /b 1
+      - name: Verify actual Win32 menu checkmarks
+        shell: cmd
+        run: |
+          for /f "usebackq tokens=*" %%v in (`"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath`) do set "VSROOT=%%v"
+          call "%VSROOT%\Common7\Tools\VsDevCmd.bat" -arch=x64 || exit /b 1
+          python tools/check_win32_menu.py || exit /b 1
       - name: Run contact and rollout regression with MSVC
         shell: pwsh
         run: |
