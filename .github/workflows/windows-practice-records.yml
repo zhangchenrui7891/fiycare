@@ -1,7 +1,7 @@
 name: A330 practice session recordings
 on:
   push:
-    branches: ['codex/v0.108-practice-records', 'codex/v0.109-frame-summary', 'codex/v0.110-approach-agl']
+    branches: ['codex/v0.108-practice-records', 'codex/v0.109-frame-summary', 'codex/v0.110-approach-agl', 'codex/v0.111-practice-report']
     paths-ignore: ['**/*.md']
   workflow_dispatch:
 permissions:
@@ -28,6 +28,9 @@ jobs:
           python -c "import struct,pathlib; pts=[(-1,0,0),(1,0,0),(0,0,2)]; pathlib.Path('assets/a330.fcmesh').write_bytes(b'FCMESH07'+struct.pack('<III',3,12,1)+b''.join(struct.pack('<12f',*p,1,1,1,0,0,0,0,1,0) for p in pts)+bytes(1))"
           if ($LASTEXITCODE -ne 0) { throw 'Failed to generate A330 fixture mesh' }
           Set-Content out/build/release/CMakeCache.txt 'FCAIR_WITH_ASSIMP:BOOL=ON'
+      - name: Run practice report regression in Windows PowerShell 5.1
+        shell: powershell
+        run: ./tools/test_practice_report.ps1
       - name: Run user-facing build entry twice
         shell: cmd
         run: |
