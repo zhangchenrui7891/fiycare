@@ -15,7 +15,7 @@ if 'hudText(hud,display.str())' in main or '跑道：中心X=0' in main:
 if 'int camera=smoke?0:1;' not in main:
     raise RuntimeError('First launch must select the glass cockpit')
 code = r'''
-#include "storage.h"
+#include "approach.h"
 #include "flight_instruments.h"
 #include "flight_alerts.h"
 #include <vector>
@@ -46,6 +46,17 @@ bool has(const std::wstring& token){for(const auto& l:labels)if(l.text.find(toke
 int main(){
  frame();require(labels.size()==2&&!has(L"IAS"),"Normal cockpit shows only help and attribution");
  largeCockpitReadout=true;frame();require(has(L"IAS")&&has(L"VS "),"Large cockpit readout");
+ const auto savedState=state;
+ state=sim::pudongA330Final();frame();require(has(L"入口 6000 m")&&!has(L"余长"),"Inbound threshold distance");
+ flight.z=-1700;frame();require(!has(L"入口")&&!has(L"余长"),"Airborne beyond threshold");
+ flight.y=flight.spec().gearHeight;frame();require(has(L"余长 3500 m")&&!has(L"入口"),"Forward rollout");
+ flight.vz=-30;frame();require(has(L"余长 100 m"),"Reverse rollout");
+ flight.vx=40;flight.vz=5;frame();require(!has(L"余长"),"Crossing runway");
+ flight.vx=0;flight.vz=0;frame();require(!has(L"余长"),"Stopped");
+ flight.vz=30;flight.x=36;frame();require(!has(L"余长"),"Outside runway");
+ flight.x=3500;flight.z=3200;frame();require(has(L"余长 0 m"),"Second runway exact end");
+ state.avionics.master=false;frame();require(!has(L"余长"),"Unpowered");
+ state=savedState;
  const double elevation=sim::terrain(flight.x,flight.z);
  const double initialY=flight.y;
  flight.y=elevation+334.;frame();require(has(L"AGL 334 m"),"Final approach geometric height");

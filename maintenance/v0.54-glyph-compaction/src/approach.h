@@ -78,6 +78,17 @@ inline ApproachGuidance approachGuidance(const Snapshot& state){
  if(arriving&&(state.career.arrivalRunway<0||state.career.arrivalRunway>=int(std::size(runways))))return {};
  return approachGuidance(state.flight,arriving?state.career.arrivalRunway:-1);
 }
+// Along-runway distance to the end in the direction of ground travel.
+inline std::optional<double> remainingRunway(const Flight& f){
+ if(f.crashed||!f.grounded()||!std::isfinite(f.vx)||!std::isfinite(f.vz))return {};
+ const double speed=std::hypot(f.vx,f.vz);
+ if(speed<trainingMinTrackSpeed||std::abs(f.vz)<speed*trainingInboundMinCosine)return {};
+ for(const auto& runway:runways){
+  if(std::abs(f.x-runway.x)<=runway.halfWidth&&std::abs(f.z-runway.z)<=runway.halfLength)
+   return runway.halfLength-(f.vz>0?1.0:-1.0)*(f.z-runway.z);
+ }
+ return {};
+}
 struct ApproachDeflection {double lateral=0,vertical=0;bool valid=false;};
 // Bounded game-display sensitivity, not a radio receiver or ILS calibration.
 // Signs tell the pilot where to fly: right of course -> left diamond;

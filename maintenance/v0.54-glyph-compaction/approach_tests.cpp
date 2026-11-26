@@ -170,6 +170,7 @@ void touchdownRegression(){
  auto practice=sim::pudongA330Final();
  auto& flight=practice.flight;
  int contacts=0;
+ std::optional<double> previousRemaining;
  for(int i=0;i<15000&&!practice.career.completed;++i){
   sim::Controls input;
   if(contacts){flight.throttle=0;input.brake=true;}
@@ -182,8 +183,14 @@ void touchdownRegression(){
    std::cout<<"A330 model touchdown: t="<<(i+1)*.01<<" s, signed vy="<<*hit
             <<" m/s, runway z="<<flight.z<<" m, score="<<result.score<<"\n";
   }
+  if(auto remaining=sim::remainingRunway(flight)){
+   require(contacts>0&&(!previousRemaining||*remaining<=*previousRemaining),"Runway remaining decreases during rollout");
+   if(!previousRemaining)std::cout<<"A330 rollout initial remaining: "<<*remaining<<" m\n";
+   previousRemaining=remaining;
+  }
   practice.career.update(flight,.01);
  }
+ require(previousRemaining.has_value()&&!sim::remainingRunway(flight),"Stopped rollout hides distance");
  require(contacts==1&&!flight.crashed&&practice.career.parked(flight)&&practice.career.completed==1
          &&practice.career.arrivalLandingScore>0,"One contact, arrival score retained at stop");
 }
