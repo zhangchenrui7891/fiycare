@@ -125,8 +125,19 @@ struct Flight {
    else if(std::abs(roll)>.3&&speed()>5)crash("坡度过大，机翼触地");
    else if(!onRunway(x,z)&&speed()>8)crash("高速偏出跑道");
    y=floor;vy=0;
-   const double resistance=c.brake?model.brakeRate:.025;
-   vx*=std::exp(-resistance*dt);vz*=std::exp(-resistance*dt);
+   // Keep rolling resistance and low-speed tuning. Bound the extra wheel
+   // brake impulse so it cannot grow in proportion to high runway speed.
+   const double rollingFactor=std::exp(-.025*dt);
+   double groundFactor=rollingFactor;
+   if(c.brake){
+    constexpr double maxWheelBrakeDeceleration=3.5; // m/s², game tuning
+    const double speedBeforeBrakes=std::hypot(vx,vz);
+    if(speedBeforeBrakes>0){
+     const double requestedFactor=std::exp(-model.brakeRate*dt);
+     groundFactor=std::max(requestedFactor,rollingFactor-maxWheelBrakeDeceleration*dt/speedBeforeBrakes);
+    }
+   }
+   vx*=groundFactor;vz*=groundFactor;
    // Nose wheel suppresses lateral sliding at low speed.
    const double side=vx*std::cos(yaw)-vz*std::sin(yaw);
    const double damp=1-std::exp(-dt*2);

@@ -214,6 +214,23 @@ int main(int argc,char** argv){
    std::cout<<"Three sessions at the same UTC second retained independent output.\n";
    return 0;
   }
+  for(int id=0;id<sim::aircraftCount;++id){
+   for(double speed:{-65.,-2.,0.,2.,65.}){
+    for(double dt:{.005,.01,.02}){
+     auto coast=sim::pudongA330Rollout().flight;coast.configure(id);
+     coast.z=0;coast.vz=speed;coast.yaw=speed<0?sim::pi:0.;
+     auto braked=coast;
+     sim::Controls input;input.brake=true;
+     coast.step(dt,{});braked.step(dt,input);
+     const double removed=std::abs(coast.vz)-std::abs(braked.vz);
+     require(removed>=-1e-10&&removed<=3.5*dt+1e-9,"Extra wheel-brake impulse is bounded");
+     require(coast.vz*braked.vz>=0,"Wheel braking must not reverse travel");
+     if(coast.y>coast.spec().gearHeight)close(removed,0,"No wheel braking after liftoff");
+     else if(std::abs(speed)==65.)close(removed,3.5*dt,"High-speed cap is active");
+     if(std::abs(speed)==2.)close(braked.vz,coast.vz*std::exp((.025-coast.spec().brakeRate)*dt),"Low-speed response retained");
+    }
+   }
+  }
   auto rollout=sim::pudongA330Rollout();
   auto& f=rollout.flight;
   require(f.grounded()&&rollout.avionics.powered(f)&&!rollout.parkingBrake&&f.throttle==0,"Powered ground start with brakes released");
