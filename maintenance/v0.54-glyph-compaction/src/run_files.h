@@ -26,14 +26,16 @@ inline std::filesystem::path createPracticeSession(const std::filesystem::path& 
 
 // Diagnostic outputs never share the live career directory. Benchmark wins
 // when both switches are supplied, matching the fixed-scene setup in main.
+enum class Practice { None, Final, Rollout };
 class RunFiles {
  std::filesystem::path output;
  bool diagnostic;
 public:
- RunFiles(const std::filesystem::path& gameFolder,bool benchmark,bool smoke,const char* benchmarkSubfolder="",bool fxaa=true,bool practice=false)
+ RunFiles(const std::filesystem::path& gameFolder,bool benchmark,bool smoke,const char* benchmarkSubfolder="",bool fxaa=true,Practice practice=Practice::None)
   :output(benchmark?gameFolder/"diagnostics"/"benchmark":
           smoke?gameFolder/"diagnostics"/"smoke":
-          practice?gameFolder/"practice"/"a330-final":gameFolder),diagnostic(benchmark||smoke||practice){
+          practice==Practice::Rollout?gameFolder/"practice"/"a330-rollout":
+          practice==Practice::Final?gameFolder/"practice"/"a330-final":gameFolder),diagnostic(benchmark||smoke||practice!=Practice::None){
   if(benchmark){
    if(!fxaa)output/="no-fxaa";
    if(*benchmarkSubfolder)output/=benchmarkSubfolder;

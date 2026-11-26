@@ -39,6 +39,19 @@ inline Snapshot pudongA330Final(){
  state.career.arrivalRunway=0;
  return state;
 }
+inline Snapshot pudongA330Rollout(){
+ Snapshot state;
+ auto& f=state.flight;
+ f.configure(2);
+ const auto& runway=runways[0];
+ f.x=runway.x;f.z=runway.z-runway.halfLength+400;
+ f.y=f.spec().gearHeight;f.vz=65;f.flap=.5;f.payload=150;
+ f.rpm=700;
+ f.engines.update(f.aircraftId,0,f.engine,f.throttle,f.fuel,f.condition,f.rpm);
+ // A ground start has no earned touchdown score or passenger settlement.
+ state.career.mission=2;state.career.stage=3;
+ return state;
+}
 inline constexpr double trainingInboundMinCosine=.5; // 60-degree acquisition cone.
 inline constexpr double trainingMinTrackSpeed=5.0; // m/s
 inline ApproachGuidance approachGuidance(const Flight& f,int selectedRunway=-1){

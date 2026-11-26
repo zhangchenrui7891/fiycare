@@ -214,6 +214,19 @@ int main(int argc,char** argv){
    std::cout<<"Three sessions at the same UTC second retained independent output.\n";
    return 0;
   }
+  auto rollout=sim::pudongA330Rollout();
+  auto& f=rollout.flight;
+  require(f.grounded()&&rollout.avionics.powered(f)&&!rollout.parkingBrake&&f.throttle==0,"Powered ground start with brakes released");
+  close(sim::remainingRunway(f).value(),3200,"Initial runway length");
+  sim::Controls braking;braking.brake=true;
+  for(int i=0;i<12000&&!rollout.career.parked(f);++i){
+   require(!f.step(.01,braking)&&!f.crashed,"Rollout stays grounded without a new contact");
+   rollout.career.update(f,.01);
+  }
+  require(rollout.career.parked(f)&&rollout.career.completed==0&&rollout.career.credits==0,"Stop without fictitious career payout");
+  std::cout<<"Rollout brake test: time="<<f.time<<" s, distance="<<f.z+1400<<" m, speed="<<f.speed()<<" m/s\n";
+  const runfiles::RunFiles rolloutFiles("profile",false,false,"",true,runfiles::Practice::Rollout);
+  require(!rolloutFiles.gameSavesEnabled()&&rolloutFiles.folder()==std::filesystem::path("profile")/"practice"/"a330-rollout","Separate rollout records");
   touchdownRegression();
   auto training=sim::pudongA330Final();
   const auto guidance=sim::approachGuidance(training);
@@ -231,7 +244,7 @@ int main(int argc,char** argv){
   require(maxPathError<8,"Neutral controls stay near the training glidepath for sixty seconds");
   std::cout<<"A330 virtual 60s: maximum vertical path error "<<maxPathError<<" m; threshold distance "<<sim::approachGuidance(training).distance<<" m. CPU only.\n";
   require(!training.flight.crashed&&!training.flight.grounded()&&training.flight.z>sim::pudongA330Final().flight.z+4500,"Sixty seconds of live flight physics");
-  const runfiles::RunFiles practice("profile",false,false,"",true,true);
+  const runfiles::RunFiles practice("profile",false,false,"",true,runfiles::Practice::Final);
   require(!practice.gameSavesEnabled()&&practice.folder()==std::filesystem::path("profile")/"practice"/"a330-final","Practice is isolated from career files");
   displayDeflections();legacyDefects();bothAirportsAndEnds();selectionPowerAndPersistence();groundTrackAcquisition();validityAndContinuity();
   std::cout<<"Training approach CPU geometry passed; not Windows, radio ILS, certified procedure or autoland validation.\n";

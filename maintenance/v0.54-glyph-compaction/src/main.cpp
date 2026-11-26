@@ -125,21 +125,24 @@ void help(HWND window){
   L"存档/照片/日志：%LOCALAPPDATA%\\FlightCareerAir\n"
   L"诊断输出另存：diagnostics\\benchmark 或 diagnostics\\smoke；不保存游戏生涯。\n"
   L"DX12初始化失败会自动尝试DX11；可用--dx11强制兼容模式。",
-  L"飞行生涯 v0.113 · 中文操作说明",MB_OK);
+  L"飞行生涯 v0.114 · 中文操作说明",MB_OK);
 }
 int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
  std::filesystem::path folder,logFolder;bool quietDiagnosticFailure=false;
  try{
   const auto args=launch::currentOptions();const bool benchmark=args.has(L"--benchmark");const bool low=args.has(L"--low")||benchmark;const bool smoke=!benchmark&&args.has(L"--smoke-test");int smokeFrames=0;
-  const bool approachPractice=!benchmark&&args.has(L"--practice-a330-final");
+  const bool rolloutPractice=!benchmark&&args.has(L"--practice-a330-rollout");
+  const bool approachPractice=rolloutPractice||(!benchmark&&args.has(L"--practice-a330-final"));
+  const auto practiceMode=rolloutPractice?runfiles::Practice::Rollout:approachPractice?runfiles::Practice::Final:runfiles::Practice::None;
+  auto practiceStart=[&](){return rolloutPractice?sim::pudongA330Rollout():sim::pudongA330Final();};
   quietDiagnosticFailure=launch::diagnosticNoDialog(args);
   const auto benchmarkPreset=timing::benchmarkPreset(args);
   const bool fxaaRequested=!args.has(L"--no-aa");
-  const runfiles::RunFiles runFiles(dataFolder(),benchmark,smoke,benchmarkPreset.outputSubfolder,fxaaRequested,approachPractice);
+  const runfiles::RunFiles runFiles(dataFolder(),benchmark,smoke,benchmarkPreset.outputSubfolder,fxaaRequested,practiceMode);
   folder=runFiles.folder();std::filesystem::create_directories(folder);
   logFolder=folder;
   if(approachPractice&&!smoke)logFolder=runfiles::createPracticeSession(folder,std::time(nullptr));
-  diagnostics.open(logFolder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.113 startup");
+  diagnostics.open(logFolder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.114 startup");
   if(benchmark){
    std::filesystem::remove(folder/L"performance_summary.txt");
    std::filesystem::remove(folder/L"benchmark_final.bmp");
@@ -151,8 +154,8 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   if(!loaded){std::ifstream legacy(folder/L"career.txt");state.career.load(legacy);logLine("Legacy v2 career migration attempted");}
   if(smoke&&(args.has(L"--airliner")||args.has(L"--a330")||args.has(L"--a350"))){state.flight=sim::Flight{};state.flight.configure(args.has(L"--a350")?3:args.has(L"--a330")?2:1);state.career.stage=state.career.gate=0;}
   if(approachPractice){
-   state=sim::pudongA330Final();
-   logLine("A330 final practice: PVG runway 0, range 6000 m, cockpit");
+   state=practiceStart();
+   logLine(rolloutPractice?"A330 rollout practice: PVG runway 0, remaining 3200 m, cockpit":"A330 final practice: PVG runway 0, range 6000 m, cockpit");
   }
   if(smoke){state.clock=args.has(L"--sunset")?17.4:12;state.exposureEV=0;state.terrainMode=1;state.haze=.00016;state.shadows=true;}
   if(benchmark){state=sim::Snapshot{};state.flight.configure(benchmarkPreset.aircraftId);state.clock=12;state.exposureEV=0;state.terrainMode=1;state.haze=.00016;state.shadows=true;state.antiAlias=fxaaRequested;}
@@ -181,7 +184,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   const DWORD style=WS_OVERLAPPEDWINDOW;
   WNDCLASSW wc{};wc.lpfnWndProc=windowProc;wc.hInstance=instance;wc.lpszClassName=L"FlightCareerAir";wc.hCursor=LoadCursor(nullptr,IDC_ARROW);if(!RegisterClassW(&wc))throw std::runtime_error("Window registration failed");
   RECT bounds{0,0,low?640:1600,low?360:900};HMENU nativeMenu=createChineseMenu();NativeMenuChecks nativeMenuChecks;AdjustWindowRect(&bounds,style,TRUE);
-  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.113 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
+  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.114 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
   if(!window)throw std::runtime_error("Window creation failed");ShowWindow(window,SW_SHOW);
   if(args.has(L"--fullscreen"))toggleFullscreen(window);
   renderScale=launch::initialRenderScale(args);
@@ -214,7 +217,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   presentation::TerrainStream<std::vector<Vertex>> terrainStream;
   presentation::FrameGeometry<Vertex> frameGeometry;frameGeometry.scene.reserve(140000);
   auto& mesh=frameGeometry.scene;auto& cabin=frameGeometry.cabin;auto& hud=frameGeometry.hud;
-  std::filesystem::path pendingPhoto;std::wstring notice=approachPractice?L"A330 进近练习：距跑道入口 6 km，已放起落架与襟翼。":L"欢迎：在主菜单选择飞机，再开始飞行。";
+  std::filesystem::path pendingPhoto;std::wstring notice=rolloutPractice?L"A330 滑跑：保持中心线，按住空格刹车。":approachPractice?L"A330 进近练习：距跑道入口 6 km，已放起落架与襟翼。":L"欢迎：在主菜单选择飞机，再开始飞行。";
   // Save recovery: disk failures must not destroy the in-memory flight.
   std::wstring saveError;
   auto trySave=[&](){
@@ -237,7 +240,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   sim::AlertManager flightAlerts;
   if(!aeroLog)logLine("Flight diagnostics CSV unavailable");
   timing::FrameWindow frameWindow;timing::FrameContextGate frameContextGate;bool previousMeasured=false;double reportTime=0,wallElapsed=0;
-  unsigned practiceAttempt=1;
+  unsigned practiceAttempt=1;bool rolloutFinished=false;
   bool benchmarkStarted=false;timing::BenchmarkSamples benchmarkSamples;
   sim::LandingResult lastLanding;
   double markTimer=0,autoSave=0;
@@ -376,12 +379,12 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
      }
      case ui::Restart:
       if(approachPractice){
-       state=sim::pudongA330Final();sim::worldMode.store(state.terrainMode);
+       state=practiceStart();sim::worldMode.store(state.terrainMode);
        camera=1;cockpit::lookYaw=0;cockpit::lookPitch=cockpit::View{}.pitch;paused=false;menuPage=ui::Page::None;
        renderHistory.reset(flight);marks.clear();lastLanding={};wasActive=false;
-       ++practiceAttempt;
+       ++practiceAttempt;rolloutFinished=false;
        logLine("Practice restart: attempt="+std::to_string(practiceAttempt)+" elapsed_s="+std::to_string(wallElapsed));
-       notice=L"已回到浦东进近起点。";
+       notice=rolloutPractice?L"滑跑重新开始，按住空格刹车。":L"已回到浦东进近起点。";
       }else{ui::restart(state);notice=L"已重新出发，保留燃油；事故恢复会扣费。";}
       flightAlerts.beginFlight(state);walking=false;physicsTime.reset();trySave();break;
      case ui::Exit:exitApproved=requestExit();break;
@@ -515,6 +518,11 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
         logLine(contact.str());
        }
        if(lastLanding.valid)notice=L"着陆评分 "+std::to_wstring(lastLanding.score)+L"分 · "+sim::landingGrade(lastLanding.score)+L"（垂直速度 "+instruments::verticalSpeed(-lastLanding.sinkRate)+L"m/s）";
+      }
+      if(rolloutPractice&&!rolloutFinished&&career.parked(flight)&&sim::nearestRunwayIndex(flight.x,flight.z)==0){
+       rolloutFinished=true;
+       notice=L"滑跑完成：已在浦东训练跑道停稳。";
+       logLine("Practice rollout stopped: attempt="+std::to_string(practiceAttempt)+" sim_s="+std::to_string(flight.time)+" z_m="+std::to_string(flight.z));
       }
       int before=career.completed,beforeCredits=career.credits;career.update(flight,.01);
       if(career.completed>before&&career.mission==2){
@@ -654,7 +662,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
    if(benchmark&&timing::benchmarkFinished(benchmarkStarted,benchmarkSamples)){
     const auto workingSet=timing::readProcessWorkingSet();
     std::ofstream summary(folder/L"performance_summary.txt",std::ios::trunc);
-    const auto result=timing::writeBenchmarkSummary(summary,"v0.113",renderer->name(),fxaaRequested,powerSaver,benchmarkSamples,benchmarkPreset,workingSet);
+    const auto result=timing::writeBenchmarkSummary(summary,"v0.114",renderer->name(),fxaaRequested,powerSaver,benchmarkSamples,benchmarkPreset,workingSet);
     summary.flush();if(!summary)logLine("Benchmark summary write failed; no report file success claimed");
     pendingPhoto=folder/L"benchmark_final.bmp";renderer->draw(mesh,hud,XMMatrixLookToLH(XMVectorZero(),viewDirection,up)*reversedPerspective(activeFov,cockpit::viewportAspect,presentation::worldNear,presentation::worldFar),daylight,pendingPhoto,cabin,cabinView,frameGeometry.indexedScene);pendingPhoto.clear();
     logLine(result.complete?"Benchmark completed with valid full-run statistics":"Benchmark ended without a valid performance verdict; inspect summary status/counts");DestroyWindow(window);

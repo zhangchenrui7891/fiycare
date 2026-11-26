@@ -1,7 +1,7 @@
 name: A330 practice session recordings
 on:
   push:
-    branches: ['codex/v0.108-practice-records', 'codex/v0.109-frame-summary', 'codex/v0.110-approach-agl', 'codex/v0.111-practice-report', 'codex/v0.112-menu-checks', 'codex/v0.113-runway-distance']
+    branches: ['codex/v0.108-practice-records', 'codex/v0.109-frame-summary', 'codex/v0.110-approach-agl', 'codex/v0.111-practice-report', 'codex/v0.112-menu-checks', 'codex/v0.113-runway-distance', 'codex/v0.114-rollout']
     paths-ignore: ['**/*.md']
   workflow_dispatch:
 permissions:
@@ -77,6 +77,17 @@ jobs:
           $shots = @(Get-ChildItem $folder -Filter 'smoke_DX11_2_noon_*_cockpit_fxaa.bmp')
           if ($shots.Count -ne 1) { throw 'Expected A330 cockpit capture' }
           Copy-Item "$folder/*" "$dir/" -Recurse -Force
+      - name: Render the A330 rollout start
+        shell: pwsh
+        run: |
+          $dir = (Resolve-Path out/build/cockpit).Path
+          $env:LOCALAPPDATA = "$env:RUNNER_TEMP/fca114-rollout"
+          $p = Start-Process "$dir/FlightCareerAir.exe" -WorkingDirectory $dir -ArgumentList '--dx11 --low --practice-a330-rollout --warp --smoke-test --diagnostic-no-dialog' -PassThru
+          if (!$p.WaitForExit(60000)) { $p.Kill(); throw 'Rollout startup timeout' }
+          $folder = "$env:LOCALAPPDATA/FlightCareerAir/diagnostics/smoke"
+          if ($p.ExitCode -ne 0 -or !(Select-String -Quiet -Path "$folder/startup.log" -Pattern 'A330 rollout practice: PVG runway 0, remaining 3200 m, cockpit')) { throw 'Rollout scene failed' }
+          Copy-Item "$folder/smoke_DX11_2_noon_flood_bright_cockpit_fxaa.bmp" "$dir/rollout.bmp"
+          Copy-Item "$folder/startup.log" "$dir/rollout.log"
       - name: Verify ordinary practice launches keep separate logs
         shell: pwsh
         run: |
@@ -106,5 +117,5 @@ jobs:
           name: cockpit-windows-check
           path: |
             maintenance/v0.54-glyph-compaction/out/build/cockpit/FlightCareerAir.exe
-            maintenance/v0.54-glyph-compaction/out/build/cockpit/startup.log
+            maintenance/v0.54-glyph-compaction/out/build/cockpit/*.log
             maintenance/v0.54-glyph-compaction/out/build/cockpit/*.bmp
