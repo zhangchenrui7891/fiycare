@@ -125,7 +125,7 @@ void help(HWND window){
   L"存档/照片/日志：%LOCALAPPDATA%\\FlightCareerAir\n"
   L"诊断输出另存：diagnostics\\benchmark 或 diagnostics\\smoke；不保存游戏生涯。\n"
   L"DX12初始化失败会自动尝试DX11；可用--dx11强制兼容模式。",
-  L"飞行生涯 v0.115 · 中文操作说明",MB_OK);
+  L"飞行生涯 v0.116 · 中文操作说明",MB_OK);
 }
 int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
  std::filesystem::path folder,logFolder;bool quietDiagnosticFailure=false;
@@ -142,7 +142,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   folder=runFiles.folder();std::filesystem::create_directories(folder);
   logFolder=folder;
   if(approachPractice&&!smoke)logFolder=runfiles::createPracticeSession(folder,std::time(nullptr));
-  diagnostics.open(logFolder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.115 startup");
+  diagnostics.open(logFolder/L"startup.log",std::ios::trunc);logLine("Flight Career Air v0.116 startup");
   if(benchmark){
    std::filesystem::remove(folder/L"performance_summary.txt");
    std::filesystem::remove(folder/L"benchmark_final.bmp");
@@ -184,7 +184,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   const DWORD style=WS_OVERLAPPEDWINDOW;
   WNDCLASSW wc{};wc.lpfnWndProc=windowProc;wc.hInstance=instance;wc.lpszClassName=L"FlightCareerAir";wc.hCursor=LoadCursor(nullptr,IDC_ARROW);if(!RegisterClassW(&wc))throw std::runtime_error("Window registration failed");
   RECT bounds{0,0,low?640:1600,low?360:900};HMENU nativeMenu=createChineseMenu();NativeMenuChecks nativeMenuChecks;AdjustWindowRect(&bounds,style,TRUE);
-  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.115 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
+  HWND window=CreateWindowW(wc.lpszClassName,L"飞行生涯 v0.116 · 可操作驾驶舱",style,CW_USEDEFAULT,CW_USEDEFAULT,bounds.right-bounds.left,bounds.bottom-bounds.top,nullptr,nativeMenu,instance,nullptr);
   if(!window)throw std::runtime_error("Window creation failed");ShowWindow(window,SW_SHOW);
   if(args.has(L"--fullscreen"))toggleFullscreen(window);
   renderScale=launch::initialRenderScale(args);
@@ -240,7 +240,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
   sim::AlertManager flightAlerts;
   if(!aeroLog)logLine("Flight diagnostics CSV unavailable");
   timing::FrameWindow frameWindow;timing::FrameContextGate frameContextGate;bool previousMeasured=false;double reportTime=0,wallElapsed=0;
-  unsigned practiceAttempt=1;bool rolloutFinished=false;
+  unsigned practiceAttempt=1;sim::RolloutReview rolloutReview(flight);
   bool benchmarkStarted=false;timing::BenchmarkSamples benchmarkSamples;
   sim::LandingResult lastLanding;
   double markTimer=0,autoSave=0;
@@ -382,7 +382,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
        state=practiceStart();sim::worldMode.store(state.terrainMode);
        camera=1;cockpit::lookYaw=0;cockpit::lookPitch=cockpit::View{}.pitch;paused=false;menuPage=ui::Page::None;
        renderHistory.reset(flight);marks.clear();lastLanding={};wasActive=false;
-       ++practiceAttempt;rolloutFinished=false;
+       ++practiceAttempt;rolloutReview=sim::RolloutReview(flight);
        logLine("Practice restart: attempt="+std::to_string(practiceAttempt)+" elapsed_s="+std::to_string(wallElapsed));
        notice=rolloutPractice?L"滑跑重新开始，按住空格刹车。":L"已回到浦东进近起点。";
       }else{ui::restart(state);notice=L"已重新出发，保留燃油；事故恢复会扣费。";}
@@ -519,10 +519,18 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
        }
        if(lastLanding.valid)notice=L"着陆评分 "+std::to_wstring(lastLanding.score)+L"分 · "+sim::landingGrade(lastLanding.score)+L"（垂直速度 "+instruments::verticalSpeed(-lastLanding.sinkRate)+L"m/s）";
       }
-      if(rolloutPractice&&!rolloutFinished&&career.parked(flight)&&sim::nearestRunwayIndex(flight.x,flight.z)==0){
-       rolloutFinished=true;
-       notice=L"滑跑完成：已在浦东训练跑道停稳。";
-       logLine("Practice rollout stopped: attempt="+std::to_string(practiceAttempt)+" sim_s="+std::to_string(flight.time)+" z_m="+std::to_string(flight.z));
+      if(rolloutPractice&&rolloutReview.observe(state,commanded.brake,.01)){
+       const double distance=rolloutReview.forwardMetres(flight);
+       std::wostringstream summary;summary.imbue(std::locale::classic());
+       summary<<std::fixed<<std::setprecision(1)<<L"停稳 "<<flight.time<<L"s · 前进 "<<std::lround(distance)
+              <<L"m · 刹车 "<<rolloutReview.brakeSeconds<<L"s · 最大偏线 "<<rolloutReview.maxCenterlineError<<L"m";
+       notice=summary.str();
+       std::ostringstream record;record.imbue(std::locale::classic());
+       record<<std::fixed<<std::setprecision(3)<<"Practice rollout stopped: attempt="<<practiceAttempt
+             <<" sim_s="<<flight.time<<" z_m="<<flight.z<<" forward_m="<<distance
+             <<" brake_s="<<rolloutReview.brakeSeconds<<" max_centerline_m="<<rolloutReview.maxCenterlineError
+             <<" elapsed_s="<<wallElapsed;
+       logLine(record.str());
       }
       int before=career.completed,beforeCredits=career.credits;career.update(flight,.01);
       if(career.completed>before&&career.mission==2){
@@ -662,7 +670,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
    if(benchmark&&timing::benchmarkFinished(benchmarkStarted,benchmarkSamples)){
     const auto workingSet=timing::readProcessWorkingSet();
     std::ofstream summary(folder/L"performance_summary.txt",std::ios::trunc);
-    const auto result=timing::writeBenchmarkSummary(summary,"v0.115",renderer->name(),fxaaRequested,powerSaver,benchmarkSamples,benchmarkPreset,workingSet);
+    const auto result=timing::writeBenchmarkSummary(summary,"v0.116",renderer->name(),fxaaRequested,powerSaver,benchmarkSamples,benchmarkPreset,workingSet);
     summary.flush();if(!summary)logLine("Benchmark summary write failed; no report file success claimed");
     pendingPhoto=folder/L"benchmark_final.bmp";renderer->draw(mesh,hud,XMMatrixLookToLH(XMVectorZero(),viewDirection,up)*reversedPerspective(activeFov,cockpit::viewportAspect,presentation::worldNear,presentation::worldFar),daylight,pendingPhoto,cabin,cabinView,frameGeometry.indexedScene);pendingPhoto.clear();
     logLine(result.complete?"Benchmark completed with valid full-run statistics":"Benchmark ended without a valid performance verdict; inspect summary status/counts");DestroyWindow(window);

@@ -231,6 +231,29 @@ int main(int argc,char** argv){
     }
    }
   }
+  for(int releaseSteps:{0,200}){
+   auto attempt=sim::pudongA330Rollout();
+   auto& aircraft=attempt.flight;
+   sim::RolloutReview review(aircraft);
+   int events=0,brakingSteps=0;
+   for(int step=0;step<12000&&!review.finished;++step){
+    sim::Controls controls;controls.brake=step<100||step>=100+releaseSteps;
+    aircraft.step(.01,controls);
+    brakingSteps+=controls.brake;
+    events+=review.observe(attempt,controls.brake,.01);
+   }
+   require(events==1&&attempt.career.parked(aircraft),"Exactly one rollout completion");
+   close(review.brakeSeconds,brakingSteps*.01,"Count applied braking steps");
+   close(aircraft.time-review.brakeSeconds,releaseSteps*.01,"Released interval excluded");
+   close(review.forwardMetres(aircraft),aircraft.z+1400,"Distance from actual spawn");
+   close(review.maxCenterlineError,0,"Straight rollout remains centered");
+   require(!review.observe(attempt,true,.01),"Stop event cannot repeat");
+   std::cout<<"Rollout review: release="<<releaseSteps*.01<<" s, total="<<aircraft.time<<" s, brakes="<<review.brakeSeconds<<" s, forward="<<review.forwardMetres(aircraft)<<" m\n";
+   attempt=sim::pudongA330Rollout();review=sim::RolloutReview(attempt.flight);
+   require(!review.finished&&review.brakeSeconds==0&&review.maxCenterlineError==0,"Restart clears prior result");
+   aircraft.x=4;review.observe(attempt,false,.01);aircraft.x=-7;review.observe(attempt,false,.01);
+   aircraft.x=0;review.observe(attempt,false,.01);close(review.maxCenterlineError,7,"Maximum absolute lateral deviation retained");
+  }
   auto rollout=sim::pudongA330Rollout();
   auto& f=rollout.flight;
   require(f.grounded()&&rollout.avionics.powered(f)&&!rollout.parkingBrake&&f.throttle==0,"Powered ground start with brakes released");

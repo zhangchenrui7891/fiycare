@@ -52,6 +52,22 @@ inline Snapshot pudongA330Rollout(){
  state.career.mission=2;state.career.stage=3;
  return state;
 }
+// One attempt starts at the configured ground spawn; only physics steps
+// advance the counters. Report displacement along the training runway (+Z).
+struct RolloutReview {
+ double startZ,brakeSeconds=0,maxCenterlineError=0;
+ bool finished=false;
+ explicit RolloutReview(const Flight& start):startZ(start.z){}
+ bool observe(const Snapshot& state,bool brake,double dt){
+  const auto& f=state.flight;
+  if(finished||f.crashed||!f.grounded())return false;
+  if(brake)brakeSeconds+=dt;
+  maxCenterlineError=std::max(maxCenterlineError,std::abs(f.x-runways[0].x));
+  finished=state.career.parked(f)&&nearestRunwayIndex(f.x,f.z)==0;
+  return finished;
+ }
+ double forwardMetres(const Flight& f)const{return f.z-startZ;}
+};
 inline constexpr double trainingInboundMinCosine=.5; // 60-degree acquisition cone.
 inline constexpr double trainingMinTrackSpeed=5.0; // m/s
 inline ApproachGuidance approachGuidance(const Flight& f,int selectedRunway=-1){
